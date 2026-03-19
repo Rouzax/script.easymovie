@@ -15,15 +15,12 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, TYPE_CHECKING, cast
+from typing import Any, Dict, Optional, cast
 
 import xbmcgui
 
-from resources.lib.constants import ADDON_ID
+from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
 from resources.lib.utils import get_logger, lang
-
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
 
 # Context menu action constants
 CONTEXT_PLAY = "play"
@@ -35,20 +32,8 @@ _BUTTON_PLAY = 110
 _BUTTON_PLAY_SET = 120
 _BUTTON_MOVIE_INFO = 130
 
-# Kodi actions
-ACTION_NAV_BACK = 92
-ACTION_PREVIOUS_MENU = 10
-
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('ui')
-    return _log
+log = get_logger('ui')
 
 
 class ContextMenuWindow(xbmcgui.WindowXMLDialog):
@@ -71,7 +56,6 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
         from resources.lib.ui import apply_theme
         apply_theme(self, self._addon_id)
 
-        log = _get_log()
         log.debug("Context menu opened", event="ui.context_open",
                   has_set=self._has_set)
 
@@ -102,7 +86,6 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
         elif controlId == _BUTTON_MOVIE_INFO:
             self._result = CONTEXT_MOVIE_INFO
 
-        log = _get_log()
         log.debug("Context option selected", event="ui.context_select",
                   result=self._result)
         self.close()

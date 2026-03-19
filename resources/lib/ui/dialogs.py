@@ -14,19 +14,12 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import List, Optional, TYPE_CHECKING, cast
+from typing import List, Optional, cast
 
 import xbmcgui
 
-from resources.lib.constants import ADDON_ID
+from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
 from resources.lib.utils import get_logger
-
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
-
-# Kodi actions for back/escape
-ACTION_NAV_BACK = 92
-ACTION_PREVIOUS_MENU = 10
 
 # Control IDs matching the XML files
 SELECT_HEADING = 1
@@ -40,15 +33,7 @@ CONFIRM_YES = 10
 CONFIRM_NO = 11
 
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('ui')
-    return _log
+log = get_logger('ui')
 
 
 def _get_addon_path() -> str:

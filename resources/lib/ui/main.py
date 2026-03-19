@@ -61,6 +61,8 @@ if TYPE_CHECKING:
         SetSettings, PlaybackSettings, AdvancedSettings,
     )
 
+_active_monitors = []  # Keep references to prevent GC
+
 
 def main(addon_id: str = ADDON_ID) -> None:
     """Entry point for the EasyMovie addon.
@@ -125,7 +127,7 @@ def main(addon_id: str = ADDON_ID) -> None:
     # 9. Apply filters
     filtered = apply_filters(all_movies, filter_config)
     if not filtered:
-        log.info("No movies after filtering", event="filter.empty", total=len(all_movies))
+        log.info("No movies after filtering", event="filter.no_results", total=len(all_movies))
         show_confirm_dialog("No Results",
                             "No movies match your filters.\nTry relaxing your criteria.",
                             yes_label="OK", no_label="", addon_id=addon_id)
@@ -142,13 +144,13 @@ def main(addon_id: str = ADDON_ID) -> None:
         storage.clear_suggested()
     elif advanced_settings.avoid_resurface:
         storage.validate_suggested(all_movies)
-        storage.prune_suggested(RESURFACE_WINDOWS[advanced_settings.resurface_window])
+        storage.prune_suggested(RESURFACE_WINDOWS.get(advanced_settings.resurface_window, 24))
         exclude_ids = storage.get_suggested_ids()
         pre_exclude = len(filtered)
-        filtered = [m for m in filtered if m["movieid"] not in exclude_ids]
+        filtered = [m for m in filtered if m.get("movieid", 0) not in exclude_ids]
         if not filtered:
             log.info("All movies excluded by resurface window",
-                     event="resurface.exhausted",
+                     event="history.exhausted",
                      pre_exclude=pre_exclude, excluded=len(exclude_ids))
             show_confirm_dialog("No Results",
                                 "All matching movies were recently suggested. "
@@ -449,12 +451,14 @@ def _load_set_details(
     movies: List[Dict[str, Any]]
 ) -> Dict[int, Dict[str, Any]]:
     """Load movie set details for all set-member movies."""
+    _log = get_logger('data')
     set_ids = {m.get("setid", 0) for m in movies if m.get("setid", 0)}
-    set_cache = {}
-    for set_id in set_ids:
-        result = json_query(get_movie_set_details_query(set_id))
-        if result:
-            set_cache[set_id] = result
+    set_cache: Dict[int, Dict[str, Any]] = {}
+    with log_timing(_log, "load_set_details", set_count=len(set_ids)):
+        for set_id in set_ids:
+            result = json_query(get_movie_set_details_query(set_id))
+            if result:
+                set_cache[set_id] = result
     return set_cache
 
 
@@ -464,14 +468,20 @@ def _load_art_for_movies(
     """Load art and plot for a list of movies via individual detail queries."""
     if not movies:
         return movies
-    enriched = []
-    for movie in movies:
-        result = json_query(get_movie_details_with_art_query(movie["movieid"]))
-        details = result.get("moviedetails")
-        if details:
-            enriched.append(details)
-        else:
-            enriched.append(movie)
+    _log = get_logger('data')
+    enriched: List[Dict[str, Any]] = []
+    with log_timing(_log, "load_art_for_movies", movie_count=len(movies)):
+        for movie in movies:
+            movie_id = movie.get("movieid", 0)
+            if not movie_id:
+                enriched.append(movie)
+                continue
+            result = json_query(get_movie_details_with_art_query(movie_id))
+            details = result.get("moviedetails")
+            if details:
+                enriched.append(details)
+            else:
+                enriched.append(movie)
     return enriched
 
 
@@ -490,10 +500,10 @@ def _run_browse_mode(
         # Exclude previously suggested from this session's pool
         if advanced_settings.avoid_resurface:
             suggested_ids = storage.get_suggested_ids()
-            available = [m for m in filtered if m["movieid"] not in suggested_ids]
+            available = [m for m in filtered if m.get("movieid", 0) not in suggested_ids]
             if not available:
                 log.info("All filtered movies exhausted, resetting pool",
-                         event="browse.pool_reset", total=len(filtered))
+                         event="ui.pool_reset", total=len(filtered))
                 available = filtered
         else:
             available = filtered
@@ -515,7 +525,7 @@ def _run_browse_mode(
         # Record as suggested (only when resurface avoidance is on)
         if advanced_settings.avoid_resurface:
             for movie in results:
-                storage.add_suggested(movie["movieid"], movie.get("title", ""))
+                storage.add_suggested(movie.get("movieid", 0), movie.get("title", ""))
 
         # Show browse window
         result = show_browse_window(results, browse_settings.view_style, addon_id)
@@ -524,6 +534,8 @@ def _run_browse_mode(
             log.info("Re-rolling", event="ui.reroll")
             continue
         elif result == RESULT_SURPRISE:
+            if not results:
+                continue
             movie = random.choice(results)
             log.info("Surprise Me", event="ui.surprise",
                      title=movie.get("title", ""))
@@ -539,10 +551,9 @@ def _run_browse_mode(
                 set_details = json_query(get_movie_set_details_query(set_id))
                 set_movies = set_details.get("movies", [])
                 if set_movies:
-                    log.info("Playing full set", event="ui.play_set",
+                    log.info("Playing full set", event="playlist.play_set",
                              set_name=movie.get("set", ""),
                              movie_count=len(set_movies))
-                    from resources.lib.playback.playlist_builder import build_and_play_playlist
                     build_and_play_playlist(set_movies)
                     if browse_settings.return_to_list:
                         continue
@@ -581,7 +592,7 @@ def _run_playlist_mode(
     # Record as suggested (only when resurface avoidance is on)
     if advanced_settings.avoid_resurface:
         for movie in results:
-            storage.add_suggested(movie["movieid"], movie.get("title", ""))
+            storage.add_suggested(movie.get("movieid", 0), movie.get("title", ""))
 
     # Build and play playlist
     success = build_and_play_playlist(
@@ -597,16 +608,17 @@ def _run_playlist_mode(
     # Start playback monitor for set continuation
     if set_settings.enabled and set_settings.continuation_enabled:
         set_cache = _load_set_details(results)
-        movies_by_id = {m["movieid"]: m for m in results}
+        movies_by_id = {m.get("movieid", 0): m for m in results}
         # Monitor runs as part of xbmc.Player — Kodi calls its callbacks.
         # Must keep reference to prevent GC during playback session.
-        PlaybackMonitor(
+        monitor = PlaybackMonitor(
             set_cache=set_cache,
             movies=movies_by_id,
             continuation_duration=set_settings.continuation_duration,
             continuation_default=set_settings.continuation_default,
             addon_id=addon_id,
         )
+        _active_monitors.append(monitor)
 
 
 def _reopen_settings(addon_id: str) -> None:
@@ -663,16 +675,19 @@ def _handle_entry_args(addon_id: str) -> bool:
         if result is not None:
             idx = result[0]
             dst = os.path.join(addon_path, 'icon.png')
-            if idx < len(icon_files):
-                src = os.path.join(icons_dir, icon_files[idx])
-                shutil.copy2(src, dst)
-            else:
-                # Browse for custom icon
-                dialog = xbmcgui.Dialog()
-                image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
-                if image:
-                    import xbmcvfs as _xbmcvfs
-                    _xbmcvfs.copy(cast(str, image), dst)
+            try:
+                if idx < len(icon_files):
+                    src = os.path.join(icons_dir, icon_files[idx])
+                    shutil.copy2(src, dst)
+                else:
+                    # Browse for custom icon
+                    dialog = xbmcgui.Dialog()
+                    image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
+                    if image:
+                        import xbmcvfs as _xbmcvfs
+                        _xbmcvfs.copy(cast(str, image), dst)
+            except (OSError, IOError):
+                notify("Failed to set icon")
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':

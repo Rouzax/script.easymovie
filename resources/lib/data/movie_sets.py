@@ -13,6 +13,10 @@ Logging:
 """
 from typing import Dict, List, Optional, Any
 
+from resources.lib.utils import get_logger
+
+log = get_logger('data')
+
 
 def find_first_unwatched_in_set(
     set_details: Dict[str, Any],
@@ -66,6 +70,11 @@ def apply_set_substitutions(
                 substitute = dict(first_unwatched)
                 substitute["set"] = movie.get("set", "")
                 substitute["setid"] = set_id
+                log.debug("Movie substituted for set-correct entry",
+                          event="results.set_substitute",
+                          original_title=movie.get("title", ""),
+                          substitute_title=substitute.get("title", ""),
+                          set_name=movie.get("set", ""))
                 result.append(substitute)
             else:
                 # All watched — keep original pick
@@ -96,6 +105,11 @@ def get_next_in_set(
     for i, movie in enumerate(movies):
         if movie.get("movieid") == current_movie_id:
             if i + 1 < len(movies):
-                return movies[i + 1]
+                next_movie = movies[i + 1]
+                log.debug("Next movie in set identified",
+                          event="continuation.next_found",
+                          current_title=movie.get("title", ""),
+                          next_title=next_movie.get("title", ""))
+                return next_movie
             return None
     return None

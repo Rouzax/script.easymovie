@@ -54,7 +54,14 @@ class StorageManager:
                     self._data["started"] = loaded.get("started", [])
                     self._data["last_filters"] = loaded.get("last_filters", {})
             except (json.JSONDecodeError, IOError, OSError):
-                pass  # Start with empty data on corruption
+                try:
+                    from resources.lib.utils import get_logger
+                    get_logger('data').warning(
+                        "Storage file corrupt or unreadable",
+                        event="history.load_fail",
+                        path=self._path)
+                except Exception:
+                    pass
 
     def save(self) -> None:
         """Write data to disk."""
@@ -64,8 +71,14 @@ class StorageManager:
                 os.makedirs(dir_path, exist_ok=True)
             with open(self._path, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, indent=2)
-        except (IOError, OSError):
-            pass  # Best effort
+        except (IOError, OSError) as exc:
+            try:
+                from resources.lib.utils import get_logger
+                get_logger('data').warning("Failed to save storage",
+                                           event="history.save_fail",
+                                           path=self._path, error=str(exc))
+            except Exception:
+                pass
 
     def add_suggested(self, movieid: int, title: str = "") -> None:
         """Record a movie as suggested (for re-suggestion avoidance).
@@ -75,7 +88,7 @@ class StorageManager:
             title: Movie title (stored for debugging, not used in logic).
         """
         # Avoid duplicates
-        existing_ids = {s["movieid"] for s in self._data["suggested"]}
+        existing_ids = {s.get("movieid", 0) for s in self._data["suggested"]}
         if movieid not in existing_ids:
             self._data["suggested"].append({
                 "movieid": movieid,
@@ -86,7 +99,7 @@ class StorageManager:
 
     def get_suggested_ids(self) -> Set[int]:
         """Get all suggested movie IDs."""
-        return {s["movieid"] for s in self._data["suggested"]}
+        return {s.get("movieid", 0) for s in self._data["suggested"]}
 
     def clear_suggested(self) -> None:
         """Remove all suggested entries."""
@@ -103,12 +116,12 @@ class StorageManager:
         Args:
             movies: Current library movies (must include movieid and title).
         """
-        title_by_id = {m["movieid"]: m.get("title", "") for m in movies}
+        title_by_id = {m.get("movieid", 0): m.get("title", "") for m in movies}
         before = len(self._data["suggested"])
         self._data["suggested"] = [
             s for s in self._data["suggested"]
-            if s.get("title") and s["movieid"] in title_by_id
-            and title_by_id[s["movieid"]] == s.get("title")
+            if s.get("title") and s.get("movieid", 0) in title_by_id
+            and title_by_id[s.get("movieid", 0)] == s.get("title")
         ]
         after = len(self._data["suggested"])
         if before != after:
@@ -137,7 +150,7 @@ class StorageManager:
             movieid: The Kodi movie ID.
             title: Movie title (stored for debugging, not used in logic).
         """
-        existing_ids = {s["movieid"] for s in self._data["started"]}
+        existing_ids = {s.get("movieid", 0) for s in self._data["started"]}
         if movieid not in existing_ids:
             self._data["started"].append({
                 "movieid": movieid,
@@ -148,7 +161,7 @@ class StorageManager:
 
     def get_started_ids(self) -> Set[int]:
         """Get all started movie IDs."""
-        return {s["movieid"] for s in self._data["started"]}
+        return {s.get("movieid", 0) for s in self._data["started"]}
 
     def save_last_filters(self, filters: Dict[str, Any]) -> None:
         """Save wizard filter answers for next session.

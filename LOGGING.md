@@ -130,16 +130,16 @@ Events follow the pattern: `domain.action`
 
 | Domain         | Used For              | Example Events                                         |
 | -------------- | --------------------- | ------------------------------------------------------ |
-| `launch`       | Addon lifecycle       | `launch.start`, `launch.mode_selected`                 |
+| `launch`       | Addon lifecycle       | `launch.start`, `launch.mode_selected`, `launch.crash` |
 | `settings`     | Configuration         | `settings.load`                                        |
 | `filter`       | Filter/wizard flow    | `filter.ask`, `filter.preset`, `filter.skip`, `filter.no_results` |
 | `query`        | Kodi API queries      | `query.movies`, `query.sets`, `query.fail`             |
 | `results`      | Result generation     | `results.generate`, `results.set_substitute`           |
 | `playback`     | Movie playback        | `playback.start`, `playback.resume`, `playback.complete` |
-| `playlist`     | Playlist ops          | `playlist.create`, `playlist.start`                    |
-| `continuation` | Set continuation      | `continuation.prompt`, `continuation.accepted`, `continuation.declined` |
-| `history`      | Re-suggestion tracking| `history.save`, `history.prune`                        |
-| `ui`           | User interface        | `ui.open`, `ui.select`, `ui.browse`, `ui.surprise`     |
+| `playlist`     | Playlist ops          | `playlist.create`, `playlist.start`, `playlist.play_set` |
+| `continuation` | Set continuation      | `continuation.prompt`, `continuation.accepted`, `continuation.declined`, `continuation.fail` |
+| `history`      | Re-suggestion tracking| `history.save`, `history.prune`, `history.exhausted`, `history.save_fail`, `history.load_fail` |
+| `ui`           | User interface        | `ui.open`, `ui.select`, `ui.browse`, `ui.surprise`, `ui.pool_reset` |
 | `clone`        | Clone operations      | `clone.create`, `clone.fail`                           |
 | `selector`     | Genre/rating picker   | `selector.open`, `selector.save`                       |
 

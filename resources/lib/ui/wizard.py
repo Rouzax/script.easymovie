@@ -7,9 +7,9 @@ answer persistence, and building the final FilterConfig.
 Logging:
     Logger: 'wizard'
     Key events:
-        - filter.ask (INFO): Showing filter dialog to user
+        - filter.ask (DEBUG): Filter step presented to user
         - filter.preset (DEBUG): Filter using preset value
-        - filter.skip (DEBUG): Filter skipped
+        - filter.skip (DEBUG): Filter step skipped
     See LOGGING.md for full guidelines.
 """
 from dataclasses import dataclass
@@ -21,6 +21,9 @@ from resources.lib.constants import (
     YEAR_FILTER_RECENCY,
 )
 from resources.lib.data.filters import FilterConfig
+from resources.lib.utils import get_logger
+
+log = get_logger('wizard')
 
 
 # The ordered list of filter types in the wizard
@@ -69,10 +72,18 @@ class WizardFlow:
             mode_key = _MODE_KEYS[filter_type]
             mode = settings.get(mode_key, FILTER_SKIP)
             if mode == FILTER_ASK:
+                log.debug("Filter step will be presented",
+                          event="filter.ask", filter_type=filter_type)
                 self.steps.append(WizardStep(
                     filter_type=filter_type,
                     index=len(self.steps),
                 ))
+            elif mode == FILTER_PRESET:
+                log.debug("Filter using preset value",
+                          event="filter.preset", filter_type=filter_type)
+            else:
+                log.debug("Filter step skipped",
+                          event="filter.skip", filter_type=filter_type)
 
     @property
     def current_step_index(self) -> int:

@@ -9,13 +9,15 @@ Logging:
     Logger: 'data'
     Key events:
         - filter.apply (DEBUG): Filters applied with result count
-        - filter.no_results (INFO): No movies matched filters
     See LOGGING.md for full guidelines.
 """
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 
 from resources.lib.constants import WATCHED_BOTH, WATCHED_UNWATCHED, WATCHED_WATCHED
+from resources.lib.utils import get_logger
+
+log = get_logger('data')
 
 
 @dataclass
@@ -50,7 +52,7 @@ def apply_filters(
     # Exclude specific movie IDs (previously suggested, blacklisted)
     if config.exclude_ids:
         exclude_set = set(config.exclude_ids)
-        result = [m for m in result if m["movieid"] not in exclude_set]
+        result = [m for m in result if m.get("movieid", 0) not in exclude_set]
 
     # Genre filter
     if config.genres:
@@ -91,6 +93,8 @@ def apply_filters(
         min_rating = config.min_score / 10.0
         result = [m for m in result if m.get("rating", 0.0) >= min_rating]
 
+    log.debug("Filters applied", event="filter.apply",
+              input_count=len(movies), result_count=len(result))
     return result
 
 

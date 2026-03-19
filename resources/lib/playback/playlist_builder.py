@@ -13,7 +13,7 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, List
 
 import xbmc
 
@@ -25,19 +25,8 @@ from resources.lib.data.queries import (
     build_play_playlist_query,
 )
 
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
-
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('playback')
-    return _log
+log = get_logger('playback')
 
 
 def build_and_play_playlist(
@@ -57,8 +46,6 @@ def build_and_play_playlist(
     Returns:
         True if playlist was created and playback started.
     """
-    log = _get_log()
-
     if not movies:
         log.warning("No movies to build playlist", event="playlist.fail")
         return False

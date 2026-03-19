@@ -15,12 +15,15 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, TYPE_CHECKING, cast
+from typing import Dict, List, Any, Optional, cast
 
 import xbmcgui
 import xbmcaddon
 
 from resources.lib.constants import (
+    ACTION_CONTEXT_MENU,
+    ACTION_NAV_BACK,
+    ACTION_PREVIOUS_MENU,
     ADDON_ID,
     VIEW_POSTER_GRID,
     VIEW_CARD_LIST,
@@ -30,14 +33,6 @@ from resources.lib.constants import (
 )
 from resources.lib.utils import get_logger
 
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
-
-# Kodi actions
-ACTION_NAV_BACK = 92
-ACTION_PREVIOUS_MENU = 10
-ACTION_CONTEXT_MENU = 117
-
 # Control IDs (shared across all view XMLs)
 LIST_CONTROL_ID = 655
 SURPRISE_BUTTON_ID = 10
@@ -46,8 +41,6 @@ REROLL_BUTTON_ID = 11
 # Result signals
 RESULT_REROLL = "__reroll__"
 RESULT_SURPRISE = "__surprise__"
-RESULT_CANCEL = None
-
 # View style to XML filename mapping
 VIEW_XML_MAP = {
     VIEW_POSTER_GRID: "script-easymovie-postergrid.xml",
@@ -58,15 +51,7 @@ VIEW_XML_MAP = {
 }
 
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('browse')
-    return _log
+log = get_logger('browse')
 
 
 class BrowseWindow(xbmcgui.WindowXMLDialog):
@@ -79,7 +64,7 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._movies: List[Dict[str, Any]] = []
-        self._result: Optional[Any] = RESULT_CANCEL
+        self._result: Optional[Any] = None
         self._addon_id: str = ADDON_ID
 
     def set_movies(self, movies: List[Dict[str, Any]]) -> None:
@@ -98,7 +83,7 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             - A movie dict if user selected a movie
             - RESULT_REROLL if user pressed Re-roll
             - RESULT_SURPRISE if user pressed Surprise Me
-            - RESULT_CANCEL (None) if user closed/backed out
+            - None if user closed/backed out
         """
         return self._result
 
@@ -107,7 +92,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         from resources.lib.ui import apply_theme
         apply_theme(self, self._addon_id)
 
-        log = _get_log()
         log.info("Browse window opened", event="ui.browse",
                  movie_count=len(self._movies))
 
@@ -153,8 +137,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
 
     def onClick(self, controlId):
         """Handle control clicks."""
-        log = _get_log()
-
         if controlId == LIST_CONTROL_ID:
             list_control = cast(xbmcgui.ControlList, self.getControl(LIST_CONTROL_ID))
             idx = list_control.getSelectedPosition()
@@ -187,7 +169,7 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         """Handle navigation actions."""
         action_id = action.getId()
         if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
-            self._result = RESULT_CANCEL
+            self._result = None
             self.close()
         elif action_id == ACTION_CONTEXT_MENU:
             movie = self._get_focused_movie()

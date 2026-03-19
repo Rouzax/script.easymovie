@@ -4,12 +4,6 @@ JSON-RPC query builders for movie operations.
 All Kodi JSON-RPC queries are constructed here. No other module
 should build raw query dicts.
 
-Logging:
-    Logger: 'queries'
-    Key events:
-        - query.movies (DEBUG): Movie query executed
-        - query.sets (DEBUG): Movie set query executed
-    See LOGGING.md for full guidelines.
 """
 from typing import Dict, Any
 
@@ -33,23 +27,6 @@ def get_all_movies_query() -> Dict[str, Any]:
 
 def get_movie_details_with_art_query(movie_id: int) -> Dict[str, Any]:
     """Get a single movie with art and plot for display."""
-    return {
-        "jsonrpc": "2.0",
-        "method": "VideoLibrary.GetMovieDetails",
-        "params": {
-            "movieid": movie_id,
-            "properties": [
-                "title", "genre", "year", "rating", "runtime",
-                "mpaa", "set", "setid", "playcount", "dateadded",
-                "plot", "art", "file", "resume", "lastplayed",
-            ],
-        },
-        "id": 1,
-    }
-
-
-def get_movie_details_query(movie_id: int) -> Dict[str, Any]:
-    """Get full details for a single movie."""
     return {
         "jsonrpc": "2.0",
         "method": "VideoLibrary.GetMovieDetails",

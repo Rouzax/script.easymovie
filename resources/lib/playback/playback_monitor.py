@@ -15,22 +15,21 @@ Logging:
 from __future__ import annotations
 
 import threading
-from typing import Any, Dict, Optional, TYPE_CHECKING, cast
+from typing import Any, Dict, Optional, cast
 
 import xbmc
 import xbmcgui
 import xbmcaddon
 
 from resources.lib.constants import (
+    ACTION_NAV_BACK,
+    ACTION_PREVIOUS_MENU,
     ADDON_ID,
     CONTINUATION_DEFAULT_CONTINUE_SET,
 )
 from resources.lib.utils import get_logger, json_query, lang
 from resources.lib.data.queries import build_add_movie_query
 from resources.lib.data.movie_sets import get_next_in_set
-
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
 
 # Control IDs for the continuation dialog
 CONT_HEADING = 1
@@ -41,20 +40,8 @@ CONT_YES = 10
 CONT_NO = 11
 CONT_POSTER = 20
 
-# Kodi actions
-ACTION_NAV_BACK = 92
-ACTION_PREVIOUS_MENU = 10
-
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('playback')
-    return _log
+log = get_logger('playback')
 
 
 class ContinuationDialog(xbmcgui.WindowXMLDialog):
@@ -212,7 +199,6 @@ class PlaybackMonitor(xbmc.Player):
 
     def _check_continuation(self) -> None:
         """Check if we should prompt for set continuation."""
-        log = _get_log()
         movie_id = self._current_movie_id
         if movie_id is None:
             return
@@ -267,7 +253,12 @@ class PlaybackMonitor(xbmc.Player):
             log.info("Continuation accepted", event="continuation.accepted",
                      next_title=next_title)
             # Insert next movie at front of playlist
-            query = build_add_movie_query(next_movie.get("movieid", 0), position=0)
-            json_query(query, return_result=False)
+            next_id = next_movie.get("movieid", 0)
+            if next_id:
+                query = build_add_movie_query(next_id, position=0)
+                json_query(query, return_result=False)
+            else:
+                log.warning("No movieid for next movie in set", event="continuation.fail",
+                            next_title=next_movie.get("title", ""))
         else:
             log.info("Continuation declined", event="continuation.declined")

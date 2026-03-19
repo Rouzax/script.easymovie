@@ -13,26 +13,15 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional
 
 import xbmc
 
 from resources.lib.utils import get_logger, json_query
 from resources.lib.data.queries import build_play_movie_query
 
-if TYPE_CHECKING:
-    from resources.lib.utils import StructuredLogger
-
 # Module-level logger
-_log: Optional[StructuredLogger] = None
-
-
-def _get_log() -> StructuredLogger:
-    """Get or create the module logger."""
-    global _log
-    if _log is None:
-        _log = get_logger('playback')
-    return _log
+log = get_logger('playback')
 
 
 def play_movie(movie: Dict[str, Any], resume: bool = False) -> None:
@@ -42,7 +31,6 @@ def play_movie(movie: Dict[str, Any], resume: bool = False) -> None:
         movie: Movie dict with at minimum 'movieid' and 'title'.
         resume: If True, resume from the last position.
     """
-    log = _get_log()
     movie_id = movie.get("movieid", 0)
     title = movie.get("title", "Unknown")
     position = 0.0

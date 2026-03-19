@@ -157,8 +157,8 @@ def _register_addon(addon_id: str) -> None:
             "params": {"addonid": addon_id, "enabled": True}
         }))
     except Exception:
-        log.warning("Failed to register clone addon",
-                    event="clone.register_fail", addon_id=addon_id)
+        log.exception("Failed to register clone addon",
+                      event="clone.fail", addon_id=addon_id)
 
 
 if __name__ == '__main__':

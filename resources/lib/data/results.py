@@ -7,7 +7,7 @@ sorting them according to user preferences.
 Logging:
     Logger: 'data'
     Key events:
-        - results.generate (INFO): Result set generated
+        - results.generate (DEBUG): Result set generated with count and sort
     See LOGGING.md for full guidelines.
 """
 import random
@@ -17,6 +17,9 @@ from resources.lib.constants import (
     SORT_RANDOM, SORT_TITLE, SORT_YEAR, SORT_RATING,
     SORT_RUNTIME, SORT_DATE_ADDED, SORT_DESC,
 )
+from resources.lib.utils import get_logger
+
+log = get_logger('data')
 
 
 # Sort key functions mapped to sort option constants
@@ -64,4 +67,7 @@ def select_and_sort_results(
             reverse=(sort_dir == SORT_DESC),
         )
 
+    log.debug("Results generated", event="results.generate",
+              pool_size=len(movies), result_count=len(selected),
+              sort_by=sort_by, sort_dir=sort_dir)
     return selected
