@@ -1,3 +1,4 @@
-from resources.lib.ui.main import main
+from resources.lib.ui.main import main, _handle_entry_args
 
-main()
+if not _handle_entry_args("script.easymovie"):
+    main()
