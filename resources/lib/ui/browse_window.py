@@ -1,0 +1,208 @@
+"""
+Browse window for displaying movie results.
+
+Supports 5 viewing modes via different XML files.
+Handles movie selection, Surprise Me, Re-roll, and context menu.
+
+Logging:
+    Logger: 'browse'
+    Key events:
+        - ui.browse (INFO): Browse window opened
+        - ui.select (INFO): Movie selected by user
+        - ui.surprise (INFO): Surprise Me triggered
+        - ui.reroll (INFO): Re-roll triggered
+    See LOGGING.md for full guidelines.
+"""
+from __future__ import annotations
+
+import os
+from typing import Dict, List, Any, Optional, TYPE_CHECKING, cast
+
+import xbmcgui
+import xbmcaddon
+
+from resources.lib.constants import (
+    ADDON_ID,
+    VIEW_POSTER_GRID,
+    VIEW_CARD_LIST,
+    VIEW_POSTERS,
+    VIEW_BIG_SCREEN,
+    VIEW_SPLIT_VIEW,
+)
+from resources.lib.utils import get_logger
+
+if TYPE_CHECKING:
+    from resources.lib.utils import StructuredLogger
+
+# Kodi actions
+ACTION_NAV_BACK = 92
+ACTION_PREVIOUS_MENU = 10
+ACTION_CONTEXT_MENU = 117
+
+# Control IDs (shared across all view XMLs)
+LIST_CONTROL_ID = 655
+SURPRISE_BUTTON_ID = 10
+REROLL_BUTTON_ID = 11
+
+# Result signals
+RESULT_REROLL = "__reroll__"
+RESULT_SURPRISE = "__surprise__"
+RESULT_CANCEL = None
+
+# View style to XML filename mapping
+VIEW_XML_MAP = {
+    VIEW_POSTER_GRID: "script-easymovie-postergrid.xml",
+    VIEW_CARD_LIST: "script-easymovie-cardlist.xml",
+    VIEW_POSTERS: "script-easymovie-main.xml",
+    VIEW_BIG_SCREEN: "script-easymovie-BigScreenList.xml",
+    VIEW_SPLIT_VIEW: "script-easymovie-splitlist.xml",
+}
+
+# Module-level logger
+_log: Optional[StructuredLogger] = None
+
+
+def _get_log() -> StructuredLogger:
+    """Get or create the module logger."""
+    global _log
+    if _log is None:
+        _log = get_logger('browse')
+    return _log
+
+
+class BrowseWindow(xbmcgui.WindowXMLDialog):
+    """Browse window for displaying and selecting movies.
+
+    Supports all 5 viewing modes via different XML files.
+    The same control IDs are used across all views.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._movies: List[Dict[str, Any]] = []
+        self._result: Optional[Any] = RESULT_CANCEL
+        self._addon_id: str = ADDON_ID
+
+    def set_movies(self, movies: List[Dict[str, Any]]) -> None:
+        """Set the movies to display."""
+        self._movies = movies
+
+    def set_addon_id(self, addon_id: str) -> None:
+        """Set the addon ID (for clone support)."""
+        self._addon_id = addon_id
+
+    @property
+    def result(self) -> Optional[Any]:
+        """The result after the window closes.
+
+        Returns:
+            - A movie dict if user selected a movie
+            - RESULT_REROLL if user pressed Re-roll
+            - RESULT_SURPRISE if user pressed Surprise Me
+            - RESULT_CANCEL (None) if user closed/backed out
+        """
+        return self._result
+
+    def onInit(self):
+        """Populate the list when the window opens."""
+        log = _get_log()
+        log.info("Browse window opened", event="ui.browse",
+                 movie_count=len(self._movies))
+
+        list_control = cast(xbmcgui.ControlList, self.getControl(LIST_CONTROL_ID))
+        list_control.reset()
+
+        for movie in self._movies:
+            li = xbmcgui.ListItem(movie.get("title", ""))
+
+            # Set standard Kodi info labels
+            li.setInfo('video', {
+                'title': movie.get("title", ""),
+                'year': movie.get("year", 0),
+                'genre': ", ".join(movie.get("genre", [])),
+                'rating': movie.get("rating", 0.0),
+                'duration': movie.get("runtime", 0) // 60,  # seconds to minutes
+                'plot': movie.get("plot", ""),
+                'mpaa': movie.get("mpaa", ""),
+            })
+
+            # Set art
+            art = movie.get("art", {})
+            if art:
+                li.setArt({
+                    'poster': art.get("poster", ""),
+                    'fanart': art.get("fanart", ""),
+                    'thumb': art.get("poster", ""),
+                })
+
+            # Set custom properties
+            set_name = movie.get("set", "")
+            if set_name:
+                li.setProperty("set_name", set_name)
+
+            li.setProperty("movieid", str(movie.get("movieid", 0)))
+
+            list_control.addItem(li)
+
+        if self._movies:
+            self.setFocusId(LIST_CONTROL_ID)
+
+    def onClick(self, controlId):
+        """Handle control clicks."""
+        log = _get_log()
+
+        if controlId == LIST_CONTROL_ID:
+            list_control = cast(xbmcgui.ControlList, self.getControl(LIST_CONTROL_ID))
+            idx = list_control.getSelectedPosition()
+            if 0 <= idx < len(self._movies):
+                self._result = self._movies[idx]
+                log.info("Movie selected", event="ui.select",
+                         title=self._movies[idx].get("title", ""),
+                         movieid=self._movies[idx].get("movieid", 0))
+            self.close()
+
+        elif controlId == SURPRISE_BUTTON_ID:
+            log.info("Surprise Me pressed", event="ui.surprise")
+            self._result = RESULT_SURPRISE
+            self.close()
+
+        elif controlId == REROLL_BUTTON_ID:
+            log.info("Re-roll pressed", event="ui.reroll")
+            self._result = RESULT_REROLL
+            self.close()
+
+    def onAction(self, action):
+        """Handle navigation actions."""
+        action_id = action.getId()
+        if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            self._result = RESULT_CANCEL
+            self.close()
+
+
+def show_browse_window(
+    movies: List[Dict[str, Any]],
+    view_style: int,
+    addon_id: str = ADDON_ID,
+) -> Optional[Any]:
+    """Show the browse window with the specified view style.
+
+    Args:
+        movies: List of movie dicts (with art) to display.
+        view_style: View style constant (VIEW_POSTER_GRID, etc.)
+        addon_id: Addon ID (for clone support).
+
+    Returns:
+        Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
+    """
+    xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_POSTER_GRID])
+    addon_path = os.path.join(
+        xbmcaddon.Addon(addon_id).getAddonInfo('path'),
+        'resources', 'skins', 'Default', '1080i'
+    )
+
+    window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
+    window.set_movies(movies)
+    window.set_addon_id(addon_id)
+    window.doModal()
+
+    return window.result
