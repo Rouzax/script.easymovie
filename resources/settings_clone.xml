@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Clone settings - same as main settings but without clone creation -->
+<settings version="1">
+	<section id="script.easymovie">
+		<!-- Category 1: EasyMovie -->
+		<category id="main" label="32000" help="">
+			<group id="launch" label="32010">
+				<setting id="primary_function" type="integer" label="32100" help="32600">
+					<level>0</level>
+					<default>2</default>
+					<constraints>
+						<options>
+							<option label="32500">0</option>
+							<option label="32501">1</option>
+							<option label="32502">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string" />
+				</setting>
+			</group>
+
+			<group id="appearance" label="32011">
+				<setting id="theme" type="integer" label="32101" help="32601">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="32527">0</option>
+							<option label="32528">1</option>
+							<option label="32529">2</option>
+							<option label="32530">3</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string" />
+				</setting>
+
+				<setting id="set_icon" type="action" label="32102" help="">
+					<level>0</level>
+					<data>RunScript(script.easymovie,set_icon)</data>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+
+				<setting id="reset_icon" type="action" label="32103" help="">
+					<level>0</level>
+					<data>RunScript(script.easymovie,reset_icon)</data>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+		</category>
+
+		<!-- Category 2: Filters (same as main) -->
+		<category id="filters" label="32001" help="">
+			<group id="genre" label="32012">
+				<setting id="genre_mode" type="integer" label="32110" help="32602">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="32503">0</option>
+							<option label="32504">1</option>
+							<option label="32505">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string" />
+				</setting>
+			</group>
+
+			<group id="watched" label="32013">
+				<setting id="watched_mode" type="integer" label="32114" help="32604">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="32503">0</option>
+							<option label="32504">1</option>
+							<option label="32505">2</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string" />
+				</setting>
+			</group>
+		</category>
+
+		<!-- Category 3: Browse Mode -->
+		<category id="browse" label="32003" help="">
+			<group id="browse_results" label="32020">
+				<setting id="browse_count" type="integer" label="32142" help="32615">
+					<level>0</level>
+					<default>10</default>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>50</maximum>
+					</constraints>
+					<control type="slider" format="integer" />
+				</setting>
+
+				<setting id="view_style" type="integer" label="32140" help="32613">
+					<level>0</level>
+					<default>0</default>
+					<constraints>
+						<options>
+							<option label="32522">0</option>
+							<option label="32523">1</option>
+							<option label="32524">2</option>
+							<option label="32525">3</option>
+							<option label="32526">4</option>
+						</options>
+					</constraints>
+					<control type="spinner" format="string" />
+				</setting>
+			</group>
+		</category>
+
+		<!-- Category 4: Advanced (simplified for clones) -->
+		<category id="advanced" label="32006" help="">
+			<group id="debugging" label="32027">
+				<setting id="logging" type="boolean" label="32176" help="32624">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle" />
+				</setting>
+			</group>
+		</category>
+
+		<!-- Hidden settings -->
+		<category id="hidden" label="" help="">
+			<group id="internal" label="">
+				<setting id="selected_genres" type="string" label="" help="">
+					<level>3</level>
+					<default></default>
+					<control type="edit" format="string" hidden="true" />
+				</setting>
+				<setting id="selected_mpaa" type="string" label="" help="">
+					<level>3</level>
+					<default></default>
+					<control type="edit" format="string" hidden="true" />
+				</setting>
+			</group>
+		</category>
+	</section>
+</settings>
