@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "mariadb": {
+      "command": "npx",
+      "args": ["-y", "@benborla29/mcp-server-mysql"],
+      "env": {
+        "MYSQL_HOST": "docker.home.lan",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "kodi",
+        "MYSQL_PASS": "kodi",
+        "MYSQL_DB": "testvideo131"
+      }
+    }
+  }
+}

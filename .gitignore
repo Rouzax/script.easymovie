@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Kodi addon development
+*.zip
+*.log
+_temp/
+.ruff_cache/
+
+# Implementation plans (development only)
+IMPLEMENTATION.md
+docs/plans/
+
+# Claude Code
+CLAUDE.md
+.claude/
+.claudeignore
+.mcp.json
+# Worktrees
+.worktrees/

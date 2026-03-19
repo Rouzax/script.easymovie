@@ -1,0 +1,25 @@
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Binary/media assets (not useful context for code changes)
+resources/skins/Default/media/*.png
+resources/skins/Default/media/*.jpg
+resources/skins/Default/media/*.gif
+
+# Distribution
+*.zip
+*.tar.gz
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Node (if MCP servers cache locally)
+node_modules/
