@@ -134,6 +134,31 @@ class WizardFlow:
         """Pre-populate answers from a previous session."""
         self._answers.update(answers)
 
+    def build_partial_filter_config(self) -> FilterConfig:
+        """Build a FilterConfig using only answers for steps before the current one.
+
+        Used for cumulative counting: when showing step N, counts should
+        reflect filters from steps 0..N-1 only, not pre-loaded future answers.
+        """
+        # Determine which filter types have been answered in this session
+        completed_types = set()
+        for i, step in enumerate(self.steps):
+            if i >= self._current_index:
+                break
+            completed_types.add(step.filter_type)
+
+        # Temporarily mask answers for uncompleted steps
+        saved_answers = dict(self._answers)
+        for key in list(self._answers.keys()):
+            if key not in completed_types:
+                del self._answers[key]
+
+        config = self.build_filter_config()
+
+        # Restore all answers
+        self._answers = saved_answers
+        return config
+
     def build_filter_config(self) -> FilterConfig:
         """Build a FilterConfig from combined preset values and wizard answers.
 

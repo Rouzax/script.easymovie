@@ -122,7 +122,11 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
 
             # Set custom properties
             runtime_secs = movie.get("runtime", 0)
-            li.setProperty("runtime_min", f"{runtime_secs // 60}m")
+            minutes = runtime_secs // 60
+            if minutes >= 60:
+                li.setProperty("runtime_min", f"{minutes // 60}h {minutes % 60}m")
+            else:
+                li.setProperty("runtime_min", f"{minutes}m")
 
             set_name = movie.get("set", "")
             if set_name:

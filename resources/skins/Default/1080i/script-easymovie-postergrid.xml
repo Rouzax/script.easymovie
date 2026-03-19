@@ -4,9 +4,11 @@
     Resolution: 1080i (1920x1080)
 
     Full-screen window with:
-    - Left: 3-column x 2-row poster grid (panel control)
+    - Left: 4-column x 2-row poster grid (panel control)
     - Right: Info panel (fanart, metadata, plot)
     - Bottom: Re-roll and Surprise Me buttons
+
+    Layout: 4 cols x 2 rows, poster 251x376 (2:3 ratio), cell 267x465
 
     Control IDs:
         655 - Panel control (poster grid)
@@ -38,13 +40,13 @@
             </animation>
 
             <!-- ====================================================== -->
-            <!-- LEFT SIDE: Poster Grid (3 cols x 2 rows)               -->
+            <!-- LEFT SIDE: Poster Grid (4 cols x 2 rows)               -->
             <!-- ====================================================== -->
             <control type="panel" id="655">
                 <left>30</left>
-                <top>20</top>
+                <top>30</top>
                 <width>1100</width>
-                <height>950</height>
+                <height>938</height>
                 <orientation>vertical</orientation>
                 <scrolltime tween="sine" easing="out">300</scrolltime>
                 <onright>655</onright>
@@ -53,105 +55,109 @@
                 <itemgap>10</itemgap>
 
                 <!-- Unfocused poster cell -->
-                <itemlayout width="355" height="465">
-                    <!-- Poster image -->
+                <itemlayout width="267" height="465">
+                    <!-- Poster image (2:3 ratio) -->
                     <control type="image">
                         <left>8</left>
                         <top>8</top>
-                        <width>339</width>
-                        <height>390</height>
-                        <aspectratio>scale</aspectratio>
+                        <width>251</width>
+                        <height>376</height>
+                        <aspectratio aligny="top">scale</aspectratio>
                         <texture>$INFO[ListItem.Art(poster)]</texture>
                     </control>
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>299</left>
+                        <left>215</left>
                         <top>12</top>
-                        <width>44</width>
-                        <height>44</height>
+                        <width>40</width>
+                        <height>40</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Title -->
                     <control type="label">
-                        <left>10</left>
-                        <top>404</top>
-                        <width>335</width>
-                        <height>30</height>
+                        <left>8</left>
+                        <top>392</top>
+                        <width>251</width>
+                        <height>34</height>
                         <aligny>center</aligny>
-                        <font>font12</font>
+                        <font>font10</font>
                         <textcolor>FFCCCCCC</textcolor>
+                        <scroll>true</scroll>
+                        <scrollspeed>30</scrollspeed>
                         <label>$INFO[ListItem.Label]</label>
                     </control>
 
-                    <!-- Rating + Runtime + Year -->
+                    <!-- Year · Rating · Runtime -->
                     <control type="label">
-                        <left>10</left>
-                        <top>434</top>
-                        <width>335</width>
-                        <height>22</height>
+                        <left>8</left>
+                        <top>426</top>
+                        <width>251</width>
+                        <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
-                        <textcolor>FFAAAAAA</textcolor>
-                        <label>$INFO[ListItem.Year] · $INFO[ListItem.Rating,★ ,] · $INFO[ListItem.Property(runtime_min)]</label>
+                        <textcolor>FF888888</textcolor>
+                        <label>$INFO[ListItem.Year] · ★$INFO[ListItem.Rating] · $INFO[ListItem.Property(runtime_min)]</label>
                     </control>
                 </itemlayout>
 
                 <!-- Focused poster cell -->
-                <focusedlayout width="355" height="465">
+                <focusedlayout width="267" height="465">
                     <!-- Accent border (3px around poster) -->
                     <control type="image">
                         <left>5</left>
                         <top>5</top>
-                        <width>345</width>
-                        <height>396</height>
+                        <width>257</width>
+                        <height>382</height>
                         <texture border="3" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
                     </control>
 
-                    <!-- Poster image -->
+                    <!-- Poster image (2:3 ratio) -->
                     <control type="image">
                         <left>8</left>
                         <top>8</top>
-                        <width>339</width>
-                        <height>390</height>
-                        <aspectratio>scale</aspectratio>
+                        <width>251</width>
+                        <height>376</height>
+                        <aspectratio aligny="top">scale</aspectratio>
                         <texture>$INFO[ListItem.Art(poster)]</texture>
                     </control>
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>299</left>
+                        <left>215</left>
                         <top>12</top>
-                        <width>44</width>
-                        <height>44</height>
+                        <width>40</width>
+                        <height>40</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Title (accent color on focus) -->
                     <control type="label">
-                        <left>10</left>
-                        <top>404</top>
-                        <width>335</width>
-                        <height>30</height>
+                        <left>8</left>
+                        <top>392</top>
+                        <width>251</width>
+                        <height>34</height>
                         <aligny>center</aligny>
-                        <font>font12</font>
+                        <font>font10</font>
                         <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                        <scroll>true</scroll>
+                        <scrollspeed>30</scrollspeed>
                         <label>$INFO[ListItem.Label]</label>
                     </control>
 
-                    <!-- Rating + Runtime + Year -->
+                    <!-- Year · Rating · Runtime -->
                     <control type="label">
-                        <left>10</left>
-                        <top>434</top>
-                        <width>335</width>
-                        <height>22</height>
+                        <left>8</left>
+                        <top>426</top>
+                        <width>251</width>
+                        <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>ffFFFFFF</textcolor>
-                        <label>$INFO[ListItem.Year] · $INFO[ListItem.Rating,★ ,] · $INFO[ListItem.Property(runtime_min)]</label>
+                        <label>$INFO[ListItem.Year] · ★$INFO[ListItem.Rating] · $INFO[ListItem.Property(runtime_min)]</label>
                     </control>
                 </focusedlayout>
             </control>
@@ -161,27 +167,18 @@
             <!-- ====================================================== -->
             <control type="group">
                 <left>1170</left>
-                <top>20</top>
+                <top>30</top>
                 <width>720</width>
-                <height>950</height>
+                <height>940</height>
 
-                <!-- Fanart image -->
+                <!-- Fanart image (top aligned with poster grid) -->
                 <control type="image">
                     <left>0</left>
-                    <top>0</top>
+                    <top>8</top>
                     <width>720</width>
                     <height>405</height>
                     <aspectratio>scale</aspectratio>
                     <texture background="true" fallback="">$INFO[Container(655).ListItem.Art(fanart)]</texture>
-                </control>
-
-                <!-- Fanart gradient overlay -->
-                <control type="image">
-                    <left>0</left>
-                    <top>355</top>
-                    <width>720</width>
-                    <height>50</height>
-                    <texture colordiffuse="FF0D1117">common/white.png</texture>
                 </control>
 
                 <!-- Movie Title -->

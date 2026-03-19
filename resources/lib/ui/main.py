@@ -70,13 +70,31 @@ def main(addon_id: str = ADDON_ID) -> None:
     Args:
         addon_id: Addon ID (different for clones).
     """
+    import xbmc
+    import xbmcaddon
     log = get_logger('default')
-    log.info("EasyMovie launched", event="launch.start", addon_id=addon_id)
+    addon = xbmcaddon.Addon(addon_id)
+    version = addon.getAddonInfo('version')
+    kodi_build = xbmc.getInfoLabel('System.BuildVersion')
+    kodi_version = kodi_build.split()[0] if kodi_build else 'unknown'
+    log.info("EasyMovie launched", event="launch.start",
+             addon_id=addon_id, version=version, kodi=kodi_version)
 
     # 1. Load settings
     (primary_function, _theme, filter_settings, browse_settings,
      playlist_settings, set_settings, playback_settings,
      advanced_settings) = load_settings(addon_id if addon_id != ADDON_ID else None)
+
+    log.debug("Settings", event="launch.settings",
+              mode=primary_function,
+              avoid_resurface=advanced_settings.avoid_resurface,
+              resurface_window=advanced_settings.resurface_window,
+              remember_filters=advanced_settings.remember_filters,
+              show_counts=advanced_settings.show_counts,
+              cumulative_counts=advanced_settings.cumulative_counts,
+              set_enabled=set_settings.enabled,
+              continuation=set_settings.continuation_enabled,
+              pool_enabled=advanced_settings.movie_pool_enabled)
 
     # 2. Check for in-progress movie
     if playback_settings.check_in_progress:
@@ -260,8 +278,8 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             return []
         if not cumulative_counts:
             return all_movies
-        # Build partial filter config from answers so far
-        partial_config = wizard.build_filter_config()
+        # Build partial filter config from completed steps only
+        partial_config = wizard.build_partial_filter_config()
         return _apply_filters(all_movies, partial_config)
 
     def _fmt(label: str, count: int) -> str:
@@ -431,6 +449,8 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             answer = SCORE_RANGES[idx][0]
 
         wizard.set_answer(filter_type, answer)
+        log.debug("Wizard answer", event="wizard.answer",
+                  filter_type=filter_type, answer=answer)
         if not wizard.advance():
             break  # Wizard complete
 
@@ -458,7 +478,8 @@ def _load_set_details(
         for set_id in set_ids:
             result = json_query(get_movie_set_details_query(set_id))
             if result:
-                set_cache[set_id] = result
+                # Unwrap: json_query returns {"setdetails": {...}}
+                set_cache[set_id] = result.get("setdetails", result)
     return set_cache
 
 
@@ -528,6 +549,9 @@ def _run_browse_mode(
                 storage.add_suggested(movie.get("movieid", 0), movie.get("title", ""))
 
         # Show browse window
+        titles = [m.get("title", "") for m in results]
+        log.debug("Presenting movies", event="browse.present",
+                  count=len(results), pool=len(available), titles=titles)
         result = show_browse_window(results, browse_settings.view_style, addon_id)
 
         if result == RESULT_REROLL:
@@ -540,28 +564,26 @@ def _run_browse_mode(
             log.info("Surprise Me", event="ui.surprise",
                      title=movie.get("title", ""))
             play_movie(movie)
-            if browse_settings.return_to_list:
-                continue
             break
         elif isinstance(result, dict) and result.get("__play_set__"):
             # Play Full Set from context menu
             movie = result["movie"]
             set_id = movie.get("setid", 0)
             if set_id:
-                set_details = json_query(get_movie_set_details_query(set_id))
+                raw = json_query(get_movie_set_details_query(set_id))
+                set_details = raw.get("setdetails", raw) if raw else {}
                 set_movies = set_details.get("movies", [])
                 if set_movies:
                     log.info("Playing full set", event="playlist.play_set",
                              set_name=movie.get("set", ""),
                              movie_count=len(set_movies))
                     build_and_play_playlist(set_movies)
-                    if browse_settings.return_to_list:
-                        continue
                     break
         elif result is not None:
+            log.info("Playing movie", event="playback.start",
+                     title=result.get("title", ""),
+                     movieid=result.get("movieid", 0))
             play_movie(result)
-            if browse_settings.return_to_list:
-                continue
             break
         else:
             break  # User closed
@@ -656,8 +678,9 @@ def _handle_entry_args(addon_id: str) -> bool:
         return True
     elif action == 'set_icon':
         from resources.lib.utils import get_addon
-        import shutil
+        import xbmcvfs as _xbmcvfs
         import xbmcgui
+        log = get_logger('default')
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
         icons_dir = os.path.join(addon_path, 'resources', 'icons')
@@ -675,19 +698,19 @@ def _handle_entry_args(addon_id: str) -> bool:
         if result is not None:
             idx = result[0]
             dst = os.path.join(addon_path, 'icon.png')
-            try:
-                if idx < len(icon_files):
-                    src = os.path.join(icons_dir, icon_files[idx])
-                    shutil.copy2(src, dst)
-                else:
-                    # Browse for custom icon
-                    dialog = xbmcgui.Dialog()
-                    image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
-                    if image:
-                        import xbmcvfs as _xbmcvfs
-                        _xbmcvfs.copy(cast(str, image), dst)
-            except (OSError, IOError):
-                notify("Failed to set icon")
+            if idx < len(icon_files):
+                src = os.path.join(icons_dir, icon_files[idx])
+                ok = _xbmcvfs.copy(src, dst)
+                log.info("Icon set" if ok else "Icon set failed",
+                         event="icon.set", source=src, target=dst, success=ok)
+            else:
+                dialog = xbmcgui.Dialog()
+                image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
+                if image:
+                    ok = _xbmcvfs.copy(cast(str, image), dst)
+                    log.info("Custom icon set" if ok else "Custom icon set failed",
+                             event="icon.set", source=cast(str, image),
+                             target=dst, success=ok)
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':

@@ -9,6 +9,9 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Simplify movie night</summary>
     <description lang="en_GB">EasyMovie helps you pick movies for movie night. Answer a few questions (genre, rating, runtime) and get a curated random selection from your library. Supports movie set awareness, multiple viewing modes, and playlist generation.</description>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
     <license>GPL-3.0-only</license>
     <platform>all</platform>
     <news>
