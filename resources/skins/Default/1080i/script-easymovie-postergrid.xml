@@ -72,7 +72,7 @@
                         <top>12</top>
                         <width>40</width>
                         <height>40</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
@@ -130,7 +130,7 @@
                         <top>12</top>
                         <width>40</width>
                         <height>40</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
