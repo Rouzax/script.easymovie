@@ -480,6 +480,11 @@ def _load_set_details(
             if result:
                 # Unwrap: json_query returns {"setdetails": {...}}
                 set_cache[set_id] = result.get("setdetails", result)
+    # Remove sets with only 1 movie in library (not useful for set features)
+    set_cache = {
+        sid: details for sid, details in set_cache.items()
+        if len(details.get("movies", [])) >= 2
+    }
     return set_cache
 
 
@@ -540,8 +545,16 @@ def _run_browse_mode(
             set_cache = _load_set_details(results)
             results = apply_set_substitutions(results, set_cache)
 
-        # Load art for display
+        # Load art for display (re-fetches full details including set/setid)
         results = _load_art_for_movies(results)
+
+        # Strip set info from single-movie sets after art loading
+        if set_settings.enabled:
+            valid_set_ids = set(set_cache.keys())
+            for movie in results:
+                if movie.get("setid", 0) and movie["setid"] not in valid_set_ids:
+                    movie["set"] = ""
+                    movie["setid"] = 0
 
         # Record as suggested (only when resurface avoidance is on)
         if advanced_settings.avoid_resurface:
@@ -610,6 +623,12 @@ def _run_playlist_mode(
     if set_settings.enabled:
         set_cache = _load_set_details(results)
         results = apply_set_substitutions(results, set_cache)
+        # Strip set info from movies whose sets were filtered out
+        valid_set_ids = set(set_cache.keys())
+        for movie in results:
+            if movie.get("setid", 0) and movie["setid"] not in valid_set_ids:
+                movie["set"] = ""
+                movie["setid"] = 0
 
     # Record as suggested (only when resurface avoidance is on)
     if advanced_settings.avoid_resurface:
@@ -655,6 +674,38 @@ def _reopen_settings(addon_id: str) -> None:
     xbmc.executebuiltin(
         f'AlarmClock(EasyMovieSettings,Addon.OpenSettings({addon_id}),00:01,silent)'
     )
+
+
+def _invalidate_icon_cache(addon_id: str) -> None:
+    """Remove the addon icon from Kodi's texture cache.
+
+    Kodi caches textures by file path. After replacing icon.png,
+    the old cached version persists until removed via JSON-RPC.
+    """
+    _log = get_logger('default')
+    result = json_query({
+        "jsonrpc": "2.0",
+        "method": "Textures.GetTextures",
+        "params": {
+            "filter": {
+                "field": "url",
+                "operator": "contains",
+                "value": addon_id,
+            }
+        },
+        "id": 1,
+    })
+    for texture in result.get("textures", []):
+        tid = texture.get("textureid")
+        if tid:
+            json_query({
+                "jsonrpc": "2.0",
+                "method": "Textures.RemoveTexture",
+                "params": {"textureid": tid},
+                "id": 1,
+            }, return_result=False)
+    _log.debug("Icon texture cache invalidated", event="icon.cache_clear",
+               addon_id=addon_id)
 
 
 def _handle_entry_args(addon_id: str) -> bool:
@@ -711,6 +762,7 @@ def _handle_entry_args(addon_id: str) -> bool:
                     log.info("Custom icon set" if ok else "Custom icon set failed",
                              event="icon.set", source=cast(str, image),
                              target=dst, success=ok)
+        _invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':
@@ -722,6 +774,7 @@ def _handle_entry_args(addon_id: str) -> bool:
         icon_path = os.path.join(addon_path, 'icon.png')
         if _xbmcvfs.exists(default_icon):
             _xbmcvfs.copy(default_icon, icon_path)
+        _invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True
 
