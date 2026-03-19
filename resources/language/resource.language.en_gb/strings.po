@@ -344,6 +344,14 @@ msgctxt "#32177"
 msgid "Create clone addon..."
 msgstr ""
 
+msgctxt "#32178"
+msgid "Show movie counts in wizard"
+msgstr ""
+
+msgctxt "#32179"
+msgid "Cumulative counts"
+msgstr ""
+
 
 # =============================================================================
 # FILTER / WIZARD LABELS (32200-32299)
@@ -423,6 +431,34 @@ msgstr ""
 
 msgctxt "#32218"
 msgid "Both"
+msgstr ""
+
+msgctxt "#32219"
+msgid "Select Playlist"
+msgstr ""
+
+msgctxt "#32220"
+msgid "Last year"
+msgstr ""
+
+msgctxt "#32221"
+msgid "Last 2 years"
+msgstr ""
+
+msgctxt "#32222"
+msgid "Last 5 years"
+msgstr ""
+
+msgctxt "#32223"
+msgid "Last 10 years"
+msgstr ""
+
+msgctxt "#32224"
+msgid "Last 20 years"
+msgstr ""
+
+msgctxt "#32225"
+msgid "Any year"
 msgstr ""
 
 
@@ -735,6 +771,14 @@ msgctxt "#32538"
 msgid "Continue playlist"
 msgstr ""
 
+msgctxt "#32539"
+msgid "Less than X years ago"
+msgstr ""
+
+msgctxt "#32540"
+msgid "Maximum age (years)"
+msgstr ""
+
 
 # =============================================================================
 # HELP TEXT (32600-32699)
@@ -842,4 +886,12 @@ msgstr ""
 
 msgctxt "#32625"
 msgid "Create a copy of EasyMovie with different settings"
+msgstr ""
+
+msgctxt "#32626"
+msgid "Display how many movies match each option in the filter wizard"
+msgstr ""
+
+msgctxt "#32627"
+msgid "Count against remaining movies after each filter step (slower on low-end hardware)"
 msgstr ""

@@ -46,6 +46,7 @@ class FilterSettings:
     year_filter_type: int = YEAR_FILTER_AFTER
     year_from: int = 0
     year_to: int = 0
+    year_recency: int = 5
     score_mode: int = FILTER_SKIP
     min_score: int = 0
 
@@ -96,6 +97,8 @@ class AdvancedSettings:
     avoid_resurface: bool = True
     resurface_window: int = 3  # Index into RESURFACE_WINDOWS (24h)
     remember_filters: bool = True
+    show_counts: bool = True
+    cumulative_counts: bool = False
     debug_logging: bool = False
 
 
@@ -146,6 +149,7 @@ def load_settings(
         year_filter_type=get_int_setting('year_filter_type', addon_id, default=YEAR_FILTER_AFTER),
         year_from=get_int_setting('year_from', addon_id, default=0),
         year_to=get_int_setting('year_to', addon_id, default=0),
+        year_recency=get_int_setting('year_recency', addon_id, default=5),
         score_mode=get_int_setting('score_mode', addon_id, default=FILTER_SKIP),
         min_score=get_int_setting('min_score', addon_id, default=0),
     )
@@ -192,6 +196,8 @@ def load_settings(
         avoid_resurface=get_bool_setting('avoid_resurface', addon_id),
         resurface_window=get_int_setting('resurface_window', addon_id, default=3),
         remember_filters=get_bool_setting('remember_filters', addon_id),
+        show_counts=get_bool_setting('show_counts', addon_id),
+        cumulative_counts=get_bool_setting('cumulative_counts', addon_id),
         debug_logging=get_bool_setting('logging', addon_id),
     )
 

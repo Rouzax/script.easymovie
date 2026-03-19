@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional
 from resources.lib.constants import (
     FILTER_ASK, FILTER_PRESET, FILTER_SKIP,
     WATCHED_BOTH,
+    YEAR_FILTER_RECENCY,
 )
 from resources.lib.data.filters import FilterConfig
 
@@ -171,8 +172,14 @@ class WizardFlow:
             config.year_from = yr.get("from", 0)
             config.year_to = yr.get("to", 0)
         elif year_mode == FILTER_PRESET:
-            config.year_from = self._settings.get("year_from", 0)
-            config.year_to = self._settings.get("year_to", 0)
+            year_filter_type = self._settings.get("year_filter_type", 0)
+            if year_filter_type == YEAR_FILTER_RECENCY:
+                import datetime
+                recency = self._settings.get("year_recency", 5)
+                config.year_from = datetime.datetime.now().year - recency
+            else:
+                config.year_from = self._settings.get("year_from", 0)
+                config.year_to = self._settings.get("year_to", 0)
 
         # Score
         score_mode = self._settings.get("score_mode", FILTER_SKIP)

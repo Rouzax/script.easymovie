@@ -15,7 +15,7 @@ Logging:
 import json
 import os
 import time
-from typing import Any, Dict, Set
+from typing import Any, Dict, List, Set
 
 
 class StorageManager:
@@ -67,17 +67,19 @@ class StorageManager:
         except (IOError, OSError):
             pass  # Best effort
 
-    def add_suggested(self, movieid: int) -> None:
+    def add_suggested(self, movieid: int, title: str = "") -> None:
         """Record a movie as suggested (for re-suggestion avoidance).
 
         Args:
             movieid: The Kodi movie ID.
+            title: Movie title (stored for debugging, not used in logic).
         """
         # Avoid duplicates
         existing_ids = {s["movieid"] for s in self._data["suggested"]}
         if movieid not in existing_ids:
             self._data["suggested"].append({
                 "movieid": movieid,
+                "title": title,
                 "timestamp": time.time(),
             })
             self.save()
@@ -85,6 +87,32 @@ class StorageManager:
     def get_suggested_ids(self) -> Set[int]:
         """Get all suggested movie IDs."""
         return {s["movieid"] for s in self._data["suggested"]}
+
+    def clear_suggested(self) -> None:
+        """Remove all suggested entries."""
+        if self._data["suggested"]:
+            self._data["suggested"] = []
+            self.save()
+
+    def validate_suggested(self, movies: List[Dict[str, Any]]) -> None:
+        """Remove suggested entries where the ID was reused for a different movie.
+
+        Kodi reuses movie IDs after deletion. By comparing stored titles
+        against current library titles, we detect and remove stale entries.
+
+        Args:
+            movies: Current library movies (must include movieid and title).
+        """
+        title_by_id = {m["movieid"]: m.get("title", "") for m in movies}
+        before = len(self._data["suggested"])
+        self._data["suggested"] = [
+            s for s in self._data["suggested"]
+            if s.get("title") and s["movieid"] in title_by_id
+            and title_by_id[s["movieid"]] == s.get("title")
+        ]
+        after = len(self._data["suggested"])
+        if before != after:
+            self.save()
 
     def prune_suggested(self, max_age_hours: int) -> None:
         """Remove suggested entries older than max_age_hours.
@@ -102,16 +130,18 @@ class StorageManager:
         if before != after:
             self.save()
 
-    def add_started(self, movieid: int) -> None:
+    def add_started(self, movieid: int, title: str = "") -> None:
         """Record a movie as started through EasyMovie.
 
         Args:
             movieid: The Kodi movie ID.
+            title: Movie title (stored for debugging, not used in logic).
         """
         existing_ids = {s["movieid"] for s in self._data["started"]}
         if movieid not in existing_ids:
             self._data["started"].append({
                 "movieid": movieid,
+                "title": title,
                 "timestamp": time.time(),
             })
             self.save()

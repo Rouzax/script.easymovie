@@ -6,15 +6,18 @@
     Multi-purpose selection dialog for wizard and settings.
     Supports single-select and multi-select (checkbox) modes.
 
+    Window properties:
+        EasyMovie.SingleSelect - "true" hides checkboxes and OK button
+
     Control IDs:
         1   - Heading label
-        100 - Scrollable list (checkbox items)
-        10  - OK button
+        100 - Scrollable list
+        10  - OK button (multi-select only)
         11  - Back button
 -->
 <window>
     <zorder>1</zorder>
-    <defaultcontrol always="true">100</defaultcontrol>
+    <defaultcontrol>11</defaultcontrol>
 
     <controls>
         <!-- Dim overlay -->
@@ -87,7 +90,7 @@
                 <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
             </control>
 
-            <!-- Scrollable list with checkboxes (ID 100) -->
+            <!-- Scrollable list (ID 100) -->
             <control type="list" id="100">
                 <left>30</left>
                 <top>82</top>
@@ -96,30 +99,32 @@
                 <orientation>vertical</orientation>
                 <scrolltime tween="sine" easing="out">200</scrolltime>
                 <onleft>100</onleft>
-                <onright>100</onright>
+                <onright>10</onright>
                 <onup>100</onup>
-                <ondown>10</ondown>
+                <ondown>11</ondown>
 
                 <!-- Unfocused item -->
                 <itemlayout width="540" height="50">
-                    <!-- Checkbox icon -->
+                    <!-- Checkbox: unchecked (multi-select only) -->
                     <control type="image">
                         <left>10</left>
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="44FFFFFF">check_off.png</texture>
-                        <visible>!String.IsEqual(ListItem.Property(checked),true)</visible>
+                        <visible>[!String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
+                    <!-- Checkbox: checked (multi-select only) -->
                     <control type="image">
                         <left>10</left>
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">check_on.png</texture>
-                        <visible>String.IsEqual(ListItem.Property(checked),true)</visible>
+                        <visible>[String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
 
+                    <!-- Label: with checkbox offset (multi-select) -->
                     <control type="label">
                         <left>48</left>
                         <top>0</top>
@@ -129,6 +134,19 @@
                         <font>font12</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <label>$INFO[ListItem.Label]</label>
+                        <visible>!String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
+                    </control>
+                    <!-- Label: no offset (single-select) -->
+                    <control type="label">
+                        <left>15</left>
+                        <top>0</top>
+                        <width>510</width>
+                        <height>50</height>
+                        <aligny>center</aligny>
+                        <font>font12</font>
+                        <textcolor>FFCCCCCC</textcolor>
+                        <label>$INFO[ListItem.Label]</label>
+                        <visible>String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
                 </itemlayout>
 
@@ -143,24 +161,26 @@
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white.png</texture>
                     </control>
 
-                    <!-- Checkbox icon -->
+                    <!-- Checkbox: unchecked (multi-select only) -->
                     <control type="image">
                         <left>10</left>
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="66FFFFFF">check_off.png</texture>
-                        <visible>!String.IsEqual(ListItem.Property(checked),true)</visible>
+                        <visible>[!String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
+                    <!-- Checkbox: checked (multi-select only) -->
                     <control type="image">
                         <left>10</left>
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">check_on.png</texture>
-                        <visible>String.IsEqual(ListItem.Property(checked),true)</visible>
+                        <visible>[String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
 
+                    <!-- Label: with checkbox offset (multi-select) -->
                     <control type="label">
                         <left>48</left>
                         <top>0</top>
@@ -170,21 +190,36 @@
                         <font>font12</font>
                         <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                         <label>$INFO[ListItem.Label]</label>
+                        <visible>!String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
+                    </control>
+                    <!-- Label: no offset (single-select) -->
+                    <control type="label">
+                        <left>15</left>
+                        <top>0</top>
+                        <width>510</width>
+                        <height>50</height>
+                        <aligny>center</aligny>
+                        <font>font12</font>
+                        <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                        <label>$INFO[ListItem.Label]</label>
+                        <visible>String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     </control>
                 </focusedlayout>
             </control>
 
-            <!-- Button Row -->
-            <control type="group">
+            <!-- Button Row: centered grouplist auto-positions visible buttons -->
+            <control type="grouplist">
                 <left>115</left>
                 <top>515</top>
                 <width>370</width>
                 <height>50</height>
+                <align>center</align>
+                <itemgap>30</itemgap>
+                <orientation>horizontal</orientation>
+                <onup>100</onup>
 
-                <!-- Back Button (ID 11) -->
+                <!-- Back Button (ID 11) — always visible -->
                 <control type="button" id="11">
-                    <left>0</left>
-                    <top>0</top>
                     <width>170</width>
                     <height>50</height>
                     <align>center</align>
@@ -193,18 +228,14 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <onright>10</onright>
-                    <onleft>10</onleft>
                     <onup>100</onup>
                     <label>$ADDON[script.easymovie 32302]</label>
                     <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>
 
-                <!-- OK Button (ID 10) -->
+                <!-- OK Button (ID 10) — hidden in single-select -->
                 <control type="button" id="10">
-                    <left>200</left>
-                    <top>0</top>
                     <width>170</width>
                     <height>50</height>
                     <align>center</align>
@@ -213,9 +244,8 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <onright>11</onright>
-                    <onleft>11</onleft>
                     <onup>100</onup>
+                    <visible>!String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     <label>$ADDON[script.easymovie 32300]</label>
                     <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>

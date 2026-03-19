@@ -10,9 +10,6 @@ than hardcoding values elsewhere.
 ADDON_ID = "script.easymovie"
 ADDON_NAME = "EasyMovie"
 
-# Kodi window IDs
-KODI_HOME_WINDOW_ID = 10000
-
 # Window property prefixes
 PROP_PREFIX = "EasyMovie"
 
@@ -48,6 +45,7 @@ GENRE_MATCH_AND = 1
 YEAR_FILTER_AFTER = 0
 YEAR_FILTER_BEFORE = 1
 YEAR_FILTER_BETWEEN = 2
+YEAR_FILTER_RECENCY = 3
 
 # Sort options
 SORT_RANDOM = 0
@@ -124,6 +122,15 @@ RUNTIME_RANGES = [
     (120, 150, "120 – 150 minutes"),
     (150, 0, "Over 150 minutes"),  # 0 = no upper limit
     (0, 0, "Any runtime"),  # both 0 = no filter
+]
+
+# Recency ranges for year filter wizard (years_ago, lang_id)
+RECENCY_RANGES = [
+    (1, 32220),   # "Last year"
+    (2, 32221),   # "Last 2 years"
+    (5, 32222),   # "Last 5 years"
+    (10, 32223),  # "Last 10 years"
+    (20, 32224),  # "Last 20 years"
 ]
 
 # Score filter ranges for wizard

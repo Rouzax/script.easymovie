@@ -163,7 +163,7 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>FFAAAAAA</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Duration]m  ·  $INFO[ListItem.Mpaa]</label>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
                     </control>
 
                     <!-- Set name (bottom right) -->
@@ -235,7 +235,7 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>ffFFFFFF</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Duration]m  ·  $INFO[ListItem.Mpaa]</label>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
                     </control>
 
                     <!-- Set name (bottom right, white on focus) -->

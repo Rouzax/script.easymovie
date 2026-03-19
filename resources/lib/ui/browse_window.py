@@ -15,7 +15,6 @@ Logging:
 """
 from __future__ import annotations
 
-import os
 from typing import Dict, List, Any, Optional, TYPE_CHECKING, cast
 
 import xbmcgui
@@ -105,6 +104,9 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         """Populate the list when the window opens."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
         log = _get_log()
         log.info("Browse window opened", event="ui.browse",
                  movie_count=len(self._movies))
@@ -115,16 +117,15 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         for movie in self._movies:
             li = xbmcgui.ListItem(movie.get("title", ""))
 
-            # Set standard Kodi info labels
-            li.setInfo('video', {
-                'title': movie.get("title", ""),
-                'year': movie.get("year", 0),
-                'genre': ", ".join(movie.get("genre", [])),
-                'rating': movie.get("rating", 0.0),
-                'duration': movie.get("runtime", 0) // 60,  # seconds to minutes
-                'plot': movie.get("plot", ""),
-                'mpaa': movie.get("mpaa", ""),
-            })
+            # Set video info via InfoTagVideo (Kodi 21+)
+            info_tag = li.getVideoInfoTag()
+            info_tag.setTitle(movie.get("title", ""))
+            info_tag.setYear(movie.get("year", 0))
+            info_tag.setGenres(movie.get("genre", []))
+            info_tag.setRating(movie.get("rating", 0.0))
+            info_tag.setDuration(movie.get("runtime", 0))
+            info_tag.setPlot(movie.get("plot", ""))
+            info_tag.setMpaa(movie.get("mpaa", ""))
 
             # Set art
             art = movie.get("art", {})
@@ -136,6 +137,9 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
                 })
 
             # Set custom properties
+            runtime_secs = movie.get("runtime", 0)
+            li.setProperty("runtime_min", f"{runtime_secs // 60}m")
+
             set_name = movie.get("set", "")
             if set_name:
                 li.setProperty("set_name", set_name)
@@ -171,12 +175,37 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             self._result = RESULT_REROLL
             self.close()
 
+    def _get_focused_movie(self) -> Optional[Dict[str, Any]]:
+        """Get the currently focused movie, or None."""
+        list_control = cast(xbmcgui.ControlList, self.getControl(LIST_CONTROL_ID))
+        idx = list_control.getSelectedPosition()
+        if 0 <= idx < len(self._movies):
+            return self._movies[idx]
+        return None
+
     def onAction(self, action):
         """Handle navigation actions."""
         action_id = action.getId()
         if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
             self._result = RESULT_CANCEL
             self.close()
+        elif action_id == ACTION_CONTEXT_MENU:
+            movie = self._get_focused_movie()
+            if movie:
+                from resources.lib.ui.context_menu import (
+                    show_context_menu, CONTEXT_PLAY, CONTEXT_PLAY_SET,
+                    CONTEXT_MOVIE_INFO,
+                )
+                result = show_context_menu(movie, self._addon_id)
+                if result == CONTEXT_PLAY:
+                    self._result = movie
+                    self.close()
+                elif result == CONTEXT_PLAY_SET:
+                    self._result = {"__play_set__": True, "movie": movie}
+                    self.close()
+                elif result == CONTEXT_MOVIE_INFO:
+                    import xbmc
+                    xbmc.executebuiltin('Action(Info)')
 
 
 def show_browse_window(
@@ -195,10 +224,7 @@ def show_browse_window(
         Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
     """
     xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_POSTER_GRID])
-    addon_path = os.path.join(
-        xbmcaddon.Addon(addon_id).getAddonInfo('path'),
-        'resources', 'skins', 'Default', '1080i'
-    )
+    addon_path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
 
     window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
     window.set_movies(movies)

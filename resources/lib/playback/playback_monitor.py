@@ -14,7 +14,6 @@ Logging:
 """
 from __future__ import annotations
 
-import os
 import threading
 from typing import Any, Dict, Optional, TYPE_CHECKING, cast
 
@@ -63,6 +62,7 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
         self._heading = "EasyMovie"
         self._message = ""
         self._subtitle = ""
@@ -101,6 +101,9 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         """Set up the dialog."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
         cast(xbmcgui.ControlLabel, self.getControl(CONT_HEADING)).setLabel(self._heading)
         cast(xbmcgui.ControlLabel, self.getControl(CONT_MESSAGE)).setLabel(self._message)
         cast(xbmcgui.ControlLabel, self.getControl(CONT_SUBTITLE)).setLabel(self._subtitle)
@@ -233,15 +236,13 @@ class PlaybackMonitor(xbmc.Player):
                  set_name=set_details.get("title", ""))
 
         # Show continuation dialog
-        addon_path = os.path.join(
-            xbmcaddon.Addon(self._addon_id).getAddonInfo('path'),
-            'resources', 'skins', 'Default', '1080i'
-        )
+        addon_path = xbmcaddon.Addon(self._addon_id).getAddonInfo('path')
 
         dialog = ContinuationDialog(
             'script-easymovie-continuation.xml',
             addon_path, 'Default', '1080i'
         )
+        dialog._addon_id = self._addon_id
 
         finished_title = movie.get("title", "")
         next_title = next_movie.get("title", "")

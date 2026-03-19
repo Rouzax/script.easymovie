@@ -11,7 +11,7 @@ Logging:
         - query.sets (DEBUG): Movie set query executed
     See LOGGING.md for full guidelines.
 """
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 
 def get_all_movies_query() -> Dict[str, Any]:
@@ -31,24 +31,18 @@ def get_all_movies_query() -> Dict[str, Any]:
     }
 
 
-def get_movies_with_art_query(movie_ids: List[int]) -> Dict[str, Any]:
-    """Get movies with art for display. Use after filtering to minimize data."""
+def get_movie_details_with_art_query(movie_id: int) -> Dict[str, Any]:
+    """Get a single movie with art and plot for display."""
     return {
         "jsonrpc": "2.0",
-        "method": "VideoLibrary.GetMovies",
+        "method": "VideoLibrary.GetMovieDetails",
         "params": {
+            "movieid": movie_id,
             "properties": [
                 "title", "genre", "year", "rating", "runtime",
                 "mpaa", "set", "setid", "playcount", "dateadded",
                 "plot", "art", "file", "resume", "lastplayed",
-                "sorttitle", "country",
             ],
-            "filter": {
-                "or": [
-                    {"field": "movieid", "operator": "is", "value": str(mid)}
-                    for mid in movie_ids
-                ],
-            } if movie_ids else {},
         },
         "id": 1,
     }
@@ -99,6 +93,19 @@ def get_movie_set_details_query(set_id: int) -> Dict[str, Any]:
                 ],
                 "sort": {"method": "year"},
             },
+        },
+        "id": 1,
+    }
+
+
+def get_playlist_files_query() -> Dict[str, Any]:
+    """Get list of video playlist files from Kodi's playlist directory."""
+    return {
+        "jsonrpc": "2.0",
+        "method": "Files.GetDirectory",
+        "params": {
+            "directory": "special://profile/playlists/video/",
+            "media": "video",
         },
         "id": 1,
     }

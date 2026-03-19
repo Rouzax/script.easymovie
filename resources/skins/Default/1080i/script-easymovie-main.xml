@@ -80,7 +80,7 @@
                     <height>30</height>
                     <font>font12</font>
                     <textcolor>FFCCCCCC</textcolor>
-                    <label>$INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Duration]m</label>
+                    <label>$INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Property(runtime_min)]</label>
                 </control>
 
                 <!-- Genre -->

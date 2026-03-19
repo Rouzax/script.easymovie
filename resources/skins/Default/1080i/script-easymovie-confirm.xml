@@ -3,13 +3,17 @@
     EasyMovie Confirm Dialog
     Resolution: 1080i (1920x1080)
 
-    Simple yes/no confirmation dialog.
+    Simple yes/no confirmation dialog. Also used as OK-only dialog
+    when EasyMovie.SingleButton property is set.
+
+    Window properties:
+        EasyMovie.SingleButton - "true" hides No button, auto-centers Yes/OK
 
     Control IDs:
         1  - Heading label
         2  - Message label (primary)
-        10 - Yes/OK button (left)
-        11 - No/Cancel button (right)
+        10 - Yes/OK button
+        11 - No/Cancel button
 -->
 <window>
     <zorder>1</zorder>
@@ -100,17 +104,18 @@
                 <label>-</label>
             </control>
 
-            <!-- Button Row -->
-            <control type="group">
+            <!-- Button Row: centered grouplist auto-positions visible buttons -->
+            <control type="grouplist">
                 <left>145</left>
                 <top>170</top>
                 <width>430</width>
                 <height>50</height>
+                <align>center</align>
+                <itemgap>30</itemgap>
+                <orientation>horizontal</orientation>
 
-                <!-- Yes Button (ID 10) -->
+                <!-- Yes/OK Button (ID 10) — always visible -->
                 <control type="button" id="10">
-                    <left>0</left>
-                    <top>0</top>
                     <width>200</width>
                     <height>50</height>
                     <align>center</align>
@@ -119,16 +124,12 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <onright>11</onright>
-                    <onleft>11</onleft>
                     <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>
 
-                <!-- No Button (ID 11) -->
+                <!-- No/Cancel Button (ID 11) — hidden when SingleButton -->
                 <control type="button" id="11">
-                    <left>230</left>
-                    <top>0</top>
                     <width>200</width>
                     <height>50</height>
                     <align>center</align>
@@ -137,8 +138,7 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <onright>10</onright>
-                    <onleft>10</onleft>
+                    <visible>!String.IsEqual(Window.Property(EasyMovie.SingleButton),true)</visible>
                     <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>

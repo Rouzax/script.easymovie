@@ -81,7 +81,7 @@
                     <height>28</height>
                     <font>font12</font>
                     <textcolor>FFCCCCCC</textcolor>
-                    <label>$INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Duration]m  ·  $INFO[Container(655).ListItem.Mpaa]</label>
+                    <label>$INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Property(runtime_min)]  ·  $INFO[Container(655).ListItem.Mpaa]</label>
                 </control>
 
                 <!-- Genre -->
@@ -212,7 +212,7 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>FFAAAAAA</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Duration]m</label>
+                        <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
                     </control>
                     <control type="label">
                         <left>75</left>
@@ -273,7 +273,7 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>ffFFFFFF</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Duration]m</label>
+                        <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
                     </control>
                     <control type="label">
                         <left>75</left>

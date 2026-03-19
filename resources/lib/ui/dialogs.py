@@ -14,7 +14,6 @@ Logging:
 """
 from __future__ import annotations
 
-import os
 from typing import List, Optional, TYPE_CHECKING, cast
 
 import xbmcgui
@@ -53,12 +52,9 @@ def _get_log() -> StructuredLogger:
 
 
 def _get_addon_path() -> str:
-    """Get the path to the addon's skin directory."""
+    """Get the addon root path (Kodi resolves the skin subdirectory)."""
     import xbmcaddon
-    return os.path.join(
-        xbmcaddon.Addon(ADDON_ID).getAddonInfo('path'),
-        'resources', 'skins', 'Default', '1080i'
-    )
+    return xbmcaddon.Addon(ADDON_ID).getAddonInfo('path')
 
 
 class SelectDialog(xbmcgui.WindowXMLDialog):
@@ -66,6 +62,7 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
         self.heading = ""
         self.items: List[str] = []
         self.preselected: List[int] = []
@@ -76,6 +73,9 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         """Populate the dialog when it opens."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
         cast(xbmcgui.ControlLabel, self.getControl(SELECT_HEADING)).setLabel(self.heading)
 
         list_control = cast(xbmcgui.ControlList, self.getControl(SELECT_LIST))
@@ -87,6 +87,10 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
                 li.setProperty('checked', 'true')
                 self.selected.append(i)
             list_control.addItem(li)
+
+        # Single-select: set property so XML hides checkboxes and OK button
+        if not self.multi_select:
+            self.setProperty('EasyMovie.SingleSelect', 'true')
 
         if self.items:
             self.setFocusId(SELECT_LIST)
@@ -138,20 +142,27 @@ class ConfirmDialog(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
         self.heading = ""
         self.message = ""
         self.yes_label = ""
         self.no_label = ""
         self.confirmed = False
+        self.cancelled = False
 
     def onInit(self):
         """Set up the dialog labels."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
         cast(xbmcgui.ControlLabel, self.getControl(CONFIRM_HEADING)).setLabel(self.heading)
         cast(xbmcgui.ControlLabel, self.getControl(CONFIRM_MESSAGE)).setLabel(self.message)
         if self.yes_label:
             cast(xbmcgui.ControlButton, self.getControl(CONFIRM_YES)).setLabel(self.yes_label)
         if self.no_label:
             cast(xbmcgui.ControlButton, self.getControl(CONFIRM_NO)).setLabel(self.no_label)
+        else:
+            self.setProperty('EasyMovie.SingleButton', 'true')
         self.setFocus(self.getControl(CONFIRM_YES))
 
     def onClick(self, controlId):
@@ -167,7 +178,7 @@ class ConfirmDialog(xbmcgui.WindowXMLDialog):
         """Handle back/escape."""
         action_id = action.getId()
         if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
-            self.confirmed = False
+            self.cancelled = True
             self.close()
 
 
@@ -176,6 +187,7 @@ def show_select_dialog(
     items: List[str],
     multi_select: bool = True,
     preselected: Optional[List[int]] = None,
+    addon_id: Optional[str] = None,
 ) -> Optional[List[int]]:
     """Show a themed selection dialog.
 
@@ -184,6 +196,7 @@ def show_select_dialog(
         items: List of item labels.
         multi_select: If True, checkboxes. If False, single-select closes on pick.
         preselected: Indices of pre-selected items.
+        addon_id: Optional addon ID (for clone support).
 
     Returns:
         List of selected indices, or None if cancelled/back pressed.
@@ -193,6 +206,7 @@ def show_select_dialog(
         _get_addon_path(),
         'Default', '1080i'
     )
+    dialog._addon_id = addon_id or ADDON_ID
     dialog.heading = heading
     dialog.items = items
     dialog.multi_select = multi_select
@@ -201,7 +215,10 @@ def show_select_dialog(
 
     if dialog.cancelled:
         return None
-    return sorted(dialog.selected)
+    selected = sorted(dialog.selected)
+    if not selected:
+        return None  # OK with nothing selected = cancel
+    return selected
 
 
 def show_confirm_dialog(
@@ -209,7 +226,8 @@ def show_confirm_dialog(
     message: str,
     yes_label: str = "",
     no_label: str = "",
-) -> bool:
+    addon_id: Optional[str] = None,
+) -> Optional[bool]:
     """Show a themed confirmation dialog.
 
     Args:
@@ -217,19 +235,23 @@ def show_confirm_dialog(
         message: Message body.
         yes_label: Custom label for the yes button.
         no_label: Custom label for the no button.
+        addon_id: Optional addon ID (for clone support).
 
     Returns:
-        True if user confirmed, False otherwise.
+        True if user confirmed, False if declined, None if cancelled/back.
     """
     dialog = ConfirmDialog(
         'script-easymovie-confirm.xml',
         _get_addon_path(),
         'Default', '1080i'
     )
+    dialog._addon_id = addon_id or ADDON_ID
     dialog.heading = heading
     dialog.message = message
     dialog.yes_label = yes_label
     dialog.no_label = no_label
     dialog.doModal()
 
+    if dialog.cancelled:
+        return None
     return dialog.confirmed

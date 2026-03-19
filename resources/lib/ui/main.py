@@ -25,7 +25,7 @@ from __future__ import annotations
 import os
 import random
 import sys
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, cast
 
 import xbmcvfs
 
@@ -34,8 +34,7 @@ from resources.lib.constants import (
     MODE_BROWSE, MODE_PLAYLIST, MODE_ASK,
     RESURFACE_WINDOWS,
 )
-from resources.lib.utils import get_logger, json_query, notify, log_timing
-from resources.lib.ui import apply_theme
+from resources.lib.utils import get_logger, json_query, notify, log_timing, lang
 from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
 from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog
@@ -44,7 +43,7 @@ from resources.lib.ui.browse_window import (
 )
 from resources.lib.data.queries import (
     get_all_movies_query,
-    get_movies_with_art_query,
+    get_movie_details_with_art_query,
     get_movie_set_details_query,
     get_in_progress_movies_query,
 )
@@ -73,14 +72,11 @@ def main(addon_id: str = ADDON_ID) -> None:
     log.info("EasyMovie launched", event="launch.start", addon_id=addon_id)
 
     # 1. Load settings
-    (primary_function, theme, filter_settings, browse_settings,
+    (primary_function, _theme, filter_settings, browse_settings,
      playlist_settings, set_settings, playback_settings,
      advanced_settings) = load_settings(addon_id if addon_id != ADDON_ID else None)
 
-    # 2. Apply theme
-    apply_theme(theme)
-
-    # 3. Check for in-progress movie
+    # 2. Check for in-progress movie
     if playback_settings.check_in_progress:
         resumed = _check_in_progress(log, advanced_settings, addon_id)
         if resumed:
@@ -89,7 +85,7 @@ def main(addon_id: str = ADDON_ID) -> None:
     # 4. Determine mode
     mode = primary_function
     if mode == MODE_ASK:
-        mode = _ask_mode(log)
+        mode = _ask_mode(log, addon_id)
         if mode is None:
             return  # User cancelled
 
@@ -107,7 +103,7 @@ def main(addon_id: str = ADDON_ID) -> None:
 
     if not all_movies:
         show_confirm_dialog("No Movies", "Your library has no movies.",
-                            yes_label="OK", no_label="")
+                            yes_label="OK", no_label="", addon_id=addon_id)
         return
 
     log.debug("Movies loaded", count=len(all_movies))
@@ -120,16 +116,19 @@ def main(addon_id: str = ADDON_ID) -> None:
     if advanced_settings.remember_filters:
         wizard.load_last_answers(storage.load_last_filters())
 
-    filter_config = _run_wizard(log, wizard, all_movies)
+    filter_config = _run_wizard(log, wizard, all_movies, addon_id,
+                               show_counts=advanced_settings.show_counts,
+                               cumulative_counts=advanced_settings.cumulative_counts)
     if filter_config is None:
         return  # User cancelled
 
     # 9. Apply filters
     filtered = apply_filters(all_movies, filter_config)
     if not filtered:
+        log.info("No movies after filtering", event="filter.empty", total=len(all_movies))
         show_confirm_dialog("No Results",
-                            "No movies match your filters. Try relaxing your criteria.",
-                            yes_label="OK", no_label="")
+                            "No movies match your filters.\nTry relaxing your criteria.",
+                            yes_label="OK", no_label="", addon_id=addon_id)
         return
 
     log.debug("Filtered movies", count=len(filtered), total=len(all_movies))
@@ -138,17 +137,28 @@ def main(addon_id: str = ADDON_ID) -> None:
     if advanced_settings.remember_filters:
         storage.save_last_filters(wizard.get_answers())
 
-    # 11. Exclude previously suggested
-    if advanced_settings.avoid_resurface:
+    # 11. Exclude previously suggested (or clear history if disabled)
+    if not advanced_settings.avoid_resurface:
+        storage.clear_suggested()
+    elif advanced_settings.avoid_resurface:
+        storage.validate_suggested(all_movies)
         storage.prune_suggested(RESURFACE_WINDOWS[advanced_settings.resurface_window])
         exclude_ids = storage.get_suggested_ids()
+        pre_exclude = len(filtered)
         filtered = [m for m in filtered if m["movieid"] not in exclude_ids]
         if not filtered:
+            log.info("All movies excluded by resurface window",
+                     event="resurface.exhausted",
+                     pre_exclude=pre_exclude, excluded=len(exclude_ids))
             show_confirm_dialog("No Results",
                                 "All matching movies were recently suggested. "
                                 "Try again later or adjust your re-suggestion window.",
-                                yes_label="OK", no_label="")
+                                yes_label="OK", no_label="", addon_id=addon_id)
             return
+        if pre_exclude != len(filtered):
+            log.debug("Resurface exclusion applied",
+                      before=pre_exclude, after=len(filtered),
+                      excluded=pre_exclude - len(filtered))
 
     # 12. Execute mode
     if mode == MODE_BROWSE:
@@ -184,6 +194,7 @@ def _check_in_progress(
         f"{title}\n{remaining} minutes remaining",
         yes_label="Resume",
         no_label="New Selection",
+        addon_id=addon_id,
     )
 
     if confirmed:
@@ -192,16 +203,18 @@ def _check_in_progress(
     return False
 
 
-def _ask_mode(log) -> Optional[int]:
+def _ask_mode(log, addon_id: str = ADDON_ID) -> Optional[int]:
     """Ask the user to choose Browse or Playlist mode."""
-    result = show_select_dialog(
-        heading="Choose Mode",
-        items=["Browse", "Playlist"],
-        multi_select=False,
+    result = show_confirm_dialog(
+        heading="EasyMovie",
+        message="Choose Mode",
+        yes_label="Browse",
+        no_label="Playlist",
+        addon_id=addon_id,
     )
     if result is None:
-        return None
-    return MODE_BROWSE if result[0] == 0 else MODE_PLAYLIST
+        return None  # User pressed back/escape
+    return MODE_BROWSE if result else MODE_PLAYLIST
 
 
 def _build_wizard_settings(filter_settings: FilterSettings) -> Dict[str, Any]:
@@ -218,19 +231,42 @@ def _build_wizard_settings(filter_settings: FilterSettings) -> Dict[str, Any]:
         "runtime_min": filter_settings.runtime_min,
         "runtime_max": filter_settings.runtime_max,
         "year_mode": filter_settings.year_mode,
+        "year_filter_type": filter_settings.year_filter_type,
         "year_from": filter_settings.year_from,
         "year_to": filter_settings.year_to,
+        "year_recency": filter_settings.year_recency,
         "score_mode": filter_settings.score_mode,
         "min_score": filter_settings.min_score,
     }
 
 
-def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
+def _run_wizard(log, wizard: WizardFlow, all_movies: list,
+                addon_id: str = ADDON_ID,
+                show_counts: bool = True,
+                cumulative_counts: bool = False) -> Optional[Any]:
     """Run the wizard flow, returning a FilterConfig or None if cancelled."""
     from resources.lib.data.filters import (
         extract_unique_genres, extract_unique_mpaa,
     )
     from resources.lib.constants import RUNTIME_RANGES, SCORE_RANGES
+
+    from resources.lib.data.filters import apply_filters as _apply_filters
+
+    def _count_pool() -> list:
+        """Get the movie pool for counting — full or cumulative."""
+        if not show_counts:
+            return []
+        if not cumulative_counts:
+            return all_movies
+        # Build partial filter config from answers so far
+        partial_config = wizard.build_filter_config()
+        return _apply_filters(all_movies, partial_config)
+
+    def _fmt(label: str, count: int) -> str:
+        """Format a label with optional count."""
+        if show_counts:
+            return f"{label} ({count})"
+        return label
 
     if wizard.is_complete:
         return wizard.build_filter_config()
@@ -245,10 +281,20 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
 
         if filter_type == "genre":
             genres = extract_unique_genres(all_movies)
+            pool = _count_pool()
+            if show_counts:
+                gcounts = {}
+                for m in pool:
+                    for g in m.get("genre", []):
+                        gcounts[g] = gcounts.get(g, 0) + 1
+                genre_labels = [_fmt(g, gcounts.get(g, 0)) for g in genres]
+            else:
+                genre_labels = genres
             preselected_genres = wizard.get_answers().get("genre", [])
             pre_indices = [i for i, g in enumerate(genres) if g in preselected_genres]
-            result = show_select_dialog("Select Genres", genres,
-                                        multi_select=True, preselected=pre_indices)
+            result = show_select_dialog("Select Genres", genre_labels,
+                                        multi_select=True, preselected=pre_indices,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -256,8 +302,19 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
             answer = [genres[i] for i in result]
 
         elif filter_type == "watched":
-            items = ["Unwatched only", "Watched only", "Both"]
-            result = show_select_dialog("Watched Status", items, multi_select=False)
+            pool = _count_pool()
+            if show_counts:
+                unwatched = sum(1 for m in pool if m.get("playcount", 0) == 0)
+                watched = len(pool) - unwatched
+                items = [
+                    _fmt("Unwatched only", unwatched),
+                    _fmt("Watched only", watched),
+                    _fmt("Both", len(pool)),
+                ]
+            else:
+                items = ["Unwatched only", "Watched only", "Both"]
+            result = show_select_dialog("Watched Status", items, multi_select=False,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -266,10 +323,21 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
 
         elif filter_type == "mpaa":
             ratings = extract_unique_mpaa(all_movies)
+            pool = _count_pool()
+            if show_counts:
+                mcounts = {}
+                for m in pool:
+                    r = m.get("mpaa", "")
+                    if r:
+                        mcounts[r] = mcounts.get(r, 0) + 1
+                rating_labels = [_fmt(r, mcounts.get(r, 0)) for r in ratings]
+            else:
+                rating_labels = list(ratings)
             preselected_mpaa = wizard.get_answers().get("mpaa", [])
             pre_indices = [i for i, r in enumerate(ratings) if r in preselected_mpaa]
-            result = show_select_dialog("Select Age Ratings", ratings,
-                                        multi_select=True, preselected=pre_indices)
+            result = show_select_dialog("Select Age Ratings", rating_labels,
+                                        multi_select=True, preselected=pre_indices,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -277,8 +345,18 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
             answer = [ratings[i] for i in result]
 
         elif filter_type == "runtime":
-            items = [label for _, _, label in RUNTIME_RANGES]
-            result = show_select_dialog("Select Runtime", items, multi_select=False)
+            pool = _count_pool()
+            items = []
+            for rt_lo, rt_hi, label in RUNTIME_RANGES:
+                if show_counts:
+                    count = sum(1 for m in pool
+                                if (rt_lo == 0 or m.get("runtime", 0) >= rt_lo * 60)
+                                and (rt_hi == 0 or m.get("runtime", 0) <= rt_hi * 60))
+                    items.append(_fmt(label, count))
+                else:
+                    items.append(label)
+            result = show_select_dialog("Select Runtime", items, multi_select=False,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -288,26 +366,61 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list) -> Optional[Any]:
             answer = {"min": rt_min, "max": rt_max}
 
         elif filter_type == "year":
-            # Simple decade picker
+            # Combined recency + decade picker
             from resources.lib.data.filters import extract_decade_buckets
-            buckets = extract_decade_buckets(all_movies)
-            items = [f"{label} ({count} movies)" for _, count, label in buckets]
-            items.append("Any year")
-            result = show_select_dialog("Select Decade", items, multi_select=False)
+            from resources.lib.constants import RECENCY_RANGES
+            import datetime
+
+            current_year = datetime.datetime.now().year
+            pool = _count_pool()
+            buckets = extract_decade_buckets(pool if show_counts else all_movies)
+
+            # Build items: recency first, then decades, then "Any year"
+            items = []
+            for years_ago, label_id in RECENCY_RANGES:
+                if show_counts:
+                    cutoff_year = current_year - years_ago
+                    rcount = sum(1 for m in pool if m.get("year", 0) >= cutoff_year)
+                    items.append(_fmt(lang(label_id), rcount))
+                else:
+                    items.append(lang(label_id))
+            recency_count = len(RECENCY_RANGES)
+            for _, count, label in buckets:
+                items.append(_fmt(label, count) if show_counts else label)
+            items.append(_fmt(lang(32225), len(pool)) if show_counts
+                         else lang(32225))
+
+            result = show_select_dialog(lang(32203), items, multi_select=False,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
                 continue
             idx = result[0]
-            if idx < len(buckets):
-                decade_start, _, _ = buckets[idx]
+            if idx < recency_count:
+                # Recency selection
+                years_ago = RECENCY_RANGES[idx][0]
+                answer = {"from": current_year - years_ago, "to": 0}
+            elif idx < recency_count + len(buckets):
+                # Decade selection
+                bucket_idx = idx - recency_count
+                decade_start, _, _ = buckets[bucket_idx]
                 answer = {"from": decade_start, "to": decade_start + 9}
             else:
                 answer = {"from": 0, "to": 0}
 
         elif filter_type == "score":
-            items = [label for _, label in SCORE_RANGES]
-            result = show_select_dialog("Select Score", items, multi_select=False)
+            pool = _count_pool()
+            items = []
+            for min_score, label in SCORE_RANGES:
+                if show_counts:
+                    scount = sum(1 for m in pool
+                                 if m.get("rating", 0.0) * 10 >= min_score)
+                    items.append(_fmt(label, scount))
+                else:
+                    items.append(label)
+            result = show_select_dialog("Select Score", items, multi_select=False,
+                                        addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -348,22 +461,15 @@ def _load_set_details(
 def _load_art_for_movies(
     movies: List[Dict[str, Any]]
 ) -> List[Dict[str, Any]]:
-    """Load art for a list of movies (phase 2 query)."""
+    """Load art and plot for a list of movies via individual detail queries."""
     if not movies:
         return movies
-    movie_ids = [m["movieid"] for m in movies]
-    result = json_query(get_movies_with_art_query(movie_ids))
-    art_movies = result.get("movies", [])
-
-    # Build lookup by movieid
-    art_lookup = {m["movieid"]: m for m in art_movies}
-
-    # Merge art into original movie dicts
     enriched = []
     for movie in movies:
-        art_movie = art_lookup.get(movie["movieid"])
-        if art_movie:
-            enriched.append(art_movie)
+        result = json_query(get_movie_details_with_art_query(movie["movieid"]))
+        details = result.get("moviedetails")
+        if details:
+            enriched.append(details)
         else:
             enriched.append(movie)
     return enriched
@@ -381,9 +487,20 @@ def _run_browse_mode(
 ) -> None:
     """Run the browse mode loop with Re-roll support."""
     while True:
+        # Exclude previously suggested from this session's pool
+        if advanced_settings.avoid_resurface:
+            suggested_ids = storage.get_suggested_ids()
+            available = [m for m in filtered if m["movieid"] not in suggested_ids]
+            if not available:
+                log.info("All filtered movies exhausted, resetting pool",
+                         event="browse.pool_reset", total=len(filtered))
+                available = filtered
+        else:
+            available = filtered
+
         # Select and sort
         results = select_and_sort_results(
-            filtered, browse_settings.result_count,
+            available, browse_settings.result_count,
             browse_settings.sort_by, browse_settings.sort_dir,
         )
 
@@ -395,9 +512,10 @@ def _run_browse_mode(
         # Load art for display
         results = _load_art_for_movies(results)
 
-        # Record as suggested
-        for movie in results:
-            storage.add_suggested(movie["movieid"])
+        # Record as suggested (only when resurface avoidance is on)
+        if advanced_settings.avoid_resurface:
+            for movie in results:
+                storage.add_suggested(movie["movieid"], movie.get("title", ""))
 
         # Show browse window
         result = show_browse_window(results, browse_settings.view_style, addon_id)
@@ -413,6 +531,22 @@ def _run_browse_mode(
             if browse_settings.return_to_list:
                 continue
             break
+        elif isinstance(result, dict) and result.get("__play_set__"):
+            # Play Full Set from context menu
+            movie = result["movie"]
+            set_id = movie.get("setid", 0)
+            if set_id:
+                set_details = json_query(get_movie_set_details_query(set_id))
+                set_movies = set_details.get("movies", [])
+                if set_movies:
+                    log.info("Playing full set", event="ui.play_set",
+                             set_name=movie.get("set", ""),
+                             movie_count=len(set_movies))
+                    from resources.lib.playback.playlist_builder import build_and_play_playlist
+                    build_and_play_playlist(set_movies)
+                    if browse_settings.return_to_list:
+                        continue
+                    break
         elif result is not None:
             play_movie(result)
             if browse_settings.return_to_list:
@@ -444,9 +578,10 @@ def _run_playlist_mode(
         set_cache = _load_set_details(results)
         results = apply_set_substitutions(results, set_cache)
 
-    # Record as suggested
-    for movie in results:
-        storage.add_suggested(movie["movieid"])
+    # Record as suggested (only when resurface avoidance is on)
+    if advanced_settings.avoid_resurface:
+        for movie in results:
+            storage.add_suggested(movie["movieid"], movie.get("title", ""))
 
     # Build and play playlist
     success = build_and_play_playlist(
@@ -474,6 +609,20 @@ def _run_playlist_mode(
         )
 
 
+def _reopen_settings(addon_id: str) -> None:
+    """Force-close dialogs and reopen settings to show updated values.
+
+    Kodi's settings dialog caches values in memory. After a selector
+    changes settings via setSetting(), we must close and reopen to
+    pick up the new values.
+    """
+    import xbmc
+    xbmc.executebuiltin('Dialog.Close(all,true)')
+    xbmc.executebuiltin(
+        f'AlarmClock(EasyMovieSettings,Addon.OpenSettings({addon_id}),00:01,silent)'
+    )
+
+
 def _handle_entry_args(addon_id: str) -> bool:
     """Handle command-line arguments for special entry points.
 
@@ -487,6 +636,7 @@ def _handle_entry_args(addon_id: str) -> bool:
     if action == 'selector':
         from resources.selector import main as selector_main
         selector_main()
+        _reopen_settings(addon_id)
         return True
     elif action == 'clone':
         from resources.clone import create_clone
@@ -494,14 +644,36 @@ def _handle_entry_args(addon_id: str) -> bool:
         return True
     elif action == 'set_icon':
         from resources.lib.utils import get_addon
+        import shutil
         import xbmcgui
         addon = get_addon(addon_id)
-        dialog = xbmcgui.Dialog()
-        image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
-        if image:
-            import xbmcvfs as _xbmcvfs
-            icon_path = os.path.join(addon.getAddonInfo('path'), 'icon.png')
-            _xbmcvfs.copy(image, icon_path)
+        addon_path = addon.getAddonInfo('path')
+        icons_dir = os.path.join(addon_path, 'resources', 'icons')
+        icon_names = ["Golden Hour", "Ultraviolet", "Ember", "Nightfall", "Browse..."]
+        icon_files = [
+            "icon-golden-hour.png", "icon-ultraviolet.png",
+            "icon-ember.png", "icon-nightfall.png",
+        ]
+        result = show_select_dialog(
+            heading="Choose Icon",
+            items=icon_names,
+            multi_select=False,
+            addon_id=addon_id,
+        )
+        if result is not None:
+            idx = result[0]
+            dst = os.path.join(addon_path, 'icon.png')
+            if idx < len(icon_files):
+                src = os.path.join(icons_dir, icon_files[idx])
+                shutil.copy2(src, dst)
+            else:
+                # Browse for custom icon
+                dialog = xbmcgui.Dialog()
+                image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
+                if image:
+                    import xbmcvfs as _xbmcvfs
+                    _xbmcvfs.copy(cast(str, image), dst)
+        _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':
         from resources.lib.utils import get_addon
@@ -512,6 +684,7 @@ def _handle_entry_args(addon_id: str) -> bool:
         icon_path = os.path.join(addon_path, 'icon.png')
         if _xbmcvfs.exists(default_icon):
             _xbmcvfs.copy(default_icon, icon_path)
+        _reopen_settings(addon_id)
         return True
 
     return False

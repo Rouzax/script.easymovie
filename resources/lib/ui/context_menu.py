@@ -1,30 +1,43 @@
 """
-Context menu for the browse window.
+Context menu for the EasyMovie browse window.
 
-Provides additional actions when the user presses the context
-menu button on a movie in the browse view.
+Options:
+- Play: Play the selected movie
+- Play Full Set: Play all movies in the set (hidden if not in a set)
+- Movie Info: Open Kodi's movie info dialog
 
 Logging:
     Logger: 'ui'
     Key events:
-        - ui.context (DEBUG): Context menu action selected
+        - ui.context_open (DEBUG): Context menu opened
+        - ui.context_select (DEBUG): Option selected
     See LOGGING.md for full guidelines.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional, TYPE_CHECKING, cast
 
 import xbmcgui
 
+from resources.lib.constants import ADDON_ID
 from resources.lib.utils import get_logger, lang
 
 if TYPE_CHECKING:
     from resources.lib.utils import StructuredLogger
 
 # Context menu action constants
-CONTEXT_PLAY = 0
-CONTEXT_PLAY_SET = 1
-CONTEXT_MOVIE_INFO = 2
+CONTEXT_PLAY = "play"
+CONTEXT_PLAY_SET = "play_set"
+CONTEXT_MOVIE_INFO = "movie_info"
+
+# Control IDs matching the XML
+_BUTTON_PLAY = 110
+_BUTTON_PLAY_SET = 120
+_BUTTON_MOVIE_INFO = 130
+
+# Kodi actions
+ACTION_NAV_BACK = 92
+ACTION_PREVIOUS_MENU = 10
 
 # Module-level logger
 _log: Optional[StructuredLogger] = None
@@ -38,39 +51,93 @@ def _get_log() -> StructuredLogger:
     return _log
 
 
-def show_context_menu(movie: Dict[str, Any]) -> Optional[int]:
-    """Show a context menu for a movie.
+class ContextMenuWindow(xbmcgui.WindowXMLDialog):
+    """Themed context menu dialog for the browse window."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
+        self._has_set: bool = False
+        self._set_name: str = ""
+        self._result: Optional[str] = None
+
+    @property
+    def result(self) -> Optional[str]:
+        """The selected action, or None if cancelled."""
+        return self._result
+
+    def onInit(self):
+        """Set up button labels and visibility."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
+        log = _get_log()
+        log.debug("Context menu opened", event="ui.context_open",
+                  has_set=self._has_set)
+
+        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY)).setLabel(
+            lang(32305))  # "Play"
+
+        set_label = lang(32306)  # "Play Full Set"
+        if self._set_name:
+            set_label = f"{set_label} ({self._set_name})"
+        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SET)).setLabel(
+            set_label)
+
+        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_MOVIE_INFO)).setLabel(
+            lang(32307))  # "Movie Info"
+
+        # Hide "Play Full Set" if movie is not in a set
+        if not self._has_set:
+            self.getControl(_BUTTON_PLAY_SET).setVisible(False)
+
+        self.setFocus(self.getControl(_BUTTON_PLAY))
+
+    def onClick(self, controlId):
+        """Handle button clicks."""
+        if controlId == _BUTTON_PLAY:
+            self._result = CONTEXT_PLAY
+        elif controlId == _BUTTON_PLAY_SET:
+            self._result = CONTEXT_PLAY_SET
+        elif controlId == _BUTTON_MOVIE_INFO:
+            self._result = CONTEXT_MOVIE_INFO
+
+        log = _get_log()
+        log.debug("Context option selected", event="ui.context_select",
+                  result=self._result)
+        self.close()
+
+    def onAction(self, action):
+        """Handle back/escape."""
+        action_id = action.getId()
+        if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            self.close()
+
+
+def show_context_menu(
+    movie: Dict[str, Any],
+    addon_id: Optional[str] = None,
+) -> Optional[str]:
+    """Show the themed context menu for a movie.
 
     Args:
         movie: The movie dict for the focused item.
+        addon_id: Optional addon ID (for clone support).
 
     Returns:
-        Action constant (CONTEXT_PLAY, etc.) or None if cancelled.
+        CONTEXT_PLAY, CONTEXT_PLAY_SET, CONTEXT_MOVIE_INFO, or None.
     """
-    log = _get_log()
+    import xbmcaddon
+    addon_path = xbmcaddon.Addon(addon_id or ADDON_ID).getAddonInfo('path')
 
-    items = [lang(32305)]  # "Play"
-
-    # Add "Play Full Set" if movie is in a set
+    dialog = ContextMenuWindow(
+        'script-easymovie-contextwindow.xml',
+        addon_path, 'Default', '1080i'
+    )
+    dialog._addon_id = addon_id or ADDON_ID
     set_name = movie.get("set", "")
-    if set_name:
-        items.append(f"{lang(32306)} ({set_name})")
+    dialog._has_set = bool(set_name)
+    dialog._set_name = set_name
+    dialog.doModal()
 
-    items.append(lang(32307))  # "Movie Info"
-
-    dialog = xbmcgui.Dialog()
-    result = dialog.contextmenu(items)
-
-    if result < 0:
-        return None
-
-    # Map result index to action
-    if result == 0:
-        log.debug("Context: Play", event="ui.context", action="play")
-        return CONTEXT_PLAY
-    elif result == 1 and set_name:
-        log.debug("Context: Play Set", event="ui.context", action="play_set")
-        return CONTEXT_PLAY_SET
-    else:
-        log.debug("Context: Movie Info", event="ui.context", action="info")
-        return CONTEXT_MOVIE_INFO
+    return dialog.result

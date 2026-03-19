@@ -1,7 +1,7 @@
 """Tests for JSON-RPC query builders."""
 from resources.lib.data.queries import (
     get_all_movies_query,
-    get_movies_with_art_query,
+    get_movie_details_with_art_query,
     get_movie_details_query,
     get_all_movie_sets_query,
     get_movie_set_details_query,
@@ -36,10 +36,13 @@ def test_get_all_movies_query_no_art():
     assert "art" not in query["params"]["properties"]
 
 
-def test_get_movies_with_art_query():
-    """Display query should include art properties."""
-    query = get_movies_with_art_query(movie_ids=[1, 2, 3])
+def test_get_movie_details_with_art_query():
+    """Detail query should include art properties."""
+    query = get_movie_details_with_art_query(movie_id=42)
+    assert query["method"] == "VideoLibrary.GetMovieDetails"
+    assert query["params"]["movieid"] == 42
     assert "art" in query["params"]["properties"]
+    assert "plot" in query["params"]["properties"]
 
 
 def test_get_movie_details_query():

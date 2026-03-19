@@ -100,11 +100,12 @@
 
 				<setting id="selected_genres_display" type="string" label="32113" help="">
 					<level>0</level>
-					<default></default>
+					<default>-</default>
 					<dependencies>
 						<dependency type="visible" setting="genre_mode" operator="is">1</dependency>
 					</dependencies>
-					<control type="label" format="string" />
+					<enable>false</enable>
+					<control type="edit" format="string" />
 				</setting>
 			</group>
 
@@ -168,11 +169,12 @@
 
 				<setting id="selected_mpaa_display" type="string" label="32118" help="">
 					<level>0</level>
-					<default></default>
+					<default>-</default>
 					<dependencies>
 						<dependency type="visible" setting="mpaa_mode" operator="is">1</dependency>
 					</dependencies>
-					<control type="label" format="string" />
+					<enable>false</enable>
+					<control type="edit" format="string" />
 				</setting>
 			</group>
 
@@ -246,6 +248,7 @@
 							<option label="32511">0</option>
 							<option label="32512">1</option>
 							<option label="32513">2</option>
+							<option label="32539">3</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string" />
@@ -256,6 +259,7 @@
 					<default>2000</default>
 					<dependencies>
 						<dependency type="visible" setting="year_mode" operator="is">1</dependency>
+						<dependency type="visible" operator="!is" setting="year_filter_type">3</dependency>
 					</dependencies>
 					<constraints>
 						<minimum>1920</minimum>
@@ -276,6 +280,21 @@
 						<minimum>1920</minimum>
 						<step>1</step>
 						<maximum>2030</maximum>
+					</constraints>
+					<control type="slider" format="integer" />
+				</setting>
+
+				<setting id="year_recency" type="integer" label="32540" help="">
+					<level>0</level>
+					<default>5</default>
+					<dependencies>
+						<dependency type="visible" setting="year_mode" operator="is">1</dependency>
+						<dependency type="visible" setting="year_filter_type" operator="is">3</dependency>
+					</dependencies>
+					<constraints>
+						<minimum>1</minimum>
+						<step>1</step>
+						<maximum>30</maximum>
 					</constraints>
 					<control type="slider" format="integer" />
 				</setting>
@@ -558,11 +577,12 @@
 
 				<setting id="pool_display" type="string" label="32172" help="">
 					<level>0</level>
-					<default></default>
+					<default>-</default>
 					<dependencies>
 						<dependency type="visible" setting="pool_enabled">true</dependency>
 					</dependencies>
-					<control type="label" format="string" />
+					<enable>false</enable>
+					<control type="edit" format="string" />
 				</setting>
 			</group>
 
@@ -599,6 +619,21 @@
 					<default>true</default>
 					<control type="toggle" />
 				</setting>
+
+				<setting id="show_counts" type="boolean" label="32178" help="32626">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle" />
+				</setting>
+
+				<setting id="cumulative_counts" type="boolean" label="32179" help="32627">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible" setting="show_counts">true</dependency>
+					</dependencies>
+					<control type="toggle" />
+				</setting>
 			</group>
 
 			<group id="debugging" label="32027">
@@ -625,28 +660,28 @@
 		<!-- ============================================================== -->
 		<category id="hidden" label="" help="">
 			<group id="internal" label="">
-				<setting id="selected_genres" type="string" label="" help="">
-					<level>3</level>
-					<default></default>
-					<control type="edit" format="string" hidden="true" />
+				<setting id="selected_genres" type="string" visible="false">
+					<level>4</level>
+					<default>none</default>
+					<control type="edit" format="string" />
 				</setting>
 
-				<setting id="selected_mpaa" type="string" label="" help="">
-					<level>3</level>
-					<default></default>
-					<control type="edit" format="string" hidden="true" />
+				<setting id="selected_mpaa" type="string" visible="false">
+					<level>4</level>
+					<default>none</default>
+					<control type="edit" format="string" />
 				</setting>
 
-				<setting id="movie_pool_playlist_path" type="string" label="" help="">
-					<level>3</level>
-					<default></default>
-					<control type="edit" format="string" hidden="true" />
+				<setting id="movie_pool_playlist_path" type="string" visible="false">
+					<level>4</level>
+					<default>none</default>
+					<control type="edit" format="string" />
 				</setting>
 
-				<setting id="last_wizard_answers" type="string" label="" help="">
-					<level>3</level>
-					<default></default>
-					<control type="edit" format="string" hidden="true" />
+				<setting id="last_wizard_answers" type="string" visible="false">
+					<level>4</level>
+					<default>none</default>
+					<control type="edit" format="string" />
 				</setting>
 			</group>
 		</category>
