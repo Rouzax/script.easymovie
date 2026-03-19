@@ -15,7 +15,7 @@ Logging:
 from __future__ import annotations
 
 import os
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, cast
 
 import xbmcgui
 
@@ -76,9 +76,9 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         """Populate the dialog when it opens."""
-        self.getControl(SELECT_HEADING).setLabel(self.heading)
+        cast(xbmcgui.ControlLabel, self.getControl(SELECT_HEADING)).setLabel(self.heading)
 
-        list_control = self.getControl(SELECT_LIST)
+        list_control = cast(xbmcgui.ControlList, self.getControl(SELECT_LIST))
         list_control.reset()
 
         for i, item_label in enumerate(self.items):
@@ -94,9 +94,10 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
     def onClick(self, controlId):
         """Handle button and list item clicks."""
         if controlId == SELECT_LIST:
+            list_control = cast(xbmcgui.ControlList, self.getControl(SELECT_LIST))
             if self.multi_select:
-                idx = self.getControl(SELECT_LIST).getSelectedPosition()
-                li = self.getControl(SELECT_LIST).getSelectedItem()
+                idx = list_control.getSelectedPosition()
+                li = list_control.getSelectedItem()
                 if li.getProperty('checked') == 'true':
                     li.setProperty('checked', '')
                     if idx in self.selected:
@@ -107,7 +108,7 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
                         self.selected.append(idx)
             else:
                 # Single select: close immediately
-                self.selected = [self.getControl(SELECT_LIST).getSelectedPosition()]
+                self.selected = [list_control.getSelectedPosition()]
                 self.close()
 
         elif controlId == SELECT_OK:
@@ -145,12 +146,13 @@ class ConfirmDialog(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         """Set up the dialog labels."""
-        self.getControl(CONFIRM_HEADING).setLabel(self.heading)
-        self.getControl(CONFIRM_MESSAGE).setLabel(self.message)
+        cast(xbmcgui.ControlLabel, self.getControl(CONFIRM_HEADING)).setLabel(self.heading)
+        cast(xbmcgui.ControlLabel, self.getControl(CONFIRM_MESSAGE)).setLabel(self.message)
         if self.yes_label:
-            self.getControl(CONFIRM_YES).setLabel(self.yes_label)
+            cast(xbmcgui.ControlButton, self.getControl(CONFIRM_YES)).setLabel(self.yes_label)
         if self.no_label:
-            self.getControl(CONFIRM_NO).setLabel(self.no_label)
+            cast(xbmcgui.ControlButton, self.getControl(CONFIRM_NO)).setLabel(self.no_label)
+        self.setFocus(self.getControl(CONFIRM_YES))
 
     def onClick(self, controlId):
         """Handle button clicks."""
