@@ -1,0 +1,128 @@
+"""
+Movie filter engine.
+
+Applies user-configured filters to a list of movie dicts from
+Kodi's JSON-RPC API. All filtering is client-side after an
+initial bulk query.
+
+Logging:
+    Logger: 'data'
+    Key events:
+        - filter.apply (DEBUG): Filters applied with result count
+        - filter.no_results (INFO): No movies matched filters
+    See LOGGING.md for full guidelines.
+"""
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any
+
+from resources.lib.constants import WATCHED_BOTH, WATCHED_UNWATCHED, WATCHED_WATCHED
+
+
+@dataclass
+class FilterConfig:
+    """Configuration for movie filtering."""
+    genres: Optional[List[str]] = None
+    genre_match_and: bool = False  # False = OR, True = AND
+    watched: int = WATCHED_BOTH  # 0=unwatched, 1=watched, 2=both
+    mpaa_ratings: Optional[List[str]] = None
+    runtime_min: int = 0  # minutes, 0 = no minimum
+    runtime_max: int = 0  # minutes, 0 = no maximum
+    year_from: int = 0  # 0 = no lower bound
+    year_to: int = 0  # 0 = no upper bound
+    min_score: int = 0  # 0-100 (divide by 10 for comparison)
+    exclude_ids: Optional[List[int]] = field(default_factory=list)
+
+
+def apply_filters(
+    movies: List[Dict[str, Any]], config: FilterConfig
+) -> List[Dict[str, Any]]:
+    """Apply all configured filters to a list of movies.
+
+    Args:
+        movies: List of movie dicts from Kodi JSON-RPC.
+        config: Filter configuration.
+
+    Returns:
+        Filtered list of movie dicts.
+    """
+    result = movies
+
+    # Exclude specific movie IDs (previously suggested, blacklisted)
+    if config.exclude_ids:
+        exclude_set = set(config.exclude_ids)
+        result = [m for m in result if m["movieid"] not in exclude_set]
+
+    # Genre filter
+    if config.genres:
+        genre_set = set(config.genres)
+        if config.genre_match_and:
+            result = [m for m in result if genre_set.issubset(set(m.get("genre", [])))]
+        else:
+            result = [m for m in result if genre_set.intersection(set(m.get("genre", [])))]
+
+    # Watched status
+    if config.watched == WATCHED_UNWATCHED:
+        result = [m for m in result if m.get("playcount", 0) == 0]
+    elif config.watched == WATCHED_WATCHED:
+        result = [m for m in result if m.get("playcount", 0) > 0]
+    # WATCHED_BOTH: no filter
+
+    # MPAA rating
+    if config.mpaa_ratings:
+        mpaa_set = set(config.mpaa_ratings)
+        result = [m for m in result if m.get("mpaa", "") in mpaa_set]
+
+    # Runtime (Kodi stores in seconds, config uses minutes)
+    if config.runtime_min > 0:
+        min_seconds = config.runtime_min * 60
+        result = [m for m in result if m.get("runtime", 0) >= min_seconds]
+    if config.runtime_max > 0:
+        max_seconds = config.runtime_max * 60
+        result = [m for m in result if m.get("runtime", 0) <= max_seconds]
+
+    # Year
+    if config.year_from > 0:
+        result = [m for m in result if m.get("year", 0) >= config.year_from]
+    if config.year_to > 0:
+        result = [m for m in result if m.get("year", 0) <= config.year_to]
+
+    # Score (config stores 0-100, Kodi rating is 0.0-10.0)
+    if config.min_score > 0:
+        min_rating = config.min_score / 10.0
+        result = [m for m in result if m.get("rating", 0.0) >= min_rating]
+
+    return result
+
+
+def extract_unique_genres(movies: List[Dict[str, Any]]) -> List[str]:
+    """Extract and sort all unique genres from a movie list."""
+    genres = set()
+    for movie in movies:
+        for genre in movie.get("genre", []):
+            genres.add(genre)
+    return sorted(genres)
+
+
+def extract_unique_mpaa(movies: List[Dict[str, Any]]) -> List[str]:
+    """Extract and sort all unique MPAA ratings from a movie list."""
+    ratings = set()
+    for movie in movies:
+        mpaa = movie.get("mpaa", "")
+        if mpaa:
+            ratings.add(mpaa)
+    return sorted(ratings)
+
+
+def extract_decade_buckets(movies: List[Dict[str, Any]]) -> List[tuple]:
+    """Extract decade buckets with counts from a movie list.
+
+    Returns list of (decade_start, count, label) tuples, sorted descending.
+    Example: [(2020, 331, "2020s"), (1990, 3, "1990s")]
+    """
+    from collections import Counter
+    decades = Counter((m.get("year", 0) // 10) * 10 for m in movies if m.get("year", 0) > 0)
+    buckets = []
+    for decade, count in sorted(decades.items(), reverse=True):
+        label = f"{decade}s"
+        buckets.append((decade, count, label))
+    return buckets
