@@ -160,15 +160,38 @@ def main(addon_id: str = ADDON_ID) -> None:
      advanced_settings) = load_settings(addon_id if addon_id != ADDON_ID else None)
 
     log.debug("Settings", event="launch.settings",
+              # Mode
               mode=primary_function,
+              # Browse
+              view_style=browse_settings.view_style,
+              browse_count=browse_settings.result_count,
+              browse_sort=browse_settings.sort_by,
+              browse_sort_dir=browse_settings.sort_dir,
+              # Playlist
+              playlist_count=playlist_settings.movie_count,
+              playlist_sort=playlist_settings.sort_by,
+              prioritize_in_progress=playlist_settings.prioritize_in_progress,
+              # Filters
+              genre_mode=filter_settings.genre_mode,
+              watched_mode=filter_settings.watched_mode,
+              mpaa_mode=filter_settings.mpaa_mode,
+              runtime_mode=filter_settings.runtime_mode,
+              year_mode=filter_settings.year_mode,
+              score_mode=filter_settings.score_mode,
+              # Sets
+              set_enabled=set_settings.enabled,
+              continuation=set_settings.continuation_enabled,
+              continuation_duration=set_settings.continuation_duration,
+              # Playback
+              check_in_progress=playback_settings.check_in_progress,
+              show_info=playback_settings.show_info_when_playing,
+              # Advanced
+              pool_enabled=advanced_settings.movie_pool_enabled,
               avoid_resurface=advanced_settings.avoid_resurface,
               resurface_window=advanced_settings.resurface_window,
               remember_filters=advanced_settings.remember_filters,
               show_counts=advanced_settings.show_counts,
-              cumulative_counts=advanced_settings.cumulative_counts,
-              set_enabled=set_settings.enabled,
-              continuation=set_settings.continuation_enabled,
-              pool_enabled=advanced_settings.movie_pool_enabled)
+              cumulative_counts=advanced_settings.cumulative_counts)
 
     # 2. Check for in-progress movie
     if playback_settings.check_in_progress:
