@@ -173,6 +173,7 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         """Handle navigation actions."""
         action_id = action.getId()
         if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            log.debug("Browse window closed by user", event="ui.browse_close")
             self._result = None
             self.close()
         elif action_id == ACTION_CONTEXT_MENU:
