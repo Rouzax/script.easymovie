@@ -11,6 +11,7 @@ Logging:
         - ui.select (INFO): Movie selected by user
         - ui.surprise (INFO): Surprise Me triggered
         - ui.reroll (INFO): Re-roll triggered
+        - ui.browse_close (DEBUG): User closed browse window
     See LOGGING.md for full guidelines.
 """
 from __future__ import annotations

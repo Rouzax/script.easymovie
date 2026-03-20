@@ -8,6 +8,7 @@ Logging:
     Logger: 'data'
     Key events:
         - results.set_substitute (DEBUG): Movie substituted for set-correct entry
+        - results.set_dedup (DEBUG): Duplicate set member skipped
         - continuation.next_found (DEBUG): Next movie in set identified
     See LOGGING.md for full guidelines.
 """

@@ -7,9 +7,11 @@ the user when a set-member movie finishes.
 Logging:
     Logger: 'playback'
     Key events:
+        - continuation.playback_ended (DEBUG): Playback ended callback received
         - continuation.prompt (INFO): Showing continuation dialog
         - continuation.accepted (INFO): User chose to watch next in set
         - continuation.declined (INFO): User declined, continuing playlist
+        - continuation.fail (WARNING): No movieid for next movie in set
     See LOGGING.md for full guidelines.
 """
 from __future__ import annotations

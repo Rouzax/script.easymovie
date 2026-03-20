@@ -11,6 +11,8 @@ Logging:
         - history.validate (DEBUG): Stale entries removed
         - history.prune (DEBUG): Old entries pruned
         - history.clear (DEBUG): History cleared
+        - history.load_fail (WARNING): Storage file corrupt or unreadable
+        - history.save_fail (WARNING): Failed to save storage
     See LOGGING.md for full guidelines.
 """
 import json
