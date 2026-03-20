@@ -180,7 +180,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             if movie:
                 from resources.lib.ui.context_menu import (
                     show_context_menu, CONTEXT_PLAY, CONTEXT_PLAY_SET,
-                    CONTEXT_MOVIE_INFO,
                 )
                 result = show_context_menu(movie, self._addon_id)
                 if result == CONTEXT_PLAY:
@@ -189,9 +188,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
                 elif result == CONTEXT_PLAY_SET:
                     self._result = {"__play_set__": True, "movie": movie}
                     self.close()
-                elif result == CONTEXT_MOVIE_INFO:
-                    import xbmc
-                    xbmc.executebuiltin('Action(Info)')
 
 
 def show_browse_window(

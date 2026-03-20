@@ -4,7 +4,6 @@ Context menu for the EasyMovie browse window.
 Options:
 - Play: Play the selected movie
 - Play Full Set: Play all movies in the set (hidden if not in a set)
-- Movie Info: Open Kodi's movie info dialog
 
 Logging:
     Logger: 'ui'
@@ -25,12 +24,10 @@ from resources.lib.utils import get_logger, lang
 # Context menu action constants
 CONTEXT_PLAY = "play"
 CONTEXT_PLAY_SET = "play_set"
-CONTEXT_MOVIE_INFO = "movie_info"
 
 # Control IDs matching the XML
 _BUTTON_PLAY = 110
 _BUTTON_PLAY_SET = 120
-_BUTTON_MOVIE_INFO = 130
 
 # Module-level logger
 log = get_logger('ui')
@@ -68,9 +65,6 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
         cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SET)).setLabel(
             set_label)
 
-        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_MOVIE_INFO)).setLabel(
-            lang(32307))  # "Movie Info"
-
         # Hide "Play Full Set" if movie is not in a set
         if not self._has_set:
             self.getControl(_BUTTON_PLAY_SET).setVisible(False)
@@ -83,8 +77,6 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
             self._result = CONTEXT_PLAY
         elif controlId == _BUTTON_PLAY_SET:
             self._result = CONTEXT_PLAY_SET
-        elif controlId == _BUTTON_MOVIE_INFO:
-            self._result = CONTEXT_MOVIE_INFO
 
         log.debug("Context option selected", event="ui.context_select",
                   result=self._result)
@@ -108,7 +100,7 @@ def show_context_menu(
         addon_id: Optional addon ID (for clone support).
 
     Returns:
-        CONTEXT_PLAY, CONTEXT_PLAY_SET, CONTEXT_MOVIE_INFO, or None.
+        CONTEXT_PLAY, CONTEXT_PLAY_SET, or None.
     """
     import xbmcaddon
     addon_path = xbmcaddon.Addon(addon_id or ADDON_ID).getAddonInfo('path')

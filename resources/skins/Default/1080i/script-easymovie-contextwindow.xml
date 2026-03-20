@@ -7,7 +7,6 @@
         100 - Button group list
         110 - Play
         120 - Play Full Set
-        130 - Movie Info
 -->
 <window>
     <zorder>100000</zorder>
@@ -104,19 +103,6 @@
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>
 
-                <!-- Movie Info -->
-                <control type="button" id="130">
-                    <width>340</width>
-                    <height>50</height>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <font>font12</font>
-                    <textoffsetx>25</textoffsetx>
-                    <textcolor>ffFFFFFF</textcolor>
-                    <focusedcolor>$INFO[Window.Property(EasyMovie.Accent)]</focusedcolor>
-                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white_rounded.png</texturefocus>
-                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
-                </control>
             </control>
         </control>
     </controls>
