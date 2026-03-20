@@ -385,5 +385,12 @@ def json_query(query: Union[Dict[str, Any], List[Dict[str, Any]]], return_result
         if return_result:
             return data.get('result', {})
         return data
-    except (json.JSONDecodeError, KeyError, TypeError):
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        try:
+            _log = get_logger('data')
+            method = query.get("method", "unknown") if isinstance(query, dict) else "batch"
+            _log.warning("JSON-RPC query failed", event="jsonrpc.error",
+                         method=method, error=str(exc))
+        except Exception:
+            pass
         return {}
