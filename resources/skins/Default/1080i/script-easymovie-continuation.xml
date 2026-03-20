@@ -100,12 +100,12 @@
                 <texture background="true">-</texture>
             </control>
 
-            <!-- Message (ID 2) -->
+            <!-- Message (ID 2) — top area, near poster -->
             <control type="label" id="2">
                 <left>210</left>
                 <top>85</top>
                 <width>560</width>
-                <height>100</height>
+                <height>130</height>
                 <align>left</align>
                 <textcolor>ffFFFFFF</textcolor>
                 <font>font13</font>
@@ -113,10 +113,10 @@
                 <label>-</label>
             </control>
 
-            <!-- Subtitle (ID 4) -->
+            <!-- Subtitle (ID 4) — mid area, between message and buttons -->
             <control type="label" id="4">
                 <left>210</left>
-                <top>200</top>
+                <top>225</top>
                 <width>560</width>
                 <height>80</height>
                 <align>left</align>
@@ -126,12 +126,12 @@
                 <label>-</label>
             </control>
 
-            <!-- Timer Label (ID 3) -->
+            <!-- Timer Label (ID 3) — anchored near buttons -->
             <control type="label" id="3">
                 <left>210</left>
-                <top>300</top>
+                <top>430</top>
                 <width>560</width>
-                <height>30</height>
+                <height>25</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <textcolor>FF888888</textcolor>

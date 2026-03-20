@@ -539,7 +539,7 @@ msgid "Watch Next"
 msgstr ""
 
 msgctxt "#32317"
-msgid "Continue"
+msgid "Skip"
 msgstr ""
 
 msgctxt "#32318"
