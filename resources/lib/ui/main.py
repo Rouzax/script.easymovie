@@ -228,55 +228,60 @@ def main(addon_id: str = ADDON_ID) -> None:
     # 7. Get storage for history
     storage = _get_storage(addon_id)
 
-    # 8. Run filter wizard
+    # 8. Prepare resurface exclusion (before wizard, so counts are accurate)
+    exclude_ids: set = set()
+    if advanced_settings.avoid_resurface:
+        storage.validate_suggested(all_movies)
+        resurface_hours = RESURFACE_WINDOWS.get(advanced_settings.resurface_window, 24)
+        storage.prune_suggested(resurface_hours)
+        exclude_ids = storage.get_suggested_ids()
+        if exclude_ids:
+            log.debug("Resurface exclusion prepared",
+                      event="history.exclude_prepared",
+                      exclude_count=len(exclude_ids),
+                      window_hours=resurface_hours)
+    else:
+        storage.clear_suggested()
+
+    # 9. Run filter wizard
     wizard = WizardFlow(_build_wizard_settings(filter_settings))
     if advanced_settings.remember_filters:
         wizard.load_last_answers(storage.load_last_filters())
 
     filter_config = _run_wizard(log, wizard, all_movies, addon_id,
                                show_counts=advanced_settings.show_counts,
-                               cumulative_counts=advanced_settings.cumulative_counts)
+                               cumulative_counts=advanced_settings.cumulative_counts,
+                               exclude_ids=exclude_ids)
     if filter_config is None:
         log.info("Wizard cancelled", event="wizard.cancel")
         return  # User cancelled
 
-    # 9. Apply filters
+    # 10. Apply filters (include resurface exclusions)
+    if exclude_ids:
+        filter_config.exclude_ids = list(exclude_ids)
     filtered = apply_filters(all_movies, filter_config)
     if not filtered:
-        log.info("No movies after filtering", event="filter.no_results", total=len(all_movies))
-        show_confirm_dialog("No Results",
-                            "No movies match your filters.\nTry relaxing your criteria.",
-                            yes_label="OK", no_label="", addon_id=addon_id)
-        return
-
-    log.debug("Filtered movies", count=len(filtered), total=len(all_movies))
-
-    # 10. Save wizard answers for next time
-    if advanced_settings.remember_filters:
-        storage.save_last_filters(wizard.get_answers())
-
-    # 11. Exclude previously suggested (or clear history if disabled)
-    if not advanced_settings.avoid_resurface:
-        storage.clear_suggested()
-    elif advanced_settings.avoid_resurface:
-        storage.validate_suggested(all_movies)
-        storage.prune_suggested(RESURFACE_WINDOWS.get(advanced_settings.resurface_window, 24))
-        exclude_ids = storage.get_suggested_ids()
-        pre_exclude = len(filtered)
-        filtered = [m for m in filtered if m.get("movieid", 0) not in exclude_ids]
-        if not filtered:
-            log.info("All movies excluded by resurface window",
+        if exclude_ids:
+            log.info("All movies excluded by filters and resurface window",
                      event="history.exhausted",
-                     pre_exclude=pre_exclude, excluded=len(exclude_ids))
+                     total=len(all_movies), excluded=len(exclude_ids))
             show_confirm_dialog("No Results",
                                 "All matching movies were recently suggested. "
                                 "Try again later or adjust your re-suggestion window.",
                                 yes_label="OK", no_label="", addon_id=addon_id)
-            return
-        if pre_exclude != len(filtered):
-            log.debug("Resurface exclusion applied",
-                      before=pre_exclude, after=len(filtered),
-                      excluded=pre_exclude - len(filtered))
+        else:
+            log.info("No movies after filtering", event="filter.no_results",
+                     total=len(all_movies))
+            show_confirm_dialog("No Results",
+                                "No movies match your filters.\nTry relaxing your criteria.",
+                                yes_label="OK", no_label="", addon_id=addon_id)
+        return
+
+    log.debug("Filtered movies", count=len(filtered), total=len(all_movies))
+
+    # 11. Save wizard answers for next time
+    if advanced_settings.remember_filters:
+        storage.save_last_filters(wizard.get_answers())
 
     # 12. Execute mode
     # Set window property so background service skips set-awareness check
@@ -368,7 +373,8 @@ def _build_wizard_settings(filter_settings: FilterSettings) -> Dict[str, Any]:
 def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 addon_id: str = ADDON_ID,
                 show_counts: bool = True,
-                cumulative_counts: bool = False) -> Optional[Any]:
+                cumulative_counts: bool = False,
+                exclude_ids: Optional[set] = None) -> Optional[Any]:
     """Run the wizard flow, returning a FilterConfig or None if cancelled."""
     from resources.lib.data.filters import (
         extract_unique_genres, extract_unique_mpaa,
@@ -382,9 +388,14 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
         if not show_counts:
             return []
         if not cumulative_counts:
+            if exclude_ids:
+                return [m for m in all_movies
+                        if m.get("movieid", 0) not in exclude_ids]
             return all_movies
         # Build partial filter config from completed steps only
         partial_config = wizard.build_partial_filter_config()
+        if exclude_ids:
+            partial_config.exclude_ids = list(exclude_ids)
         return _apply_filters(all_movies, partial_config, reason="cumulative_count")
 
     def _fmt(label: str, count: int) -> str:
