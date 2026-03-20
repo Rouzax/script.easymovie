@@ -35,7 +35,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="set_icon" type="action" label="32102" help="">
+				<setting id="set_icon" type="action" label="32102" help="32628">
 					<level>0</level>
 					<data>RunScript(script.easymovie,set_icon)</data>
 					<control type="button" format="action">
@@ -43,7 +43,7 @@
 					</control>
 				</setting>
 
-				<setting id="reset_icon" type="action" label="32103" help="">
+				<setting id="reset_icon" type="action" label="32103" help="32629">
 					<level>0</level>
 					<data>RunScript(script.easymovie,reset_icon)</data>
 					<control type="button" format="action">
@@ -124,7 +124,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="watched_preset" type="integer" label="32115" help="">
+				<setting id="watched_preset" type="integer" label="32115" help="32630">
 					<level>0</level>
 					<default>0</default>
 					<dependencies>
@@ -193,7 +193,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="runtime_min" type="integer" label="32120" help="">
+				<setting id="runtime_min" type="integer" label="32120" help="32631">
 					<level>0</level>
 					<default>0</default>
 					<dependencies>
@@ -207,7 +207,7 @@
 					<control type="slider" format="integer" />
 				</setting>
 
-				<setting id="runtime_max" type="integer" label="32121" help="">
+				<setting id="runtime_max" type="integer" label="32121" help="32632">
 					<level>0</level>
 					<default>0</default>
 					<dependencies>
@@ -237,7 +237,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="year_filter_type" type="integer" label="32123" help="">
+				<setting id="year_filter_type" type="integer" label="32123" help="32633">
 					<level>0</level>
 					<default>0</default>
 					<dependencies>
@@ -254,7 +254,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="year_from" type="integer" label="32124" help="">
+				<setting id="year_from" type="integer" label="32124" help="32634">
 					<level>0</level>
 					<default>2000</default>
 					<dependencies>
@@ -269,7 +269,7 @@
 					<control type="slider" format="integer" />
 				</setting>
 
-				<setting id="year_to" type="integer" label="32125" help="">
+				<setting id="year_to" type="integer" label="32125" help="32635">
 					<level>0</level>
 					<default>2026</default>
 					<dependencies>
@@ -284,7 +284,7 @@
 					<control type="slider" format="integer" />
 				</setting>
 
-				<setting id="year_recency" type="integer" label="32540" help="">
+				<setting id="year_recency" type="integer" label="32540" help="32636">
 					<level>0</level>
 					<default>5</default>
 					<dependencies>
@@ -315,7 +315,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="min_score" type="integer" label="32127" help="">
+				<setting id="min_score" type="integer" label="32127" help="32637">
 					<level>0</level>
 					<default>0</default>
 					<dependencies>
@@ -342,7 +342,7 @@
 					<control type="toggle" />
 				</setting>
 
-				<setting id="set_show_info" type="boolean" label="32131" help="">
+				<setting id="set_show_info" type="boolean" label="32131" help="32638">
 					<level>0</level>
 					<default>true</default>
 					<dependencies>
@@ -450,7 +450,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="browse_sort_dir" type="integer" label="32144" help="">
+				<setting id="browse_sort_dir" type="integer" label="32144" help="32639">
 					<level>0</level>
 					<default>1</default>
 					<constraints>
@@ -496,7 +496,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="playlist_sort_dir" type="integer" label="32152" help="">
+				<setting id="playlist_sort_dir" type="integer" label="32152" help="32639">
 					<level>0</level>
 					<default>1</default>
 					<constraints>
@@ -537,7 +537,7 @@
 			</group>
 
 			<group id="during_playback" label="32023">
-				<setting id="show_info_playing" type="boolean" label="32161" help="">
+				<setting id="show_info_playing" type="boolean" label="32161" help="32640">
 					<level>0</level>
 					<default>true</default>
 					<control type="toggle" />
@@ -545,7 +545,7 @@
 			</group>
 
 			<group id="notifications" label="32024">
-				<setting id="show_notifications" type="boolean" label="32162" help="">
+				<setting id="show_notifications" type="boolean" label="32162" help="32641">
 					<level>0</level>
 					<default>true</default>
 					<control type="toggle" />

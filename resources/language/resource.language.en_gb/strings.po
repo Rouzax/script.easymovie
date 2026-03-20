@@ -65,7 +65,7 @@ msgstr ""
 
 # Group labels
 msgctxt "#32010"
-msgid "Launch"
+msgid "On Launch"
 msgstr ""
 
 msgctxt "#32011"
@@ -147,7 +147,7 @@ msgstr ""
 
 # Category 1: EasyMovie
 msgctxt "#32100"
-msgid "Primary function"
+msgid "When I open EasyMovie"
 msgstr ""
 
 msgctxt "#32101"
@@ -155,11 +155,11 @@ msgid "Theme"
 msgstr ""
 
 msgctxt "#32102"
-msgid "Set custom icon..."
+msgid "Set custom icon"
 msgstr ""
 
 msgctxt "#32103"
-msgid "Reset icon to default"
+msgid "Reset to default icon"
 msgstr ""
 
 # Category 2: Filters
@@ -249,11 +249,11 @@ msgid "Enable continuation prompts"
 msgstr ""
 
 msgctxt "#32133"
-msgid "Prompt duration (seconds)"
+msgid "Countdown duration (seconds)"
 msgstr ""
 
 msgctxt "#32134"
-msgid "Default action"
+msgid "If countdown expires"
 msgstr ""
 
 # Category 4: Browse Mode
@@ -262,7 +262,7 @@ msgid "View style"
 msgstr ""
 
 msgctxt "#32141"
-msgid "Return to list after playback"
+msgid "Return to EasyMovie after playback"
 msgstr ""
 
 msgctxt "#32142"
@@ -291,11 +291,11 @@ msgid "Sort direction"
 msgstr ""
 
 msgctxt "#32153"
-msgid "Prioritize in-progress movies"
+msgid "Start playlist with unfinished movies"
 msgstr ""
 
 msgctxt "#32154"
-msgid "Resume from last position"
+msgid "Seek to resume point for movies"
 msgstr ""
 
 # Category 6: Playback
@@ -341,7 +341,7 @@ msgid "Enable debug logging"
 msgstr ""
 
 msgctxt "#32177"
-msgid "Create clone addon..."
+msgid "Create EasyMovie copy..."
 msgstr ""
 
 msgctxt "#32178"
@@ -785,7 +785,7 @@ msgid "Choose what happens when you launch EasyMovie"
 msgstr ""
 
 msgctxt "#32601"
-msgid "Color theme for the EasyMovie interface"
+msgid "Choose the accent color theme for EasyMovie windows and dialogs"
 msgstr ""
 
 msgctxt "#32602"
@@ -825,11 +825,11 @@ msgid "Show a prompt when a collection movie finishes to watch the next one"
 msgstr ""
 
 msgctxt "#32611"
-msgid "How many seconds the continuation prompt stays on screen"
+msgid "Seconds before the continuation prompt auto-dismisses"
 msgstr ""
 
 msgctxt "#32612"
-msgid "What happens when the continuation timer runs out"
+msgid "What happens when the countdown timer reaches zero without user input"
 msgstr ""
 
 msgctxt "#32613"
@@ -853,7 +853,7 @@ msgid "Partially watched movies play first in the playlist"
 msgstr ""
 
 msgctxt "#32618"
-msgid "Resume movies from where you left off"
+msgid "Automatically skip to where you left off for movies"
 msgstr ""
 
 msgctxt "#32619"
@@ -877,11 +877,11 @@ msgid "Pre-fill wizard dialogs with your last answers"
 msgstr ""
 
 msgctxt "#32624"
-msgid "Write detailed logs for troubleshooting"
+msgid "Write detailed diagnostic information to a separate log file"
 msgstr ""
 
 msgctxt "#32625"
-msgid "Create a copy of EasyMovie with different settings"
+msgid "Create a separate copy of EasyMovie with its own settings"
 msgstr ""
 
 msgctxt "#32626"
@@ -890,6 +890,62 @@ msgstr ""
 
 msgctxt "#32627"
 msgid "Count against remaining movies after each filter step (slower on low-end hardware)"
+msgstr ""
+
+msgctxt "#32628"
+msgid "Choose from built-in icon themes or browse for a custom image. The addon icon shown in Kodi menus and notifications will update immediately."
+msgstr ""
+
+msgctxt "#32629"
+msgid "Restore the original EasyMovie icon."
+msgstr ""
+
+msgctxt "#32630"
+msgid "Filter by unwatched, watched, or both"
+msgstr ""
+
+msgctxt "#32631"
+msgid "Only include movies at least this long. Set to 0 for no minimum."
+msgstr ""
+
+msgctxt "#32632"
+msgid "Only include movies no longer than this. Set to 0 for no maximum."
+msgstr ""
+
+msgctxt "#32633"
+msgid "Choose how to filter by year: after, before, between, or recent"
+msgstr ""
+
+msgctxt "#32634"
+msgid "The starting year for the filter range"
+msgstr ""
+
+msgctxt "#32635"
+msgid "The ending year for the filter range"
+msgstr ""
+
+msgctxt "#32636"
+msgid "Only include movies released within this many years"
+msgstr ""
+
+msgctxt "#32637"
+msgid "Only include movies rated at or above this score (0–100)"
+msgstr ""
+
+msgctxt "#32638"
+msgid "Display movie set name and position in the browse view"
+msgstr ""
+
+msgctxt "#32639"
+msgid "Choose ascending or descending sort order"
+msgstr ""
+
+msgctxt "#32640"
+msgid "Show a notification with title and details when a movie starts playing"
+msgstr ""
+
+msgctxt "#32641"
+msgid "Show progress notifications while EasyMovie searches and filters your library"
 msgstr ""
 
 # =============================================================================
