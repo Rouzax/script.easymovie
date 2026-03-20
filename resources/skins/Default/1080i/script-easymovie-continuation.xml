@@ -100,28 +100,26 @@
                 <texture background="true">-</texture>
             </control>
 
-            <!-- Message: "You just watched..." (ID 2) -->
+            <!-- Message (ID 2) -->
             <control type="label" id="2">
                 <left>210</left>
-                <top>90</top>
+                <top>85</top>
                 <width>560</width>
-                <height>60</height>
+                <height>100</height>
                 <align>left</align>
-                <aligny>center</aligny>
                 <textcolor>ffFFFFFF</textcolor>
                 <font>font13</font>
                 <wrapmultiline>true</wrapmultiline>
                 <label>-</label>
             </control>
 
-            <!-- Subtitle: "X is next in the Y" (ID 4) -->
+            <!-- Subtitle (ID 4) -->
             <control type="label" id="4">
                 <left>210</left>
-                <top>160</top>
+                <top>190</top>
                 <width>560</width>
                 <height>80</height>
                 <align>left</align>
-                <aligny>center</aligny>
                 <textcolor>FFAAAAAA</textcolor>
                 <font>font12</font>
                 <wrapmultiline>true</wrapmultiline>
@@ -131,7 +129,7 @@
             <!-- Timer Label (ID 3) -->
             <control type="label" id="3">
                 <left>210</left>
-                <top>260</top>
+                <top>280</top>
                 <width>560</width>
                 <height>30</height>
                 <align>left</align>
