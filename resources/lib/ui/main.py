@@ -385,7 +385,7 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             return all_movies
         # Build partial filter config from completed steps only
         partial_config = wizard.build_partial_filter_config()
-        return _apply_filters(all_movies, partial_config)
+        return _apply_filters(all_movies, partial_config, reason="cumulative_count")
 
     def _fmt(label: str, count: int) -> str:
         """Format a label with optional count."""

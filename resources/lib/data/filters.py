@@ -37,25 +37,30 @@ class FilterConfig:
 
 
 def apply_filters(
-    movies: List[Dict[str, Any]], config: FilterConfig
+    movies: List[Dict[str, Any]], config: FilterConfig,
+    reason: str = "final",
 ) -> List[Dict[str, Any]]:
     """Apply all configured filters to a list of movies.
 
     Args:
         movies: List of movie dicts from Kodi JSON-RPC.
         config: Filter configuration.
+        reason: Why filters are being applied. "final" logs per-step detail,
+            "cumulative_count" logs only the summary.
 
     Returns:
         Filtered list of movie dicts.
     """
     result = movies
+    verbose = reason == "final"
 
     # Exclude specific movie IDs (previously suggested, blacklisted)
     if config.exclude_ids:
         exclude_set = set(config.exclude_ids)
         result = [m for m in result if m.get("movieid", 0) not in exclude_set]
-        log.debug("Filter step", event="filter.step",
-                  step="exclude_ids", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="exclude_ids", remaining=len(result))
 
     # Genre filter
     if config.genres:
@@ -64,58 +69,67 @@ def apply_filters(
             result = [m for m in result if genre_set.issubset(set(m.get("genre", [])))]
         else:
             result = [m for m in result if genre_set.intersection(set(m.get("genre", [])))]
-        log.debug("Filter step", event="filter.step",
-                  step="genre", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="genre", remaining=len(result))
 
     # Watched status
     if config.watched == WATCHED_UNWATCHED:
         result = [m for m in result if m.get("playcount", 0) == 0]
-        log.debug("Filter step", event="filter.step",
-                  step="watched", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="watched", remaining=len(result))
     elif config.watched == WATCHED_WATCHED:
         result = [m for m in result if m.get("playcount", 0) > 0]
-        log.debug("Filter step", event="filter.step",
-                  step="watched", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="watched", remaining=len(result))
     # WATCHED_BOTH: no filter
 
     # MPAA rating
     if config.mpaa_ratings:
         mpaa_set = set(config.mpaa_ratings)
         result = [m for m in result if m.get("mpaa", "") in mpaa_set]
-        log.debug("Filter step", event="filter.step",
-                  step="mpaa", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="mpaa", remaining=len(result))
 
     # Runtime (Kodi stores in seconds, config uses minutes)
     if config.runtime_min > 0:
         min_seconds = config.runtime_min * 60
         result = [m for m in result if m.get("runtime", 0) >= min_seconds]
-        log.debug("Filter step", event="filter.step",
-                  step="runtime_min", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="runtime_min", remaining=len(result))
     if config.runtime_max > 0:
         max_seconds = config.runtime_max * 60
         result = [m for m in result if m.get("runtime", 0) <= max_seconds]
-        log.debug("Filter step", event="filter.step",
-                  step="runtime_max", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="runtime_max", remaining=len(result))
 
     # Year
     if config.year_from > 0:
         result = [m for m in result if m.get("year", 0) >= config.year_from]
-        log.debug("Filter step", event="filter.step",
-                  step="year_from", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="year_from", remaining=len(result))
     if config.year_to > 0:
         result = [m for m in result if m.get("year", 0) <= config.year_to]
-        log.debug("Filter step", event="filter.step",
-                  step="year_to", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="year_to", remaining=len(result))
 
     # Score (config stores 0-100, Kodi rating is 0.0-10.0)
     if config.min_score > 0:
         min_rating = config.min_score / 10.0
         result = [m for m in result if m.get("rating", 0.0) >= min_rating]
-        log.debug("Filter step", event="filter.step",
-                  step="score", remaining=len(result))
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="score", remaining=len(result))
 
     log.debug("Filters applied", event="filter.apply",
-              input_count=len(movies), result_count=len(result))
+              reason=reason, input_count=len(movies), result_count=len(result))
     return result
 
 
