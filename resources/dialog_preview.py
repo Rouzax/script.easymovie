@@ -5,10 +5,14 @@ Dialog Preview Script — quickly cycle through all custom dialogs.
 
 Usage from Kodi:
     RunScript(script.easymovie,dialog_preview)
+    RunScript(script.easymovie,dialog_preview,script.easymovie.kids)
 
 Or from the Kodi debug console / JSON-RPC:
     {"jsonrpc":"2.0","method":"Addons.ExecuteAddon",
      "params":{"addonid":"script.easymovie","params":["dialog_preview"]},"id":1}
+
+The optional third argument overrides the addon ID, so dialogs use
+that addon's name, theme, and skin path (useful for testing clones).
 """
 from __future__ import annotations
 
@@ -17,11 +21,13 @@ from typing import Any, Dict, List, Optional
 import xbmcgui
 import xbmcaddon
 
-addon = xbmcaddon.Addon()
-addon_id = addon.getAddonInfo('id')
-script_path = addon.getAddonInfo('path')
-
 dialog = xbmcgui.Dialog()
+
+# Resolved at init() time — overridable via Main(override_addon_id)
+addon_id = ""
+addon_name = ""
+script_path = ""
+_notify_title = ""
 
 # Module-level cache so "All Dialogs" doesn't re-query
 _cached_movies: Optional[List[Dict[str, Any]]] = None
@@ -134,7 +140,7 @@ def preview_confirm() -> None:
         no_label="Decline",
         addon_id=addon_id,
     )
-    dialog.notification("EasyMovie Preview", "Confirm result: %s" % result)
+    dialog.notification(_notify_title, "Confirm result: %s" % result)
 
 
 def preview_confirm_single() -> None:
@@ -147,7 +153,7 @@ def preview_confirm_single() -> None:
         no_label="",
         addon_id=addon_id,
     )
-    dialog.notification("EasyMovie Preview", "OK-only result: %s" % result)
+    dialog.notification(_notify_title, "OK-only result: %s" % result)
 
 
 def preview_select_single() -> None:
@@ -167,7 +173,7 @@ def preview_select_single() -> None:
         "Single Select Preview", items,
         multi_select=False, addon_id=addon_id,
     )
-    dialog.notification("EasyMovie Preview", "Selected: %s" % result)
+    dialog.notification(_notify_title, "Selected: %s" % result)
 
 
 def preview_select_multi() -> None:
@@ -188,14 +194,14 @@ def preview_select_multi() -> None:
         multi_select=True, preselected=[1, 3, 5],
         addon_id=addon_id,
     )
-    dialog.notification("EasyMovie Preview", "Selected: %s" % result)
+    dialog.notification(_notify_title, "Selected: %s" % result)
 
 
 def preview_browse() -> None:
     """Show the BrowseWindow with real movies from the library."""
     movies = _fetch_preview_movies()
     if not movies:
-        dialog.ok("EasyMovie Preview",
+        dialog.ok(_notify_title,
                    "No movies found in the library.\n"
                    "Browse preview requires a populated movie library.")
         return
@@ -205,12 +211,12 @@ def preview_browse() -> None:
 
     result = show_browse_window(movies, VIEW_POSTER_GRID, addon_id)
     if result is None:
-        dialog.notification("EasyMovie Preview", "Browse: closed")
+        dialog.notification(_notify_title, "Browse: closed")
     elif isinstance(result, dict):
         title = result.get("title", result.get("movie", {}).get("title", ""))
-        dialog.notification("EasyMovie Preview", "Browse: %s" % title)
+        dialog.notification(_notify_title, "Browse: %s" % title)
     else:
-        dialog.notification("EasyMovie Preview", "Browse: %s" % result)
+        dialog.notification(_notify_title, "Browse: %s" % result)
 
 
 def preview_context_menu() -> None:
@@ -220,7 +226,7 @@ def preview_context_menu() -> None:
 
     from resources.lib.ui.context_menu import show_context_menu
     result = show_context_menu(movie, addon_id=addon_id)
-    dialog.notification("EasyMovie Preview", "Context: %s" % result)
+    dialog.notification(_notify_title, "Context: %s" % result)
 
 
 def preview_continuation() -> None:
@@ -252,7 +258,7 @@ def preview_continuation() -> None:
     )
     cd.doModal()
     dialog.notification(
-        "EasyMovie Preview",
+        _notify_title,
         "Continuation: confirmed=%s auto=%s" % (cd.confirmed, cd.auto_selected)
     )
     del cd
@@ -292,14 +298,28 @@ def preview_set_warning() -> None:
     cd._heading = lang(32326)  # "EasyMovie - earlier movie in set"
     cd.doModal()
     dialog.notification(
-        "EasyMovie Preview",
+        _notify_title,
         "Set warning: confirmed=%s" % cd.confirmed
     )
     del cd
 
 
-def Main() -> None:
-    """Show the dialog preview selection menu."""
+def Main(override_addon_id: Optional[str] = None) -> None:
+    """Show the dialog preview selection menu.
+
+    Args:
+        override_addon_id: If set, use this addon ID for theming and
+            name display instead of the running addon's own ID.
+            Useful for testing clones.
+    """
+    global addon_id, addon_name, script_path, _notify_title
+
+    addon = xbmcaddon.Addon(override_addon_id)  # type: ignore[arg-type]
+    addon_id = addon.getAddonInfo('id')
+    addon_name = addon.getAddonInfo('name')
+    script_path = addon.getAddonInfo('path')
+    _notify_title = "%s Preview" % addon_name
+
     options = [
         "1. Confirm Dialog",
         "2. Confirm Dialog (OK only)",
@@ -312,7 +332,8 @@ def Main() -> None:
         "9. All Dialogs (cycle through)",
     ]
 
-    choice = dialog.select("EasyMovie Dialog Preview", options)  # type: ignore[arg-type]
+    menu_title = "%s Dialog Preview [%s]" % (addon_name, addon_id)
+    choice = dialog.select(menu_title, options)  # type: ignore[arg-type]
 
     previews = [
         preview_confirm,

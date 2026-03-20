@@ -847,7 +847,8 @@ def _handle_entry_args(addon_id: str) -> bool:
         return True
     elif action == 'dialog_preview':
         from resources import dialog_preview
-        dialog_preview.Main()
+        override = sys.argv[2] if len(sys.argv) > 2 else None
+        dialog_preview.Main(override)
         return True
     elif action == 'set_icon':
         from resources.lib.utils import get_addon
