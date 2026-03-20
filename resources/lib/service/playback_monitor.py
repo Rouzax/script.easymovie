@@ -50,8 +50,13 @@ class MoviePlaybackMonitor(xbmc.Player):
     dialog offering to play the earlier movie instead.
     """
 
-    def onPlayBackStarted(self) -> None:
-        """Handle playback start — check for earlier unwatched set movies."""
+    def onAVStarted(self) -> None:
+        """Handle AV stream start — check for earlier unwatched set movies.
+
+        Uses onAVStarted instead of onPlayBackStarted because
+        Player.GetItem metadata (setid, type) is not reliably
+        available until the AV stream is initialized.
+        """
         try:
             self._check_set_awareness()
         except Exception:
@@ -73,6 +78,8 @@ class MoviePlaybackMonitor(xbmc.Player):
 
         # Query what's playing
         result = json_query(get_playing_item_query(), return_result=True)
+        log.debug("Player.GetItem result", event="setcheck.query",
+                   result=result)
         if not result or 'item' not in result:
             log.debug("No playing item", event="setcheck.skip")
             return
