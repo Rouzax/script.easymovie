@@ -8,8 +8,9 @@ addon's userdata directory.
 Logging:
     Logger: 'data'
     Key events:
-        - history.save (DEBUG): Data saved to disk
+        - history.validate (DEBUG): Stale entries removed
         - history.prune (DEBUG): Old entries pruned
+        - history.clear (DEBUG): History cleared
     See LOGGING.md for full guidelines.
 """
 import json
@@ -104,8 +105,16 @@ class StorageManager:
     def clear_suggested(self) -> None:
         """Remove all suggested entries."""
         if self._data["suggested"]:
+            count = len(self._data["suggested"])
             self._data["suggested"] = []
             self.save()
+            try:
+                from resources.lib.utils import get_logger
+                get_logger('data').debug(
+                    "Suggested history cleared",
+                    event="history.clear", removed=count)
+            except Exception:
+                pass
 
     def validate_suggested(self, movies: List[Dict[str, Any]]) -> None:
         """Remove suggested entries where the ID was reused for a different movie.
@@ -125,6 +134,14 @@ class StorageManager:
         ]
         after = len(self._data["suggested"])
         if before != after:
+            try:
+                from resources.lib.utils import get_logger
+                get_logger('data').debug(
+                    "Stale suggested entries removed",
+                    event="history.validate",
+                    removed=before - after, remaining=after)
+            except Exception:
+                pass
             self.save()
 
     def prune_suggested(self, max_age_hours: int) -> None:
@@ -141,6 +158,15 @@ class StorageManager:
         ]
         after = len(self._data["suggested"])
         if before != after:
+            try:
+                from resources.lib.utils import get_logger
+                get_logger('data').debug(
+                    "Old suggested entries pruned",
+                    event="history.prune",
+                    removed=before - after, remaining=after,
+                    max_age_hours=max_age_hours)
+            except Exception:
+                pass
             self.save()
 
     def add_started(self, movieid: int, title: str = "") -> None:
