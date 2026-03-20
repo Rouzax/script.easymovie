@@ -186,6 +186,9 @@ def show_select_dialog(
     Returns:
         List of selected indices, or None if cancelled/back pressed.
     """
+    log.debug("Select dialog opened", event="ui.dialog_open",
+              heading=heading, item_count=len(items),
+              multi_select=multi_select)
     dialog = SelectDialog(
         'script-easymovie-select.xml',
         _get_addon_path(),
@@ -199,10 +202,16 @@ def show_select_dialog(
     dialog.doModal()
 
     if dialog.cancelled:
+        log.debug("Select dialog cancelled", event="ui.dialog_cancel",
+                  heading=heading)
         return None
     selected = sorted(dialog.selected)
     if not selected:
+        log.debug("Select dialog cancelled", event="ui.dialog_cancel",
+                  heading=heading)
         return None  # OK with nothing selected = cancel
+    log.debug("Select dialog selection made", event="ui.dialog_select",
+              heading=heading, selected_count=len(selected))
     return selected
 
 
@@ -225,6 +234,8 @@ def show_confirm_dialog(
     Returns:
         True if user confirmed, False if declined, None if cancelled/back.
     """
+    log.debug("Confirm dialog opened", event="ui.dialog_open",
+              heading=heading)
     dialog = ConfirmDialog(
         'script-easymovie-confirm.xml',
         _get_addon_path(),
@@ -238,5 +249,9 @@ def show_confirm_dialog(
     dialog.doModal()
 
     if dialog.cancelled:
+        log.debug("Confirm dialog cancelled", event="ui.dialog_cancel",
+                  heading=heading)
         return None
+    log.debug("Confirm dialog result", event="ui.dialog_select",
+              heading=heading, confirmed=dialog.confirmed)
     return dialog.confirmed
