@@ -47,54 +47,67 @@ log = get_logger('playback')
 
 
 class ContinuationDialog(xbmcgui.WindowXMLDialog):
-    """Countdown dialog for movie set continuation prompts."""
+    """Countdown dialog for movie set continuation and set warning prompts.
+
+    Args:
+        *args: Positional args passed to WindowXMLDialog.
+        **kwargs: Keyword args. Custom kwargs:
+            - message: str - Dialog message text
+            - subtitle: str - Secondary message text
+            - yes_label: str - Label for the Yes button (left)
+            - no_label: str - Label for the No button (right)
+            - duration: int - Countdown seconds (0 = no timer)
+            - heading: str - Static heading text (e.g. addon/clone name)
+            - timer_template: str - Timer format with %s for seconds
+            - default_yes: bool - True if Yes is the default on timeout
+            - poster: str - Optional poster image path
+            - addon_id: str - Addon ID for theming
+            - logger: StructuredLogger - Optional logger instance
+    """
+
+    def __new__(cls, *args, **kwargs):
+        """Create instance, filtering out custom kwargs for parent class."""
+        for key in ('message', 'subtitle', 'yes_label', 'no_label',
+                    'duration', 'heading', 'timer_template',
+                    'default_yes', 'poster', 'addon_id', 'logger'):
+            kwargs.pop(key, None)
+        return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, *args, **kwargs):
+        self._message = kwargs.pop('message', '')
+        self._subtitle = kwargs.pop('subtitle', '')
+        self._yes_label = kwargs.pop('yes_label', '')
+        self._no_label = kwargs.pop('no_label', '')
+        self._duration = kwargs.pop('duration', 0)
+        self._heading = kwargs.pop('heading', '')
+        self._timer_template = kwargs.pop('timer_template', 'Auto-selecting in %ss')
+        self._default_yes = kwargs.pop('default_yes', True)
+        self._poster = kwargs.pop('poster', '')
+        self._addon_id: str = kwargs.pop('addon_id', ADDON_ID)
+        self._log = kwargs.pop('logger', None) or log
         super().__init__(*args, **kwargs)
-        self._addon_id: str = ADDON_ID
-        self._heading = ""
-        self._message = ""
-        self._subtitle = ""
-        self._yes_label = ""
-        self._no_label = ""
-        self._poster = ""
-        self._duration = 20
-        self._default_yes = True
-        self._confirmed = False
+        self._closed = False
+        self._button_clicked: Optional[int] = None
         self._timer_thread: Optional[threading.Thread] = None
-        self._cancel_timer = False
-        self._auto_selected = False
-
-    def configure(
-        self,
-        message: str,
-        subtitle: str,
-        yes_label: str,
-        no_label: str,
-        poster: str = "",
-        duration: int = 20,
-        default_yes: bool = True,
-    ) -> None:
-        """Configure the dialog before showing."""
-        self._message = message
-        self._subtitle = subtitle
-        self._yes_label = yes_label
-        self._no_label = no_label
-        self._poster = poster
-        self._duration = duration
-        self._default_yes = default_yes
 
     @property
-    def confirmed(self) -> bool:
-        """Whether the user chose to watch next."""
-        return self._confirmed
+    def result(self) -> bool:
+        """Whether the affirmative action was chosen.
 
-    @property
-    def auto_selected(self) -> bool:
-        """Whether the timer expired and auto-selected."""
-        return self._auto_selected
+        Returns True if:
+        - User clicked Yes button, OR
+        - Timer expired and default_yes is True
 
-    def onInit(self):
+        Returns False otherwise (No button, ESC, or timer expired with
+        default_yes False).
+        """
+        if self._button_clicked == CONT_YES:
+            return True
+        if self._button_clicked == CONT_NO:
+            return False
+        return self._default_yes
+
+    def onInit(self) -> None:
         """Set up the dialog."""
         from resources.lib.ui import apply_theme
         apply_theme(self, self._addon_id)
@@ -113,9 +126,13 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
                 pass
 
         if self._duration > 0:
-            cast(xbmcgui.ControlLabel, self.getControl(CONT_TIMER)).setLabel(
-                f"Auto-selecting in {self._duration}s"
-            )
+            try:
+                cast(xbmcgui.ControlLabel, self.getControl(CONT_TIMER)).setLabel(
+                    self._timer_template % self._duration
+                )
+            except RuntimeError:
+                pass
+
             # Focus the non-default button
             if self._default_yes:
                 self.setFocus(self.getControl(CONT_NO))
@@ -123,48 +140,48 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
                 self.setFocus(self.getControl(CONT_YES))
 
             # Start countdown
-            self._cancel_timer = False
-            self._timer_thread = threading.Thread(target=self._countdown_loop)
-            self._timer_thread.daemon = True
+            self._timer_thread = threading.Thread(
+                target=self._countdown_loop, daemon=True
+            )
             self._timer_thread.start()
         else:
-            cast(xbmcgui.ControlLabel, self.getControl(CONT_TIMER)).setLabel('')
+            try:
+                cast(xbmcgui.ControlLabel, self.getControl(CONT_TIMER)).setLabel('')
+            except RuntimeError:
+                pass  # Timer control not in this skin XML (e.g. set warning)
             self.setFocus(self.getControl(CONT_YES))
 
     def _countdown_loop(self) -> None:
         """Countdown timer that auto-closes the dialog."""
         remaining = self._duration
-        while remaining > 0 and not self._cancel_timer:
+        while remaining > 0 and not self._closed:
             xbmc.sleep(1000)
+            if self._closed:
+                return
             remaining -= 1
             try:
                 cast(xbmcgui.ControlLabel, self.getControl(CONT_TIMER)).setLabel(
-                    f"Auto-selecting in {remaining}s"
+                    self._timer_template % remaining
                 )
             except RuntimeError:
-                break
+                return
 
-        if not self._cancel_timer:
-            self._auto_selected = True
-            self._confirmed = self._default_yes
+        if not self._closed:
+            self._log.debug("Countdown expired", event="continuation.timeout")
             self.close()
 
-    def onClick(self, controlId):
+    def onClick(self, controlId: int) -> None:
         """Handle button clicks."""
-        self._cancel_timer = True
-        if controlId == CONT_YES:
-            self._confirmed = True
-            self.close()
-        elif controlId == CONT_NO:
-            self._confirmed = False
+        if controlId in (CONT_YES, CONT_NO):
+            self._button_clicked = controlId
+            self._closed = True
             self.close()
 
-    def onAction(self, action):
+    def onAction(self, action: xbmcgui.Action) -> None:
         """Handle back/escape."""
-        action_id = action.getId()
-        if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
-            self._cancel_timer = True
-            self._confirmed = False
+        if action.getId() in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            self._button_clicked = CONT_NO
+            self._closed = True
             self.close()
 
 
@@ -238,12 +255,6 @@ class PlaybackMonitor(xbmc.Player):
         # Show continuation dialog
         addon_path = xbmcaddon.Addon(self._addon_id).getAddonInfo('path')
 
-        dialog = ContinuationDialog(
-            'script-easymovie-continuation.xml',
-            addon_path, 'Default', '1080i'
-        )
-        dialog._addon_id = self._addon_id
-
         finished_title = movie.get("title", "")
         next_title = next_movie.get("title", "")
         set_name = set_details.get("title", "")
@@ -252,24 +263,24 @@ class PlaybackMonitor(xbmc.Player):
         next_art = next_movie.get("art", {})
         poster = next_art.get("poster", "") if isinstance(next_art, dict) else ""
 
-        dialog.configure(
+        dialog = ContinuationDialog(
+            'script-easymovie-continuation.xml',
+            addon_path, 'Default', '1080i',
             message=f"{lang(32319)}[CR][B]{finished_title}[/B]",
-            subtitle=(
-                f"{lang(32318)} [B]{set_name}[/B]:[CR]"
-                f"{next_title}"
-            ),
+            subtitle=f"{lang(32318)} [B]{set_name}[/B]:[CR]{next_title}",
             yes_label=lang(32316),
             no_label=lang(32317),
             poster=poster,
             duration=self._continuation_duration,
             default_yes=(self._continuation_default == CONTINUATION_DEFAULT_CONTINUE_SET),
+            heading=xbmcaddon.Addon(self._addon_id).getAddonInfo('name'),
+            addon_id=self._addon_id,
         )
         dialog.doModal()
 
-        if dialog.confirmed:
+        if dialog.result:
             log.info("Continuation accepted", event="continuation.accepted",
-                     next_title=next_title,
-                     auto_selected=dialog.auto_selected)
+                     next_title=next_title)
             # Insert next movie at front of playlist
             next_id = next_movie.get("movieid", 0)
             if next_id:
@@ -279,5 +290,4 @@ class PlaybackMonitor(xbmc.Player):
                 log.warning("No movieid for next movie in set", event="continuation.fail",
                             next_title=next_movie.get("title", ""))
         else:
-            log.info("Continuation declined", event="continuation.declined",
-                     auto_selected=dialog.auto_selected)
+            log.info("Continuation declined", event="continuation.declined")

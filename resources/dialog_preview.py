@@ -263,10 +263,7 @@ def preview_continuation() -> None:
 
     cd = ContinuationDialog(
         'script-easymovie-continuation.xml',
-        script_path, 'Default', '1080i'
-    )
-    cd._addon_id = addon_id
-    cd.configure(
+        script_path, 'Default', '1080i',
         message=f"{lang(32319)}[CR][B]{finished_title}[/B]",
         subtitle=f"{lang(32318)} [B]{set_name}[/B]:[CR]{next_title}",
         yes_label=lang(32316),
@@ -274,11 +271,13 @@ def preview_continuation() -> None:
         poster=poster,
         duration=15,
         default_yes=True,
+        heading=addon_name,
+        addon_id=addon_id,
     )
     cd.doModal()
     dialog.notification(
         _notify_title,
-        "Continuation: confirmed=%s auto=%s" % (cd.confirmed, cd.auto_selected)
+        "Continuation: result=%s" % cd.result
     )
     del cd
 
@@ -297,31 +296,26 @@ def preview_set_warning() -> None:
     poster = art.get("poster", "") if isinstance(art, dict) else ""
 
     cd = ContinuationDialog(
-        'script-easymovie-continuation.xml',
-        script_path, 'Default', '1080i'
-    )
-    cd._addon_id = addon_id
-
-    # Formatted message with line breaks for readability
-    message = (
-        f"[B]{title}[/B] ({year})[CR]"
-        f"{lang(32327)} [B]{set_name}[/B][CR]"
-        f"{lang(32328)}"  # "is in your library and unwatched."
-    )
-
-    cd.configure(
-        message=message,
-        subtitle=lang(32329),  # "Would you like to watch it instead?"
-        yes_label=lang(32300),  # "OK"
-        no_label=lang(32301),  # "Cancel"
+        'script-easymovie-setwarning.xml',
+        script_path, 'Default', '1080i',
+        message=(
+            f"[B]{title}[/B] ({year})[CR]"
+            f"{lang(32327)} [B]{set_name}[/B][CR]"
+            f"{lang(32328)}"
+        ),
+        subtitle=lang(32329),
+        yes_label=lang(32300),
+        no_label=lang(32301),
         poster=poster,
         duration=0,
         default_yes=True,
+        heading=addon_name,
+        addon_id=addon_id,
     )
     cd.doModal()
     dialog.notification(
         _notify_title,
-        "Set warning: confirmed=%s" % cd.confirmed
+        "Set warning: result=%s" % cd.result
     )
     del cd
 

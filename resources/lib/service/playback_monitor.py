@@ -156,36 +156,31 @@ class MoviePlaybackMonitor(xbmc.Player):
 
         # Build dialog
         addon_path = xbmcaddon.Addon(ADDON_ID).getAddonInfo('path')
-        dialog = ContinuationDialog(
-            'script-easymovie-continuation.xml',
-            addon_path, 'Default', '1080i'
-        )
-        dialog._addon_id = ADDON_ID
 
         # Get poster art
         art = earlier_movie.get("art", {})
         poster = art.get("poster", "") if isinstance(art, dict) else ""
 
-        # Formatted message with line breaks for readability
-        # "from" [set name] / "is in your library and unwatched."
-        message = (
-            f"[B]{earlier_title}[/B] ({earlier_year})[CR]"
-            f"{lang(32327)} [B]{set_name}[/B][CR]"
-            f"{lang(32328)}"  # "is in your library and unwatched."
-        )
-
-        dialog.configure(
-            message=message,
-            subtitle=lang(32329),  # "Would you like to watch it instead?"
-            yes_label=lang(32300),  # "OK"
-            no_label=lang(32301),  # "Cancel"
+        dialog = ContinuationDialog(
+            'script-easymovie-setwarning.xml',
+            addon_path, 'Default', '1080i',
+            message=(
+                f"[B]{earlier_title}[/B] ({earlier_year})[CR]"
+                f"{lang(32327)} [B]{set_name}[/B][CR]"
+                f"{lang(32328)}"
+            ),
+            subtitle=lang(32329),
+            yes_label=lang(32300),
+            no_label=lang(32301),
             poster=poster,
-            duration=0,  # No countdown — blocking choice
+            duration=0,
             default_yes=True,
+            heading=xbmcaddon.Addon(ADDON_ID).getAddonInfo('name'),
+            addon_id=ADDON_ID,
         )
         dialog.doModal()
 
-        if dialog.confirmed:
+        if dialog.result:
             log.info("User chose earlier movie",
                       event="setcheck.accepted",
                       earlier_title=earlier_title,
