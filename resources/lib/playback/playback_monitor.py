@@ -61,6 +61,7 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
         self._confirmed = False
         self._timer_thread: Optional[threading.Thread] = None
         self._cancel_timer = False
+        self._auto_selected = False
 
     def configure(
         self,
@@ -85,6 +86,11 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
     def confirmed(self) -> bool:
         """Whether the user chose to watch next."""
         return self._confirmed
+
+    @property
+    def auto_selected(self) -> bool:
+        """Whether the timer expired and auto-selected."""
+        return self._auto_selected
 
     def onInit(self):
         """Set up the dialog."""
@@ -136,6 +142,7 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
                 break
 
         if not self._cancel_timer:
+            self._auto_selected = True
             self._confirmed = self._default_yes
             self.close()
 
@@ -193,6 +200,10 @@ class PlaybackMonitor(xbmc.Player):
 
     def onPlayBackEnded(self) -> None:
         """Called when playback ends naturally (movie finished)."""
+        log.debug("Playback ended callback",
+                  event="continuation.playback_ended",
+                  movie_id=self._current_movie_id,
+                  active=self._active)
         if not self._active or self._current_movie_id is None:
             return
         self._check_continuation()
@@ -251,7 +262,8 @@ class PlaybackMonitor(xbmc.Player):
 
         if dialog.confirmed:
             log.info("Continuation accepted", event="continuation.accepted",
-                     next_title=next_title)
+                     next_title=next_title,
+                     auto_selected=dialog.auto_selected)
             # Insert next movie at front of playlist
             next_id = next_movie.get("movieid", 0)
             if next_id:
@@ -261,4 +273,5 @@ class PlaybackMonitor(xbmc.Player):
                 log.warning("No movieid for next movie in set", event="continuation.fail",
                             next_title=next_movie.get("title", ""))
         else:
-            log.info("Continuation declined", event="continuation.declined")
+            log.info("Continuation declined", event="continuation.declined",
+                     auto_selected=dialog.auto_selected)
