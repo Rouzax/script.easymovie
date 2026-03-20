@@ -494,10 +494,6 @@ msgctxt "#32306"
 msgid "Play Full Set"
 msgstr ""
 
-msgctxt "#32307"
-msgid "Movie Info"
-msgstr ""
-
 msgctxt "#32308"
 msgid "Save"
 msgstr ""
@@ -894,4 +890,76 @@ msgstr ""
 
 msgctxt "#32627"
 msgid "Count against remaining movies after each filter step (slower on low-end hardware)"
+msgstr ""
+
+# =============================================================================
+# CLONE & UPDATE (327xx)
+# =============================================================================
+
+msgctxt "#32700"
+msgid "This creates a copy of EasyMovie with its own settings."
+msgstr ""
+
+msgctxt "#32701"
+msgid "It creates a new folder in your addons directory."
+msgstr ""
+
+msgctxt "#32702"
+msgid "Do you wish to continue?"
+msgstr ""
+
+msgctxt "#32703"
+msgid "EasyMovie - "
+msgstr ""
+
+msgctxt "#32704"
+msgid "That name is already in use. Please try another."
+msgstr ""
+
+msgctxt "#32705"
+msgid "Clone created successfully."
+msgstr ""
+
+msgctxt "#32706"
+msgid "Restart Kodi for settings labels to appear."
+msgstr ""
+
+msgctxt "#32707"
+msgid "An error occurred while creating the clone."
+msgstr ""
+
+msgctxt "#32708"
+msgid "Operation cancelled."
+msgstr ""
+
+msgctxt "#32709"
+msgid "A new version of EasyMovie is available."
+msgstr ""
+
+msgctxt "#32710"
+msgid "The clone needs to be updated before it can be used."
+msgstr ""
+
+msgctxt "#32711"
+msgid "Update now?"
+msgstr ""
+
+msgctxt "#32712"
+msgid "Update"
+msgstr ""
+
+msgctxt "#32713"
+msgid "Update successful."
+msgstr ""
+
+msgctxt "#32714"
+msgid "Restart Kodi for all changes to take effect."
+msgstr ""
+
+msgctxt "#32715"
+msgid "An error occurred while updating the clone."
+msgstr ""
+
+msgctxt "#32716"
+msgid "Continue"
 msgstr ""
