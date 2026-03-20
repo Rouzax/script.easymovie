@@ -78,6 +78,52 @@ def _find_set_movie(movies: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+# Module-level cache for set pair
+_cached_set_pair: Optional[Dict[str, Any]] = None
+
+
+def _fetch_set_pair() -> Dict[str, Any]:
+    """Fetch two consecutive movies from the same set.
+
+    Returns dict with keys: finished, next_movie, set_name.
+    Uses cached result on subsequent calls.
+    """
+    global _cached_set_pair
+    if _cached_set_pair is not None:
+        return _cached_set_pair
+
+    from resources.lib.utils import json_query
+    from resources.lib.data.queries import (
+        get_all_movie_sets_query,
+        get_movie_set_details_query,
+    )
+
+    # Find a set with at least 2 movies
+    sets_result = json_query(get_all_movie_sets_query())
+    for movie_set in sets_result.get("sets", []):
+        set_id = movie_set.get("setid", 0)
+        if not set_id:
+            continue
+        details = json_query(get_movie_set_details_query(set_id))
+        set_details = details.get("setdetails", details)
+        set_movies = set_details.get("movies", [])
+        if len(set_movies) >= 2:
+            _cached_set_pair = {
+                "finished": set_movies[0],
+                "next_movie": set_movies[1],
+                "set_name": set_details.get("title", movie_set.get("title", "")),
+            }
+            return _cached_set_pair
+
+    # Fallback: no sets with 2+ movies
+    _cached_set_pair = {
+        "finished": {"title": "The Dark Knight", "year": 2008, "art": {}},
+        "next_movie": {"title": "The Dark Knight Rises", "year": 2012, "art": {}},
+        "set_name": "The Dark Knight Collection",
+    }
+    return _cached_set_pair
+
+
 def preview_confirm() -> None:
     """Show the themed ConfirmDialog."""
     from resources.lib.ui.dialogs import show_confirm_dialog
@@ -179,24 +225,16 @@ def preview_context_menu() -> None:
 
 def preview_continuation() -> None:
     """Show the ContinuationDialog with countdown (playlist continuation)."""
-    movies = _fetch_preview_movies()
-
     from resources.lib.playback.playback_monitor import ContinuationDialog
     from resources.lib.utils import lang
 
-    if len(movies) >= 2:
-        finished = movies[0]
-        next_movie = movies[1]
-        finished_title = finished.get("title", "Preview Movie")
-        next_title = next_movie.get("title", "Next Movie")
-        set_name = finished.get("set", "") or "Preview Collection"
-        art = next_movie.get("art", {})
-        poster = art.get("poster", "") if isinstance(art, dict) else ""
-    else:
-        finished_title = "The Dark Knight"
-        next_title = "The Dark Knight Rises"
-        set_name = "The Dark Knight Collection"
-        poster = ""
+    pair = _fetch_set_pair()
+    finished_title = pair["finished"].get("title", "Preview Movie")
+    next_movie = pair["next_movie"]
+    next_title = next_movie.get("title", "Next Movie")
+    set_name = pair["set_name"]
+    art = next_movie.get("art", {})
+    poster = art.get("poster", "") if isinstance(art, dict) else ""
 
     cd = ContinuationDialog(
         'script-easymovie-continuation.xml',
@@ -222,15 +260,14 @@ def preview_continuation() -> None:
 
 def preview_set_warning() -> None:
     """Show the ContinuationDialog as set warning (no countdown)."""
-    movies = _fetch_preview_movies()
-
     from resources.lib.playback.playback_monitor import ContinuationDialog
     from resources.lib.utils import lang
 
-    movie = _find_set_movie(movies)
+    pair = _fetch_set_pair()
+    movie = pair["finished"]
     title = movie.get("title", "Preview Movie")
     year = str(movie.get("year", 2024))
-    set_name = movie.get("set", "Preview Collection")
+    set_name = pair["set_name"]
     art = movie.get("art", {})
     poster = art.get("poster", "") if isinstance(art, dict) else ""
 
