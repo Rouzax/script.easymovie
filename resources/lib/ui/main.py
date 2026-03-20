@@ -845,6 +845,10 @@ def _handle_entry_args(addon_id: str) -> bool:
         from resources.clone import create_clone
         create_clone()
         return True
+    elif action == 'dialog_preview':
+        from resources import dialog_preview
+        dialog_preview.Main()
+        return True
     elif action == 'set_icon':
         from resources.lib.utils import get_addon
         import xbmcvfs as _xbmcvfs
