@@ -174,20 +174,14 @@ def create_clone() -> None:
             os.path.join(temp_path, 'resources', 'settings.xml'),
         )
 
-        # Remove clone-only file
-        clone_py = os.path.join(temp_path, 'resources', 'clone.py')
-        if os.path.exists(clone_py):
-            os.remove(clone_py)
+        # Remove clone-only files
+        for remove_file in ['resources/clone.py', 'resources/update_clone.py']:
+            path = os.path.join(temp_path, remove_file)
+            if os.path.exists(path):
+                os.remove(path)
 
         progress.update(35, "Updating addon metadata...")
-        # Update addon.xml tokens and set parent version
-        _replace_in_file(addon_xml, [
-            ('SANNAME', sanitized),
-            ('CLONENAME', clone_name),
-            ('COMBNAME', combined_name),
-            ('PARENTVERSION', parent_version),
-        ])
-        # Also parse and set via ElementTree for correctness
+        # Update addon.xml via ElementTree (overwrites template tokens)
         tree = ET.parse(addon_xml)
         root = tree.getroot()
         root.set('id', clone_id)

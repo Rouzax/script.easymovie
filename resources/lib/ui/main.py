@@ -123,8 +123,8 @@ def _check_clone_version(addon_id: str, addon_path: str) -> bool:
         parent_path = parent_addon.getAddonInfo('path')
         update_script = os.path.join(parent_path, 'resources', 'update_clone.py')
         xbmc.executebuiltin(
-            f'RunScript({update_script},{parent_path},'
-            f'{addon_path},{addon_id},{clone_name})'
+            f'RunScript("{update_script}","{parent_path}",'
+            f'"{addon_path}","{addon_id}","{clone_name}")'
         )
 
     return False  # Don't proceed — either updating or user cancelled

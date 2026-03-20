@@ -38,13 +38,7 @@ import xbmcvfs
 # Constants (inlined to avoid import issues)
 ADDON_NAME = "EasyMovie"
 
-# Parse arguments
-src_path = sys.argv[1]
-clone_path = sys.argv[2]
-clone_id = sys.argv[3]
-clone_name = sys.argv[4]
-
-# Get main addon for version info
+# Get main addon for version info and localized strings
 _main_addon = xbmcaddon.Addon('script.easymovie')
 dialog = xbmcgui.Dialog()
 
@@ -79,8 +73,20 @@ def _replace_in_file(filepath: str, old: str, new: str) -> None:
         f.write(content.replace(old, new))
 
 
-def run_update() -> None:
-    """Run the clone update."""
+def run_update(
+    src_path: str,
+    clone_path: str,
+    clone_id: str,
+    clone_name: str,
+) -> None:
+    """Run the clone update.
+
+    Args:
+        src_path: Path to main EasyMovie installation.
+        clone_path: Path to clone addon folder.
+        clone_id: Sanitized addon ID (e.g., script.easymovie.kids_movies).
+        clone_name: Human-readable name (e.g., "Kids Movies").
+    """
     parent_version = _main_addon.getAddonInfo('version')
 
     # Use temp folder for atomic operation
@@ -122,10 +128,11 @@ def run_update() -> None:
             os.path.join(temp_path, 'resources', 'settings.xml'),
         )
 
-        # Remove clone-only file
-        clone_py = os.path.join(temp_path, 'resources', 'clone.py')
-        if os.path.exists(clone_py):
-            os.remove(clone_py)
+        # Remove clone-only files
+        for remove_file in ['resources/clone.py', 'resources/update_clone.py']:
+            path = os.path.join(temp_path, remove_file)
+            if os.path.exists(path):
+                os.remove(path)
 
         progress.update(35, "Updating addon metadata...")
         # Parse and update addon.xml
@@ -232,7 +239,7 @@ def run_update() -> None:
         xbmc.executebuiltin('UpdateLocalAddons')
         xbmc.sleep(3000)
 
-        progress.update(92, "Enabling clone...")
+        progress.update(95, "Enabling clone...")
         xbmc.executeJSONRPC(
             '{"jsonrpc":"2.0","method":"Addons.SetAddonEnabled",'
             f'"id":1,"params":{{"addonid":"{clone_id}","enabled":false}}}}'
@@ -260,6 +267,12 @@ def run_update() -> None:
 
 
 if __name__ == "__main__":
-    _log(f"Clone update started: {clone_name}")
-    run_update()
-    _log(f"Clone update completed: {clone_name} -> {_main_addon.getAddonInfo('version')}")
+    _src_path = sys.argv[1]
+    _clone_path = sys.argv[2]
+    _clone_id = sys.argv[3]
+    _clone_name = sys.argv[4]
+
+    _log(f"Clone update started: {_clone_name}")
+    run_update(_src_path, _clone_path, _clone_id, _clone_name)
+    _log(f"Clone update completed: {_clone_name} -> "
+         f"{_main_addon.getAddonInfo('version')}")
