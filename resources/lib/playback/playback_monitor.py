@@ -253,8 +253,11 @@ class PlaybackMonitor(xbmc.Player):
         poster = next_art.get("poster", "") if isinstance(next_art, dict) else ""
 
         dialog.configure(
-            message=f"{lang(32319)} {finished_title}",
-            subtitle=f"{next_title} {lang(32318)} {set_name}",
+            message=f"{lang(32319)}[CR][B]{finished_title}[/B]",
+            subtitle=(
+                f"{lang(32318)} [B]{set_name}[/B]:[CR]"
+                f"{next_title}"
+            ),
             yes_label=lang(32316),
             no_label=lang(32317),
             poster=poster,

@@ -159,13 +159,34 @@
                     <control type="label">
                         <left>75</left>
                         <top>10</top>
-                        <width>540</width>
+                        <width>480</width>
                         <height>30</height>
                         <aligny>center</aligny>
                         <font>font12</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <label>$INFO[ListItem.Label]</label>
                     </control>
+
+                    <!-- Watched icon (right-aligned on title row) -->
+                    <control type="image">
+                        <left>566</left>
+                        <top>13</top>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="FFAAAAAA">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set icon (far-right on title row) -->
+                    <control type="image">
+                        <left>598</left>
+                        <top>13</top>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="FFAAAAAA">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
+                    </control>
+
                     <control type="label">
                         <left>75</left>
                         <top>42</top>
@@ -198,13 +219,34 @@
                     <control type="label">
                         <left>95</left>
                         <top>10</top>
-                        <width>520</width>
+                        <width>460</width>
                         <height>30</height>
                         <aligny>center</aligny>
                         <font>font12</font>
                         <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                         <label>$INFO[ListItem.Label]</label>
                     </control>
+
+                    <!-- Watched icon (right-aligned on title row) -->
+                    <control type="image">
+                        <left>566</left>
+                        <top>13</top>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set icon (far-right on title row) -->
+                    <control type="image">
+                        <left>598</left>
+                        <top>13</top>
+                        <width>24</width>
+                        <height>24</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
+                    </control>
+
                     <control type="label">
                         <left>95</left>
                         <top>42</top>

@@ -71,7 +71,7 @@
                 <height>40</height>
                 <font>font14_title</font>
                 <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
-                <label>EasyMovie</label>
+                <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
             </control>
 
             <!-- Accent line separator -->
@@ -133,12 +133,32 @@
                     <control type="label">
                         <left>70</left>
                         <top>11</top>
-                        <width>850</width>
+                        <width>840</width>
                         <height>28</height>
                         <aligny>center</aligny>
                         <font>font12</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <label>$INFO[ListItem.Label]</label>
+                    </control>
+
+                    <!-- Watched icon -->
+                    <control type="image">
+                        <left>920</left>
+                        <top>15</top>
+                        <width>20</width>
+                        <height>20</height>
+                        <texture colordiffuse="FFAAAAAA">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set icon -->
+                    <control type="image">
+                        <left>948</left>
+                        <top>15</top>
+                        <width>20</width>
+                        <height>20</height>
+                        <texture colordiffuse="FFAAAAAA">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Rating (top right) -->
@@ -205,12 +225,32 @@
                     <control type="label">
                         <left>70</left>
                         <top>11</top>
-                        <width>850</width>
+                        <width>840</width>
                         <height>28</height>
                         <aligny>center</aligny>
                         <font>font12</font>
                         <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                         <label>$INFO[ListItem.Label]</label>
+                    </control>
+
+                    <!-- Watched icon -->
+                    <control type="image">
+                        <left>920</left>
+                        <top>15</top>
+                        <width>20</width>
+                        <height>20</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set icon -->
+                    <control type="image">
+                        <left>948</left>
+                        <top>15</top>
+                        <width>20</width>
+                        <height>20</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Rating (top right, white on focus) -->

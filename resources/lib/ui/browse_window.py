@@ -93,6 +93,12 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         from resources.lib.ui import apply_theme
         apply_theme(self, self._addon_id)
 
+        # Set addon name for skin heading (shows clone name for clones)
+        self.setProperty(
+            'EasyMovie.AddonName',
+            xbmcaddon.Addon(self._addon_id).getAddonInfo('name'),
+        )
+
         log.info("Browse window opened", event="ui.browse",
                  movie_count=len(self._movies))
 
@@ -134,6 +140,9 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
                 li.setProperty("set_name", set_name)
 
             li.setProperty("movieid", str(movie.get("movieid", 0)))
+
+            if movie.get("playcount", 0) > 0:
+                li.setProperty("watched", "true")
 
             list_control.addItem(li)
 

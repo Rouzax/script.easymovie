@@ -539,11 +539,11 @@ msgid "Watch Next"
 msgstr ""
 
 msgctxt "#32317"
-msgid "Continue Playlist"
+msgid "Continue"
 msgstr ""
 
 msgctxt "#32318"
-msgid "is next in the"
+msgid "Next in"
 msgstr ""
 
 msgctxt "#32319"
@@ -579,10 +579,14 @@ msgid "earlier movie in set"
 msgstr ""
 
 msgctxt "#32327"
-msgid "%s (%s) from %s is in your library and unwatched."
+msgid "from"
 msgstr ""
 
 msgctxt "#32328"
+msgid "is in your library and unwatched."
+msgstr ""
+
+msgctxt "#32329"
 msgid "Would you like to watch it instead?"
 msgstr ""
 

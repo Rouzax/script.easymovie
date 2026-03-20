@@ -3,7 +3,8 @@
     EasyMovie Posters View
     Resolution: 1080i (1920x1080)
 
-    Layout: Left info panel (fanart, title, metadata, plot) + Right poster grid
+    Layout: Left info panel (fanart, title, metadata, plot, buttons) + Right poster grid
+    Based on EasyTV Posters View structure — no titles in grid, info panel only.
 
     Control IDs:
         655 - Main poster panel container
@@ -106,12 +107,21 @@
                     <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                 </control>
 
+                <!-- Separator line -->
+                <control type="image">
+                    <left>0</left>
+                    <top>515</top>
+                    <width>620</width>
+                    <height>2</height>
+                    <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                </control>
+
                 <!-- Plot -->
                 <control type="textbox">
                     <left>0</left>
-                    <top>520</top>
+                    <top>527</top>
                     <width>620</width>
-                    <height>380</height>
+                    <height>370</height>
                     <font>font12</font>
                     <textcolor>FFAAAAAA</textcolor>
                     <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
@@ -167,66 +177,130 @@
 
             <!-- ==================== RIGHT SIDE: POSTER GRID ==================== -->
             <control type="panel" id="655">
-                <left>740</left>
-                <top>60</top>
-                <width>1140</width>
-                <height>960</height>
+                <left>720</left>
+                <top>40</top>
+                <width>1160</width>
+                <height>1000</height>
                 <orientation>vertical</orientation>
-                <scrolltime tween="sine" easing="out">300</scrolltime>
                 <onleft>10</onleft>
                 <onright>655</onright>
+                <onup>655</onup>
                 <ondown>655</ondown>
-                <itemgap>8</itemgap>
+                <preloaditems>6</preloaditems>
+                <scrolltime tween="sine" easing="out">200</scrolltime>
 
-                <!-- Unfocused poster -->
-                <itemlayout width="220" height="340">
+                <!-- Unfocused poster item -->
+                <itemlayout width="220" height="360">
+                    <!-- Poster image -->
                     <control type="image">
-                        <left>5</left>
-                        <top>5</top>
-                        <width>210</width>
-                        <height>315</height>
-                        <aspectratio>scale</aspectratio>
-                        <texture>$INFO[ListItem.Art(poster)]</texture>
+                        <left>15</left>
+                        <top>20</top>
+                        <width>190</width>
+                        <height>285</height>
+                        <texture background="true">$INFO[ListItem.Art(poster)]</texture>
+                        <aspectratio aligny="top">scale</aspectratio>
                     </control>
-                    <control type="label">
-                        <left>5</left>
-                        <top>318</top>
-                        <width>210</width>
-                        <height>20</height>
-                        <aligny>center</aligny>
-                        <font>font10</font>
-                        <textcolor>FFAAAAAA</textcolor>
-                        <label>$INFO[ListItem.Label]</label>
+
+                    <!-- Watched scrim (top-left gradient) -->
+                    <control type="image">
+                        <left>15</left>
+                        <top>20</top>
+                        <width>80</width>
+                        <height>80</height>
+                        <texture>common/scrim_topleft.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Watched icon -->
+                    <control type="image">
+                        <left>19</left>
+                        <top>24</top>
+                        <width>40</width>
+                        <height>40</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set scrim (top-right gradient) -->
+                    <control type="image">
+                        <left>125</left>
+                        <top>20</top>
+                        <width>80</width>
+                        <height>80</height>
+                        <texture>common/scrim_topright.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
+                    </control>
+
+                    <!-- Set badge overlay -->
+                    <control type="image">
+                        <left>161</left>
+                        <top>24</top>
+                        <width>40</width>
+                        <height>40</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
                 </itemlayout>
 
-                <!-- Focused poster -->
-                <focusedlayout width="220" height="340">
+                <!-- Focused poster item -->
+                <focusedlayout width="220" height="360">
                     <!-- Accent border -->
                     <control type="image">
-                        <left>2</left>
-                        <top>2</top>
-                        <width>216</width>
-                        <height>321</height>
-                        <texture border="4" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                        <left>12</left>
+                        <top>17</top>
+                        <width>196</width>
+                        <height>291</height>
+                        <texture border="3" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
                     </control>
+
+                    <!-- Poster image -->
                     <control type="image">
-                        <left>5</left>
-                        <top>5</top>
-                        <width>210</width>
-                        <height>315</height>
-                        <aspectratio>scale</aspectratio>
-                        <texture>$INFO[ListItem.Art(poster)]</texture>
+                        <left>15</left>
+                        <top>20</top>
+                        <width>190</width>
+                        <height>285</height>
+                        <texture background="true">$INFO[ListItem.Art(poster)]</texture>
+                        <aspectratio aligny="top">scale</aspectratio>
                     </control>
-                    <control type="label">
-                        <left>5</left>
-                        <top>318</top>
-                        <width>210</width>
-                        <height>20</height>
-                        <aligny>center</aligny>
-                        <font>font10</font>
-                        <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
-                        <label>$INFO[ListItem.Label]</label>
+
+                    <!-- Watched scrim (top-left gradient) -->
+                    <control type="image">
+                        <left>15</left>
+                        <top>20</top>
+                        <width>80</width>
+                        <height>80</height>
+                        <texture>common/scrim_topleft.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Watched icon -->
+                    <control type="image">
+                        <left>19</left>
+                        <top>24</top>
+                        <width>40</width>
+                        <height>40</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
+                    </control>
+
+                    <!-- Set scrim (top-right gradient) -->
+                    <control type="image">
+                        <left>125</left>
+                        <top>20</top>
+                        <width>80</width>
+                        <height>80</height>
+                        <texture>common/scrim_topright.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
+                    </control>
+
+                    <!-- Set badge overlay -->
+                    <control type="image">
+                        <left>161</left>
+                        <top>24</top>
+                        <width>40</width>
+                        <height>40</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
+                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
                 </focusedlayout>
             </control>

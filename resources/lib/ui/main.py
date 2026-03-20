@@ -335,11 +335,13 @@ def _check_in_progress(
 
 def _ask_mode(log, addon_id: str = ADDON_ID) -> Optional[int]:
     """Ask the user to choose Browse or Playlist mode."""
+    import xbmcaddon
+    addon_name = xbmcaddon.Addon(addon_id).getAddonInfo('name')
     result = show_confirm_dialog(
-        heading="EasyMovie",
-        message="Choose Mode",
-        yes_label="Browse",
-        no_label="Playlist",
+        heading=addon_name,
+        message=lang(32320),  # "Choose Mode"
+        yes_label=lang(32321),  # "Browse"
+        no_label=lang(32322),  # "Playlist"
         addon_id=addon_id,
     )
     if result is None:
@@ -687,6 +689,8 @@ def _run_browse_mode(
 
         if result == RESULT_REROLL:
             log.info("Re-rolling", event="ui.reroll")
+            if playback_settings.show_processing_notifications:
+                notify("Finding movies...")
             continue
         elif result == RESULT_SURPRISE:
             if not results:

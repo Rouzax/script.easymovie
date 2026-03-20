@@ -198,7 +198,7 @@ def preview_select_multi() -> None:
 
 
 def preview_browse() -> None:
-    """Show the BrowseWindow with real movies from the library."""
+    """Show the BrowseWindow — lets user pick which view style to preview."""
     movies = _fetch_preview_movies()
     if not movies:
         dialog.ok(_notify_title,
@@ -207,9 +207,28 @@ def preview_browse() -> None:
         return
 
     from resources.lib.ui.browse_window import show_browse_window
-    from resources.lib.constants import VIEW_POSTER_GRID
+    from resources.lib.constants import (
+        VIEW_POSTER_GRID, VIEW_CARD_LIST, VIEW_POSTERS,
+        VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
+    )
 
-    result = show_browse_window(movies, VIEW_POSTER_GRID, addon_id)
+    view_names = [
+        "Poster Grid",
+        "Card List",
+        "Posters",
+        "Big Screen",
+        "Split View",
+    ]
+    view_values = [
+        VIEW_POSTER_GRID, VIEW_CARD_LIST, VIEW_POSTERS,
+        VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
+    ]
+
+    choice = dialog.select("Browse View Style", view_names)
+    if choice < 0:
+        return
+
+    result = show_browse_window(movies, view_values[choice], addon_id)
     if result is None:
         dialog.notification(_notify_title, "Browse: closed")
     elif isinstance(result, dict):
@@ -248,8 +267,8 @@ def preview_continuation() -> None:
     )
     cd._addon_id = addon_id
     cd.configure(
-        message="%s %s" % (lang(32319), finished_title),
-        subtitle="%s %s %s" % (next_title, lang(32318), set_name),
+        message=f"{lang(32319)}[CR][B]{finished_title}[/B]",
+        subtitle=f"{lang(32318)} [B]{set_name}[/B]:[CR]{next_title}",
         yes_label=lang(32316),
         no_label=lang(32317),
         poster=poster,
@@ -283,19 +302,22 @@ def preview_set_warning() -> None:
     )
     cd._addon_id = addon_id
 
-    # lang(32327) = "%s (%s) from %s is in your library and unwatched."
-    message = lang(32327) % (title, year, set_name)
+    # Formatted message with line breaks for readability
+    message = (
+        f"[B]{title}[/B] ({year})[CR]"
+        f"{lang(32327)} [B]{set_name}[/B][CR]"
+        f"{lang(32328)}"  # "is in your library and unwatched."
+    )
 
     cd.configure(
         message=message,
-        subtitle=lang(32328),  # "Would you like to watch it instead?"
+        subtitle=lang(32329),  # "Would you like to watch it instead?"
         yes_label=lang(32300),  # "OK"
         no_label=lang(32301),  # "Cancel"
         poster=poster,
         duration=0,
         default_yes=True,
     )
-    cd._heading = "%s - %s" % (addon_name, lang(32326))
     cd.doModal()
     dialog.notification(
         _notify_title,

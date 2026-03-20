@@ -166,20 +166,23 @@ class MoviePlaybackMonitor(xbmc.Player):
         art = earlier_movie.get("art", {})
         poster = art.get("poster", "") if isinstance(art, dict) else ""
 
-        # lang(32327) = "%s (%s) from %s is in your library and unwatched."
-        message = lang(32327) % (earlier_title, earlier_year, set_name)
+        # Formatted message with line breaks for readability
+        # "from" [set name] / "is in your library and unwatched."
+        message = (
+            f"[B]{earlier_title}[/B] ({earlier_year})[CR]"
+            f"{lang(32327)} [B]{set_name}[/B][CR]"
+            f"{lang(32328)}"  # "is in your library and unwatched."
+        )
 
         dialog.configure(
             message=message,
-            subtitle=lang(32328),  # "Would you like to watch it instead?"
+            subtitle=lang(32329),  # "Would you like to watch it instead?"
             yes_label=lang(32300),  # "OK"
             no_label=lang(32301),  # "Cancel"
             poster=poster,
             duration=0,  # No countdown — blocking choice
             default_yes=True,
         )
-        addon_name = xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
-        dialog._heading = "%s - %s" % (addon_name, lang(32326))
         dialog.doModal()
 
         if dialog.confirmed:
