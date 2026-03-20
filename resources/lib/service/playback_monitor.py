@@ -81,10 +81,6 @@ class MoviePlaybackMonitor(xbmc.Player):
             log.debug("No video info tag available", event="setcheck.skip")
             return
 
-        log.debug("Playing item from InfoTag",
-                   event="setcheck.query",
-                   media_type=media_type, movie_id=movie_id)
-
         if media_type != 'movie':
             log.debug("Not a movie", event="setcheck.skip",
                        media_type=media_type)
