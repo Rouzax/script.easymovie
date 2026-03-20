@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, TYPE_CHECKING, cast
 import xbmcvfs
 
 from resources.lib.constants import (
-    ADDON_ID,
+    ADDON_ID, ADDON_NAME,
     MODE_BROWSE, MODE_PLAYLIST, MODE_ASK,
     RESURFACE_WINDOWS,
 )
@@ -64,6 +64,72 @@ if TYPE_CHECKING:
 _active_monitors = []  # Keep references to prevent GC
 
 
+def _check_clone_version(addon_id: str, addon_path: str) -> bool:
+    """Check if a clone needs updating. Returns True if OK to proceed.
+
+    For clones, compares clone version against parent version.
+    If outdated, prompts for mandatory update.
+    Returns False if the clone should not proceed (update triggered or declined).
+    """
+    import xbmc
+    import xbmcaddon
+    import xbmcgui
+
+    log = get_logger('default')
+
+    # Check if we just updated (Kodi cache may still report old version)
+    window = xbmcgui.Window(10000)
+    update_flag = f'EasyMovie.UpdateComplete.{addon_id}'
+    parent_addon = xbmcaddon.Addon(ADDON_ID)
+    parent_version = parent_addon.getAddonInfo('version')
+
+    update_flag_version = window.getProperty(update_flag)
+    if update_flag_version:
+        if update_flag_version == parent_version:
+            log.info("Clone update flag detected, skipping version check",
+                     event="clone.update_flag_cleared", addon_id=addon_id,
+                     flag_version=update_flag_version)
+            return True
+        else:
+            # Flag is for an older version — another update happened
+            window.clearProperty(update_flag)
+            log.info("Clone update flag outdated, checking version",
+                     event="clone.update_flag_stale", addon_id=addon_id,
+                     flag_version=update_flag_version,
+                     parent_version=parent_version)
+
+    clone_addon = xbmcaddon.Addon(addon_id)
+    clone_version = clone_addon.getAddonInfo('version')
+    clone_name = clone_addon.getAddonInfo('name')
+
+    if clone_version == parent_version:
+        return True
+
+    log.warning("Clone out of date", event="clone.outdated",
+                clone_version=clone_version, parent_version=parent_version,
+                addon_id=addon_id)
+
+    # Mandatory update prompt
+    message = (lang(32709) + '\n' + lang(32710) + '\n\n' + lang(32711))
+    confirmed = show_confirm_dialog(
+        f"{ADDON_NAME} - {clone_name}",
+        message,
+        yes_label=lang(32712),  # "Update"
+        no_label=lang(32301),   # "Cancel"
+    )
+
+    if confirmed:
+        # Use main addon's update_clone.py (latest update logic)
+        parent_path = parent_addon.getAddonInfo('path')
+        update_script = os.path.join(parent_path, 'resources', 'update_clone.py')
+        xbmc.executebuiltin(
+            f'RunScript({update_script},{parent_path},'
+            f'{addon_path},{addon_id},{clone_name})'
+        )
+
+    return False  # Don't proceed — either updating or user cancelled
+
+
 def main(addon_id: str = ADDON_ID) -> None:
     """Entry point for the EasyMovie addon.
 
@@ -74,6 +140,13 @@ def main(addon_id: str = ADDON_ID) -> None:
     import xbmcaddon
     log = get_logger('default')
     addon = xbmcaddon.Addon(addon_id)
+
+    # Check clone version before proceeding
+    if addon_id != ADDON_ID:
+        addon_path_str = addon.getAddonInfo('path')
+        if not _check_clone_version(addon_id, addon_path_str):
+            return
+
     version = addon.getAddonInfo('version')
     kodi_build = xbmc.getInfoLabel('System.BuildVersion')
     kodi_version = kodi_build.split()[0] if kodi_build else 'unknown'
