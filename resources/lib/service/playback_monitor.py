@@ -76,6 +76,11 @@ class MoviePlaybackMonitor(xbmc.Player):
                        event="setcheck.skip")
             return
 
+        # Brief delay to let the player fully register the item.
+        # Player.GetItem metadata may not be available immediately
+        # when onAVStarted fires.
+        xbmc.sleep(1000)
+
         # Query what's playing
         result = json_query(get_playing_item_query(), return_result=True)
         log.debug("Player.GetItem result", event="setcheck.query",
