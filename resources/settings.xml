@@ -551,6 +551,14 @@
 					<control type="toggle" />
 				</setting>
 			</group>
+
+			<group id="warnings" label="32029">
+				<setting id="previous_movie_check" type="boolean" label="32163" help="32642">
+					<level>1</level>
+					<default>true</default>
+					<control type="toggle" />
+				</setting>
+			</group>
 		</category>
 
 		<!-- ============================================================== -->

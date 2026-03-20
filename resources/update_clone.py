@@ -128,8 +128,10 @@ def run_update(
             os.path.join(temp_path, 'resources', 'settings.xml'),
         )
 
-        # Remove clone-only files
-        for remove_file in ['resources/clone.py', 'resources/update_clone.py']:
+        # Remove clone-only files (clones don't run background services)
+        for remove_file in [
+            'resources/clone.py', 'resources/update_clone.py', 'service.py',
+        ]:
             path = os.path.join(temp_path, remove_file)
             if os.path.exists(path):
                 os.remove(path)

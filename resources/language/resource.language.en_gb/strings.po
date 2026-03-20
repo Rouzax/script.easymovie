@@ -140,6 +140,10 @@ msgctxt "#32028"
 msgid "Tools"
 msgstr ""
 
+msgctxt "#32029"
+msgid "Warnings"
+msgstr ""
+
 
 # =============================================================================
 # SETTING LABELS (32100-32199)
@@ -299,6 +303,10 @@ msgid "Seek to resume point for movies"
 msgstr ""
 
 # Category 6: Playback
+msgctxt "#32163"
+msgid "Warn about earlier unwatched movies in set"
+msgstr ""
+
 msgctxt "#32160"
 msgid "Check for in-progress movie on launch"
 msgstr ""
@@ -564,6 +572,18 @@ msgstr ""
 
 msgctxt "#32325"
 msgid "Your library has no movies."
+msgstr ""
+
+msgctxt "#32326"
+msgid "EasyMovie - earlier movie in set"
+msgstr ""
+
+msgctxt "#32327"
+msgid "%s (%s) from %s is in your library and unwatched."
+msgstr ""
+
+msgctxt "#32328"
+msgid "Would you like to watch it instead?"
 msgstr ""
 
 
@@ -946,6 +966,10 @@ msgstr ""
 
 msgctxt "#32641"
 msgid "Show progress notifications while EasyMovie searches and filters your library"
+msgstr ""
+
+msgctxt "#32642"
+msgid "If you start a movie but there's an earlier unwatched one in the same set, ask if you want to watch that instead."
 msgstr ""
 
 # =============================================================================

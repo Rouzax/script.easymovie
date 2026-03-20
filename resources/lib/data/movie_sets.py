@@ -35,6 +35,38 @@ def find_first_unwatched_in_set(
     return None
 
 
+def find_first_unwatched_before(
+    set_details: Dict[str, Any],
+    current_movie_id: int,
+) -> Optional[Dict[str, Any]]:
+    """Find the first unwatched movie that comes before the given movie in a set.
+
+    Used by the background service to detect when a user starts playing
+    a later movie in a set while an earlier one is still unwatched.
+
+    Args:
+        set_details: MovieSetDetails response with movies sorted by year.
+        current_movie_id: The movie being played.
+
+    Returns:
+        First unwatched movie before current, or None if none exist
+        or current movie is not in the set.
+    """
+    movies = set_details.get("movies", [])
+
+    # Verify the current movie is actually in this set
+    if not any(m.get("movieid") == current_movie_id for m in movies):
+        return None
+
+    for movie in movies:
+        if movie.get("movieid") == current_movie_id:
+            # Reached the current movie — no earlier unwatched found
+            return None
+        if movie.get("playcount", 0) == 0:
+            return movie
+    return None
+
+
 def apply_set_substitutions(
     movies: List[Dict[str, Any]],
     set_cache: Dict[int, Dict[str, Any]],

@@ -32,6 +32,7 @@ import xbmcvfs
 from resources.lib.constants import (
     ADDON_ID,
     MODE_BROWSE, MODE_PLAYLIST, MODE_ASK,
+    PROP_PLAYLIST_RUNNING,
     RESURFACE_WINDOWS,
 )
 from resources.lib.utils import get_logger, json_query, notify, log_timing, lang
@@ -254,12 +255,19 @@ def main(addon_id: str = ADDON_ID) -> None:
                       excluded=pre_exclude - len(filtered))
 
     # 12. Execute mode
-    if mode == MODE_BROWSE:
-        _run_browse_mode(log, filtered, browse_settings, set_settings,
-                         playback_settings, advanced_settings, storage, addon_id)
-    else:
-        _run_playlist_mode(log, filtered, playlist_settings, set_settings,
-                           playback_settings, advanced_settings, storage, addon_id)
+    # Set window property so background service skips set-awareness check
+    import xbmcgui
+    window = xbmcgui.Window(10000)
+    window.setProperty(PROP_PLAYLIST_RUNNING, 'true')
+    try:
+        if mode == MODE_BROWSE:
+            _run_browse_mode(log, filtered, browse_settings, set_settings,
+                             playback_settings, advanced_settings, storage, addon_id)
+        else:
+            _run_playlist_mode(log, filtered, playlist_settings, set_settings,
+                               playback_settings, advanced_settings, storage, addon_id)
+    finally:
+        window.clearProperty(PROP_PLAYLIST_RUNNING)
 
 
 def _check_in_progress(

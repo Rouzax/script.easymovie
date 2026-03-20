@@ -134,6 +134,19 @@ def build_play_movie_query(movie_id: int) -> Dict[str, Any]:
     }
 
 
+def get_playing_item_query() -> Dict[str, Any]:
+    """Get information about the currently playing video item."""
+    return {
+        "jsonrpc": "2.0",
+        "method": "Player.GetItem",
+        "params": {
+            "playerid": 1,
+            "properties": ["title", "setid", "set", "playcount", "type"],
+        },
+        "id": 1,
+    }
+
+
 def get_in_progress_movies_query() -> Dict[str, Any]:
     """Get movies with a resume point (partially watched)."""
     return {

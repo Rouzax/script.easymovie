@@ -1,0 +1,217 @@
+"""
+Background playback monitor for movie set awareness.
+
+Monitors all movie playback in Kodi. When a user plays a movie
+that belongs to a set with earlier unwatched entries, pauses
+playback and offers to play the earlier movie instead.
+
+Skips the check when playback was initiated by EasyMovie
+(which handles set ordering via substitution).
+
+Logging:
+    Logger: 'service'
+    Key events:
+        - setcheck.found (INFO): Earlier unwatched movie found
+        - setcheck.accepted (INFO): User chose to switch
+        - setcheck.declined (INFO): User chose to continue
+        - setcheck.skip (DEBUG): Check skipped (reason logged)
+        - setcheck.error (ERROR): Query or dialog error
+    See LOGGING.md for full guidelines.
+"""
+from __future__ import annotations
+
+from typing import Any, Dict
+
+import xbmc
+import xbmcaddon
+import xbmcgui
+
+from resources.lib.constants import (
+    ADDON_ID,
+    PLAYER_STOP_DELAY_MS,
+    PROP_PLAYLIST_RUNNING,
+)
+from resources.lib.utils import get_bool_setting, get_logger, json_query, lang
+from resources.lib.data.queries import (
+    get_movie_set_details_query,
+    get_playing_item_query,
+)
+from resources.lib.data.movie_sets import find_first_unwatched_before
+from resources.lib.playback.playback_monitor import ContinuationDialog
+
+log = get_logger('service')
+
+
+class MoviePlaybackMonitor(xbmc.Player):
+    """Monitors playback for movie set awareness.
+
+    When a movie starts playing, checks if it belongs to a set
+    with earlier unwatched entries. If so, pauses and shows a
+    dialog offering to play the earlier movie instead.
+    """
+
+    def onPlayBackStarted(self) -> None:
+        """Handle playback start — check for earlier unwatched set movies."""
+        try:
+            self._check_set_awareness()
+        except Exception:
+            log.exception("Set check failed", event="setcheck.error")
+
+    def _check_set_awareness(self) -> None:
+        """Run the set awareness check."""
+        # Check setting
+        if not get_bool_setting('previous_movie_check'):
+            log.debug("Set check disabled by setting", event="setcheck.skip")
+            return
+
+        # Skip EasyMovie-initiated playback
+        window = xbmcgui.Window(10000)
+        if window.getProperty(PROP_PLAYLIST_RUNNING) == 'true':
+            log.debug("EasyMovie session active, skipping",
+                       event="setcheck.skip")
+            return
+
+        # Query what's playing
+        result = json_query(get_playing_item_query(), return_result=True)
+        if not result or 'item' not in result:
+            log.debug("No playing item", event="setcheck.skip")
+            return
+
+        item = result['item']
+        if item.get('type') != 'movie':
+            log.debug("Not a movie", event="setcheck.skip",
+                       item_type=item.get('type', 'unknown'))
+            return
+
+        set_id = item.get('setid', 0)
+        if not set_id or set_id <= 0:
+            log.debug("Movie not in a set", event="setcheck.skip")
+            return
+
+        movie_id = item.get('id', 0)
+        if not movie_id:
+            log.debug("No movie ID", event="setcheck.skip")
+            return
+
+        # Query set details
+        log.debug("Querying set details", event="setcheck.query",
+                   set_id=set_id)
+        set_result = json_query(
+            get_movie_set_details_query(set_id), return_result=True
+        )
+        if not set_result:
+            log.debug("No set details returned", event="setcheck.skip")
+            return
+
+        set_details = set_result.get("setdetails", set_result)
+
+        # Check for earlier unwatched
+        earlier = find_first_unwatched_before(set_details, movie_id)
+        if earlier is None:
+            log.debug("No earlier unwatched movie", event="setcheck.skip",
+                       set_name=item.get('set', ''))
+            return
+
+        # Found an earlier unwatched movie
+        earlier_title = earlier.get("title", "")
+        earlier_year = str(earlier.get("year", ""))
+        set_name = item.get("set", set_details.get("title", ""))
+
+        log.info("Earlier unwatched movie found",
+                  event="setcheck.found",
+                  current_title=item.get('title', ''),
+                  earlier_title=earlier_title,
+                  set_name=set_name)
+
+        self._show_set_warning(earlier, earlier_title, earlier_year, set_name)
+
+    def _show_set_warning(
+        self,
+        earlier_movie: Dict[str, Any],
+        earlier_title: str,
+        earlier_year: str,
+        set_name: str,
+    ) -> None:
+        """Pause playback and show dialog for earlier unwatched movie."""
+        # Pause playback
+        try:
+            xbmc.executeJSONRPC(
+                '{"jsonrpc":"2.0","method":"Player.PlayPause",'
+                '"params":{"playerid":1,"play":false},"id":1}'
+            )
+        except Exception:
+            log.exception("Failed to pause playback", event="setcheck.error")
+            return
+
+        # Build dialog
+        addon_path = xbmcaddon.Addon(ADDON_ID).getAddonInfo('path')
+        dialog = ContinuationDialog(
+            'script-easymovie-continuation.xml',
+            addon_path, 'Default', '1080i'
+        )
+        dialog._addon_id = ADDON_ID
+
+        # Get poster art
+        art = earlier_movie.get("art", {})
+        poster = art.get("poster", "") if isinstance(art, dict) else ""
+
+        # lang(32327) = "%s (%s) from %s is in your library and unwatched."
+        message = lang(32327) % (earlier_title, earlier_year, set_name)
+
+        dialog.configure(
+            message=message,
+            subtitle=lang(32328),  # "Would you like to watch it instead?"
+            yes_label=lang(32300),  # "OK"
+            no_label=lang(32301),  # "Cancel"
+            poster=poster,
+            duration=0,  # No countdown — blocking choice
+            default_yes=True,
+        )
+        dialog._heading = lang(32326)  # "EasyMovie - earlier movie in set"
+        dialog.doModal()
+
+        if dialog.confirmed:
+            log.info("User chose earlier movie",
+                      event="setcheck.accepted",
+                      movie_title=earlier_title)
+            self._play_earlier_movie(earlier_movie)
+        else:
+            log.info("User declined, continuing",
+                      event="setcheck.declined")
+            self._unpause()
+
+    def _play_earlier_movie(self, movie: Dict[str, Any]) -> None:
+        """Stop current playback and start the earlier movie."""
+        movie_id = movie.get("movieid", 0)
+        if not movie_id:
+            log.warning("No movieid for earlier movie",
+                         event="setcheck.error")
+            self._unpause()
+            return
+
+        try:
+            xbmc.executeJSONRPC(
+                '{"jsonrpc":"2.0","method":"Player.Stop",'
+                '"params":{"playerid":1},"id":1}'
+            )
+            xbmc.sleep(PLAYER_STOP_DELAY_MS)
+            xbmc.executeJSONRPC(
+                '{"jsonrpc":"2.0","method":"Player.Open",'
+                '"params":{"item":{"movieid":%d},'
+                '"options":{"resume":true}},"id":1}' % movie_id
+            )
+        except Exception:
+            log.exception("Failed to start earlier movie",
+                           event="setcheck.error")
+
+    @staticmethod
+    def _unpause() -> None:
+        """Resume paused playback."""
+        try:
+            xbmc.executeJSONRPC(
+                '{"jsonrpc":"2.0","method":"Player.PlayPause",'
+                '"params":{"playerid":1,"play":true},"id":1}'
+            )
+        except Exception:
+            log.exception("Failed to unpause playback",
+                           event="setcheck.error")

@@ -9,6 +9,7 @@ from resources.lib.data.queries import (
     build_play_playlist_query,
     build_play_movie_query,
     get_in_progress_movies_query,
+    get_playing_item_query,
 )
 
 
@@ -100,3 +101,15 @@ def test_in_progress_movies_query():
     query = get_in_progress_movies_query()
     assert query["method"] == "VideoLibrary.GetMovies"
     assert query["params"]["filter"]["field"] == "inprogress"
+
+
+def test_playing_item_query():
+    """Player.GetItem query should request set-related properties."""
+    query = get_playing_item_query()
+    assert query["method"] == "Player.GetItem"
+    assert query["params"]["playerid"] == 1
+    props = query["params"]["properties"]
+    assert "title" in props
+    assert "setid" in props
+    assert "set" in props
+    assert "type" in props

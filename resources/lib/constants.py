@@ -154,6 +154,12 @@ PLAYBACK_COMPLETE_THRESHOLD = 0.90  # 90% watched = complete
 CONTINUATION_DEFAULT_CONTINUE_SET = 0
 CONTINUATION_DEFAULT_CONTINUE_PLAYLIST = 1
 
+# Window properties for service coordination
+PROP_PLAYLIST_RUNNING = "EasyMovie.PlaylistRunning"
+
+# Playback monitor timing (milliseconds)
+PLAYER_STOP_DELAY_MS = 500
+
 # Kodi GUI action IDs
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK = 92

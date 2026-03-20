@@ -1,5 +1,6 @@
 """Tests for movie set awareness logic."""
 from resources.lib.data.movie_sets import (
+    find_first_unwatched_before,
     find_first_unwatched_in_set,
     apply_set_substitutions,
     get_next_in_set,
@@ -96,6 +97,62 @@ def test_get_next_in_set_not_found():
     """Movie not in set returns None."""
     next_movie = get_next_in_set(HP_SET, current_movie_id=999)
     assert next_movie is None
+
+
+SINGLE_MOVIE_SET = {
+    "setid": 13,
+    "title": "Single Movie Set",
+    "movies": [
+        {"movieid": 401, "title": "Only Movie", "playcount": 0, "year": 2020},
+    ],
+}
+
+
+# ---- find_first_unwatched_before tests ----
+
+
+def test_find_earlier_unwatched_exists():
+    """Playing movie 104 (Goblet of Fire), movie 103 is earlier and unwatched."""
+    result = find_first_unwatched_before(HP_SET, current_movie_id=104)
+    assert result is not None
+    assert result["movieid"] == 103
+
+
+def test_find_earlier_unwatched_all_earlier_watched():
+    """Playing movie 103, movies 101-102 are watched — no earlier unwatched."""
+    result = find_first_unwatched_before(HP_SET, current_movie_id=103)
+    assert result is None
+
+
+def test_find_earlier_unwatched_first_in_set():
+    """Playing the first movie in a set — no earlier movies exist."""
+    result = find_first_unwatched_before(HP_SET, current_movie_id=101)
+    assert result is None
+
+
+def test_find_earlier_unwatched_not_in_set():
+    """Movie ID not in the set — returns None."""
+    result = find_first_unwatched_before(HP_SET, current_movie_id=999)
+    assert result is None
+
+
+def test_find_earlier_unwatched_single_movie_set():
+    """Single movie set — no earlier movie possible."""
+    result = find_first_unwatched_before(SINGLE_MOVIE_SET, current_movie_id=401)
+    assert result is None
+
+
+def test_find_earlier_unwatched_all_unwatched():
+    """All unwatched, playing movie 202 — movie 201 is earlier and unwatched."""
+    result = find_first_unwatched_before(ALL_UNWATCHED_SET, current_movie_id=202)
+    assert result is not None
+    assert result["movieid"] == 201
+
+
+def test_find_earlier_unwatched_all_watched():
+    """All watched, playing movie 302 — no unwatched earlier movies."""
+    result = find_first_unwatched_before(ALL_WATCHED_SET, current_movie_id=302)
+    assert result is None
 
 
 def test_no_duplicate_sets_in_results():
