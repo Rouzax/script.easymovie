@@ -143,7 +143,7 @@ def run_update(
         root.set('version', parent_version)
         summary_elem = tree.find('.//summary')
         if summary_elem is not None:
-            summary_elem.text = f"{ADDON_NAME} - {clone_name}"
+            summary_elem.text = clone_name
         tree.write(addon_xml, encoding='unicode', xml_declaration=True)
 
         progress.update(45, "Updating settings...")

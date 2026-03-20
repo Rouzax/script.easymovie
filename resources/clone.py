@@ -104,7 +104,6 @@ def create_clone() -> None:
                     event="clone.name_fallback", original=clone_name)
 
     clone_id = f"script.easymovie.{sanitized}"
-    combined_name = f"{ADDON_NAME} - {clone_name}"
 
     # Get parent addon info
     addon = xbmcaddon.Addon(ADDON_ID)
@@ -189,7 +188,7 @@ def create_clone() -> None:
         root.set('version', parent_version)
         summary_elem = tree.find('.//summary')
         if summary_elem is not None:
-            summary_elem.text = combined_name
+            summary_elem.text = clone_name
         tree.write(addon_xml, encoding='unicode', xml_declaration=True)
 
         progress.update(45, "Updating settings...")
@@ -294,4 +293,6 @@ def create_clone() -> None:
 
 
 if __name__ == '__main__':
+    log.info("Clone creation started", event="clone.start")
     create_clone()
+    log.info("Clone creation completed", event="clone.complete")

@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, TYPE_CHECKING, cast
 import xbmcvfs
 
 from resources.lib.constants import (
-    ADDON_ID, ADDON_NAME,
+    ADDON_ID,
     MODE_BROWSE, MODE_PLAYLIST, MODE_ASK,
     RESURFACE_WINDOWS,
 )
@@ -112,7 +112,7 @@ def _check_clone_version(addon_id: str, addon_path: str) -> bool:
     # Mandatory update prompt
     message = (lang(32709) + '\n' + lang(32710) + '\n\n' + lang(32711))
     confirmed = show_confirm_dialog(
-        f"{ADDON_NAME} - {clone_name}",
+        clone_name,
         message,
         yes_label=lang(32712),  # "Update"
         no_label=lang(32301),   # "Cancel"
@@ -123,8 +123,8 @@ def _check_clone_version(addon_id: str, addon_path: str) -> bool:
         parent_path = parent_addon.getAddonInfo('path')
         update_script = os.path.join(parent_path, 'resources', 'update_clone.py')
         xbmc.executebuiltin(
-            f'RunScript("{update_script}","{parent_path}",'
-            f'"{addon_path}","{addon_id}","{clone_name}")'
+            f'RunScript({update_script},{parent_path},'
+            f'{addon_path},{addon_id},{clone_name})'
         )
 
     return False  # Don't proceed — either updating or user cancelled
