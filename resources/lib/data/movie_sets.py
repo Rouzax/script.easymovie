@@ -92,6 +92,10 @@ def apply_set_substitutions(
         if set_id and set_id in set_cache:
             # Skip if we already have a movie from this set
             if set_id in seen_sets:
+                log.debug("Duplicate set member skipped",
+                          event="results.set_dedup",
+                          title=movie.get("title", ""),
+                          set_name=movie.get("set", ""))
                 continue
             seen_sets.add(set_id)
 
