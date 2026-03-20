@@ -129,7 +129,7 @@
             <!-- Timer Label (ID 3) — centered countdown near buttons -->
             <control type="label" id="3">
                 <left>30</left>
-                <top>390</top>
+                <top>380</top>
                 <width>740</width>
                 <height>25</height>
                 <align>center</align>
