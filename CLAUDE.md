@@ -140,7 +140,7 @@ Modular structure under `resources/lib/`:
 
 Entry point: `default.py` → `resources/lib/ui/main.py`. No background service.
 
-Supporting scripts in `resources/`: `selector.py`, `clone.py`
+Supporting scripts in `resources/`: `selector.py`, `clone.py`, `update_clone.py`
 
 ### Architectural Rules
 
