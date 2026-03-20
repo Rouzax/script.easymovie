@@ -33,8 +33,8 @@ from resources.lib.constants import (
 )
 from resources.lib.utils import get_bool_setting, get_logger, json_query, lang
 from resources.lib.data.queries import (
+    get_movie_details_with_art_query,
     get_movie_set_details_query,
-    get_playing_item_query,
 )
 from resources.lib.data.movie_sets import find_first_unwatched_before
 from resources.lib.playback.playback_monitor import ContinuationDialog
@@ -45,18 +45,14 @@ log = get_logger('service')
 class MoviePlaybackMonitor(xbmc.Player):
     """Monitors playback for movie set awareness.
 
-    When a movie starts playing, checks if it belongs to a set
-    with earlier unwatched entries. If so, pauses and shows a
-    dialog offering to play the earlier movie instead.
+    Uses onAVStarted with xbmc.Player().getVideoInfoTag() to get
+    the playing movie's database ID and media type immediately
+    (no JSON-RPC timing issues), then queries GetMovieDetails
+    for set membership.
     """
 
     def onAVStarted(self) -> None:
-        """Handle AV stream start — check for earlier unwatched set movies.
-
-        Uses onAVStarted instead of onPlayBackStarted because
-        Player.GetItem metadata (setid, type) is not reliably
-        available until the AV stream is initialized.
-        """
+        """Handle AV stream start — check for earlier unwatched set movies."""
         try:
             self._check_set_awareness()
         except Exception:
@@ -76,33 +72,40 @@ class MoviePlaybackMonitor(xbmc.Player):
                        event="setcheck.skip")
             return
 
-        # Brief delay to let the player fully register the item.
-        # Player.GetItem metadata may not be available immediately
-        # when onAVStarted fires.
-        xbmc.sleep(1000)
-
-        # Query what's playing
-        result = json_query(get_playing_item_query(), return_result=True)
-        log.debug("Player.GetItem result", event="setcheck.query",
-                   result=result)
-        if not result or 'item' not in result:
-            log.debug("No playing item", event="setcheck.skip")
+        # Get playing item info from the player directly (no JSON-RPC delay)
+        try:
+            info_tag = self.getVideoInfoTag()
+            media_type = info_tag.getMediaType()
+            movie_id = info_tag.getDbId()
+        except RuntimeError:
+            log.debug("No video info tag available", event="setcheck.skip")
             return
 
-        item = result['item']
-        if item.get('type') != 'movie':
+        log.debug("Playing item from InfoTag",
+                   event="setcheck.query",
+                   media_type=media_type, movie_id=movie_id)
+
+        if media_type != 'movie':
             log.debug("Not a movie", event="setcheck.skip",
-                       item_type=item.get('type', 'unknown'))
+                       media_type=media_type)
             return
 
-        set_id = item.get('setid', 0)
-        if not set_id or set_id <= 0:
-            log.debug("Movie not in a set", event="setcheck.skip")
-            return
-
-        movie_id = item.get('id', 0)
         if not movie_id:
             log.debug("No movie ID", event="setcheck.skip")
+            return
+
+        # Query movie details for set membership
+        movie_result = json_query(
+            get_movie_details_with_art_query(movie_id), return_result=True
+        )
+        if not movie_result:
+            log.debug("No movie details returned", event="setcheck.skip")
+            return
+
+        movie_details = movie_result.get("moviedetails", movie_result)
+        set_id = movie_details.get("setid", 0)
+        if not set_id or set_id <= 0:
+            log.debug("Movie not in a set", event="setcheck.skip")
             return
 
         # Query set details
@@ -121,17 +124,17 @@ class MoviePlaybackMonitor(xbmc.Player):
         earlier = find_first_unwatched_before(set_details, movie_id)
         if earlier is None:
             log.debug("No earlier unwatched movie", event="setcheck.skip",
-                       set_name=item.get('set', ''))
+                       set_name=movie_details.get('set', ''))
             return
 
         # Found an earlier unwatched movie
         earlier_title = earlier.get("title", "")
         earlier_year = str(earlier.get("year", ""))
-        set_name = item.get("set", set_details.get("title", ""))
+        set_name = movie_details.get("set", set_details.get("title", ""))
 
         log.info("Earlier unwatched movie found",
                   event="setcheck.found",
-                  current_title=item.get('title', ''),
+                  current_title=movie_details.get('title', ''),
                   earlier_title=earlier_title,
                   set_name=set_name)
 
