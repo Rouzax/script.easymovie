@@ -6,8 +6,7 @@ objects used by the rest of the addon.
 
 Logging:
     Logger: 'ui'
-    Key events:
-        - settings.load (DEBUG): Settings loaded successfully
+    Key events: None (settings are logged by ui/main.py at launch.settings)
     See LOGGING.md for full guidelines.
 """
 from __future__ import annotations
@@ -202,9 +201,6 @@ def load_settings(
         cumulative_counts=get_bool_setting('cumulative_counts', addon_id),
         debug_logging=get_bool_setting('logging', addon_id),
     )
-
-    log.debug("Settings loaded", event="settings.load",
-              mode=primary_function, theme=theme)
 
     return (primary_function, theme, filter_settings, browse_settings,
             playlist_settings, set_settings, playback_settings, advanced_settings)

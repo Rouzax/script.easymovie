@@ -184,11 +184,14 @@ class MoviePlaybackMonitor(xbmc.Player):
         if dialog.confirmed:
             log.info("User chose earlier movie",
                       event="setcheck.accepted",
-                      movie_title=earlier_title)
+                      earlier_title=earlier_title,
+                      set_name=set_name)
             self._play_earlier_movie(earlier_movie)
         else:
             log.info("User declined, continuing",
-                      event="setcheck.declined")
+                      event="setcheck.declined",
+                      earlier_title=earlier_title,
+                      set_name=set_name)
             self._unpause()
 
     def _play_earlier_movie(self, movie: Dict[str, Any]) -> None:
