@@ -295,7 +295,7 @@ def preview_set_warning() -> None:
         duration=0,
         default_yes=True,
     )
-    cd._heading = lang(32326)  # "EasyMovie - earlier movie in set"
+    cd._heading = "%s - %s" % (addon_name, lang(32326))
     cd.doModal()
     dialog.notification(
         _notify_title,

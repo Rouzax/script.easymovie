@@ -575,7 +575,7 @@ msgid "Your library has no movies."
 msgstr ""
 
 msgctxt "#32326"
-msgid "EasyMovie - earlier movie in set"
+msgid "earlier movie in set"
 msgstr ""
 
 msgctxt "#32327"

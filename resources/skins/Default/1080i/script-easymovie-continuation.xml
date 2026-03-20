@@ -78,7 +78,7 @@
                 <align>center</align>
                 <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                 <font>font14_title</font>
-                <label>EasyMovie</label>
+                <label></label>
             </control>
 
             <!-- Accent line separator -->

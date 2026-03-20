@@ -52,7 +52,7 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._addon_id: str = ADDON_ID
-        self._heading = "EasyMovie"
+        self._heading = ""
         self._message = ""
         self._subtitle = ""
         self._yes_label = ""
@@ -99,7 +99,8 @@ class ContinuationDialog(xbmcgui.WindowXMLDialog):
         from resources.lib.ui import apply_theme
         apply_theme(self, self._addon_id)
 
-        cast(xbmcgui.ControlLabel, self.getControl(CONT_HEADING)).setLabel(self._heading)
+        heading = self._heading or xbmcaddon.Addon(self._addon_id).getAddonInfo('name')
+        cast(xbmcgui.ControlLabel, self.getControl(CONT_HEADING)).setLabel(heading)
         cast(xbmcgui.ControlLabel, self.getControl(CONT_MESSAGE)).setLabel(self._message)
         cast(xbmcgui.ControlLabel, self.getControl(CONT_SUBTITLE)).setLabel(self._subtitle)
         cast(xbmcgui.ControlButton, self.getControl(CONT_YES)).setLabel(self._yes_label)

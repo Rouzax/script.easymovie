@@ -178,7 +178,8 @@ class MoviePlaybackMonitor(xbmc.Player):
             duration=0,  # No countdown — blocking choice
             default_yes=True,
         )
-        dialog._heading = lang(32326)  # "EasyMovie - earlier movie in set"
+        addon_name = xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
+        dialog._heading = "%s - %s" % (addon_name, lang(32326))
         dialog.doModal()
 
         if dialog.confirmed:
