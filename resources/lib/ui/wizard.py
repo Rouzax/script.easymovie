@@ -47,6 +47,24 @@ class WizardStep:
     index: int
 
 
+def _get_preset_value(settings: Dict[str, Any], filter_type: str) -> Any:
+    """Get the preset value for a filter type, for logging."""
+    key_map = {
+        "genre": "preset_genres",
+        "watched": "watched_preset",
+        "mpaa": "preset_mpaa",
+        "runtime": ("runtime_min", "runtime_max"),
+        "year": ("year_from", "year_to"),
+        "score": "min_score",
+    }
+    key = key_map.get(filter_type)
+    if isinstance(key, tuple):
+        return {k: settings.get(k) for k in key}
+    if key:
+        return settings.get(key)
+    return None
+
+
 class WizardFlow:
     """Manages the wizard flow for filter selection.
 
@@ -79,8 +97,10 @@ class WizardFlow:
                     index=len(self.steps),
                 ))
             elif mode == FILTER_PRESET:
+                preset_value = _get_preset_value(settings, filter_type)
                 log.debug("Filter using preset value",
-                          event="filter.preset", filter_type=filter_type)
+                          event="filter.preset", filter_type=filter_type,
+                          value=preset_value)
             else:
                 log.debug("Filter step skipped",
                           event="filter.skip", filter_type=filter_type)

@@ -237,6 +237,7 @@ def main(addon_id: str = ADDON_ID) -> None:
                                show_counts=advanced_settings.show_counts,
                                cumulative_counts=advanced_settings.cumulative_counts)
     if filter_config is None:
+        log.info("Wizard cancelled", event="wizard.cancel")
         return  # User cancelled
 
     # 9. Apply filters
@@ -558,7 +559,9 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
         if not wizard.advance():
             break  # Wizard complete
 
-    return wizard.build_filter_config()
+    config = wizard.build_filter_config()
+    log.debug("Wizard complete", event="wizard.complete")
+    return config
 
 
 def _get_storage(addon_id: str) -> StorageManager:
