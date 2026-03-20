@@ -3,16 +3,16 @@
     EasyMovie Continuation Prompt Dialog
     Resolution: 1080i (1920x1080)
 
-    Shown when a movie set member finishes playing.
-    "You just watched X. Y is next in the Z collection."
+    Shown when a movie set member finishes playing, or when an
+    earlier unwatched movie in a set is detected.
 
     Control IDs:
         1  - Heading label
-        2  - Message label (primary - "You just watched...")
+        2  - Message label (primary)
         3  - Timer label (countdown)
-        4  - Subtitle label ("X is next in the Y collection")
-        10 - "Watch Next" button
-        11 - "Continue Playlist" button
+        4  - Subtitle label (secondary info)
+        10 - Yes/primary button
+        11 - No/secondary button
         20 - Movie poster image
 -->
 <window>
@@ -35,12 +35,12 @@
             </animation>
         </control>
 
-        <!-- Dialog Container: 800x460 centered -->
+        <!-- Dialog Container: 800x530 centered -->
         <control type="group">
             <left>560</left>
-            <top>310</top>
+            <top>275</top>
             <width>800</width>
-            <height>460</height>
+            <height>530</height>
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" delay="100" />
                 <effect type="slide" start="0,-100" end="0" center="auto" tween="back" easing="out" time="600" delay="100" />
@@ -55,7 +55,7 @@
                 <left>-2</left>
                 <top>-2</top>
                 <width>804</width>
-                <height>464</height>
+                <height>534</height>
                 <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
             </control>
 
@@ -64,7 +64,7 @@
                 <left>0</left>
                 <top>0</top>
                 <width>800</width>
-                <height>460</height>
+                <height>530</height>
                 <texture border="12">common/menu.png</texture>
                 <colordiffuse>ffffffff</colordiffuse>
             </control>
@@ -116,7 +116,7 @@
             <!-- Subtitle (ID 4) -->
             <control type="label" id="4">
                 <left>210</left>
-                <top>190</top>
+                <top>200</top>
                 <width>560</width>
                 <height>80</height>
                 <align>left</align>
@@ -129,7 +129,7 @@
             <!-- Timer Label (ID 3) -->
             <control type="label" id="3">
                 <left>210</left>
-                <top>280</top>
+                <top>300</top>
                 <width>560</width>
                 <height>30</height>
                 <align>left</align>
@@ -142,11 +142,11 @@
             <!-- Button Row -->
             <control type="group">
                 <left>185</left>
-                <top>390</top>
+                <top>460</top>
                 <width>430</width>
                 <height>50</height>
 
-                <!-- Watch Next Button (ID 10) -->
+                <!-- Yes/primary Button (ID 10) -->
                 <control type="button" id="10">
                     <left>0</left>
                     <top>0</top>
@@ -164,7 +164,7 @@
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>
 
-                <!-- Continue Playlist Button (ID 11) -->
+                <!-- No/secondary Button (ID 11) -->
                 <control type="button" id="11">
                     <left>230</left>
                     <top>0</top>
