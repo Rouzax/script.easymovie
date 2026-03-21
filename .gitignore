@@ -24,9 +24,9 @@ desktop.ini
 _temp/
 .ruff_cache/
 
-# Implementation plans (development only)
+# Development docs (plans, source artwork)
 IMPLEMENTATION.md
-docs/plans/
+docs/
 
 # Claude Code
 CLAUDE.md
