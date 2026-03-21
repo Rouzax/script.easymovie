@@ -13,9 +13,12 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import xbmc
+
+if TYPE_CHECKING:
+    from resources.lib.data.storage import StorageManager
 
 from resources.lib.constants import PLAYLIST_ADD_DELAY_MS
 from resources.lib.utils import get_logger, json_query, notify
@@ -34,6 +37,7 @@ def build_and_play_playlist(
     show_notifications: bool = True,
     prioritize_in_progress: bool = False,
     resume_from_position: bool = True,
+    storage: Optional['StorageManager'] = None,
 ) -> bool:
     """Build a Kodi video playlist from movies and start playback.
 
@@ -42,6 +46,7 @@ def build_and_play_playlist(
         show_notifications: Show progress notifications while building.
         prioritize_in_progress: Sort partially-watched movies first.
         resume_from_position: Resume movies from their last position.
+        storage: If provided, records movies as EasyMovie-started.
 
     Returns:
         True if playlist was created and playback started.
@@ -53,6 +58,13 @@ def build_and_play_playlist(
     # Optionally sort in-progress movies first
     if prioritize_in_progress:
         movies = _sort_in_progress_first(movies)
+
+    # Record all playlist movies as EasyMovie-started
+    if storage:
+        for movie in movies:
+            mid = movie.get("movieid", 0)
+            if mid:
+                storage.add_started(mid, movie.get("title", ""))
 
     # Clear existing video playlist
     json_query(get_clear_video_playlist_query(), return_result=False)

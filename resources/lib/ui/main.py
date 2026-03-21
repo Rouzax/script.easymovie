@@ -229,6 +229,9 @@ def main(addon_id: str = ADDON_ID) -> None:
 
     log.debug("Movies loaded", count=len(all_movies))
 
+    # 6a. Clean up stale started entries (housekeeping)
+    storage.validate_started(all_movies)
+
     # 6b. Apply playlist pool filter (narrow universe before anything else)
     if advanced_settings.movie_pool_enabled and advanced_settings.movie_pool_path:
         pool_ids = extract_movie_ids_from_playlist(advanced_settings.movie_pool_path)
@@ -746,7 +749,7 @@ def _run_browse_mode(
                     log.info("Playing full set", event="playlist.play_set",
                              set_name=movie.get("set", ""),
                              movie_count=len(set_movies))
-                    build_and_play_playlist(set_movies)
+                    build_and_play_playlist(set_movies, storage=storage)
                     break
         elif result is not None:
             log.info("Playing movie", event="playback.start",
@@ -797,6 +800,7 @@ def _run_playlist_mode(
         show_notifications=playback_settings.show_processing_notifications,
         prioritize_in_progress=playlist_settings.prioritize_in_progress,
         resume_from_position=playlist_settings.resume_from_position,
+        storage=storage,
     )
 
     if not success:
