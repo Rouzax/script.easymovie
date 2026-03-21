@@ -321,10 +321,25 @@ def _check_in_progress(
     log, advanced_settings: AdvancedSettings, addon_id: str,
     storage: Optional['StorageManager'] = None,
 ) -> bool:
-    """Check for in-progress movies and offer to resume."""
+    """Check for in-progress movies started by EasyMovie and offer to resume."""
     result = json_query(get_in_progress_movies_query())
     movies = result.get("movies", [])
     if not movies:
+        return False
+
+    # Only consider movies that EasyMovie started
+    started_ids = storage.get_started_ids() if storage else set()
+    if started_ids:
+        movies = [m for m in movies if m.get("movieid", 0) in started_ids]
+        if not movies:
+            log.debug("In-progress movies found but none started by EasyMovie",
+                      event="launch.resume_skip_foreign")
+            return False
+    else:
+        # No tracking data yet — skip resume check entirely
+        # (first run, or storage was cleared)
+        log.debug("No EasyMovie-started movies tracked, skipping resume check",
+                  event="launch.resume_skip_no_history")
         return False
 
     movie = movies[0]
