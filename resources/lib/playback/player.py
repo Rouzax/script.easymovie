@@ -13,9 +13,12 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import xbmc
+
+if TYPE_CHECKING:
+    from resources.lib.data.storage import StorageManager
 
 from resources.lib.utils import get_logger, json_query
 from resources.lib.data.queries import build_play_movie_query
@@ -24,16 +27,24 @@ from resources.lib.data.queries import build_play_movie_query
 log = get_logger('playback')
 
 
-def play_movie(movie: Dict[str, Any], resume: bool = False) -> None:
+def play_movie(
+    movie: Dict[str, Any], resume: bool = False,
+    storage: Optional['StorageManager'] = None,
+) -> None:
     """Play a single movie.
 
     Args:
         movie: Movie dict with at minimum 'movieid' and 'title'.
         resume: If True, resume from the last position.
+        storage: Optional StorageManager to record started movies.
     """
     movie_id = movie.get("movieid", 0)
     title = movie.get("title", "Unknown")
     position = 0.0
+
+    # Record that EasyMovie started this movie (persists across restarts)
+    if storage and movie_id:
+        storage.add_started(movie_id, title)
 
     if resume:
         resume_info = movie.get("resume", {})

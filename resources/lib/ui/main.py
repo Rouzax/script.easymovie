@@ -194,9 +194,12 @@ def main(addon_id: str = ADDON_ID) -> None:
               show_counts=advanced_settings.show_counts,
               cumulative_counts=advanced_settings.cumulative_counts)
 
+    # 1b. Get storage for history (needed for resume check and later)
+    storage = _get_storage(addon_id)
+
     # 2. Check for in-progress movie
     if playback_settings.check_in_progress:
-        resumed = _check_in_progress(log, advanced_settings, addon_id)
+        resumed = _check_in_progress(log, advanced_settings, addon_id, storage=storage)
         if resumed:
             return
 
@@ -243,10 +246,7 @@ def main(addon_id: str = ADDON_ID) -> None:
             log.warning("Playlist pool enabled but empty, using full library",
                         event="pool.fallback")
 
-    # 7. Get storage for history
-    storage = _get_storage(addon_id)
-
-    # 8. Prepare resurface exclusion (before wizard, so counts are accurate)
+    # 7. Prepare resurface exclusion (before wizard, so counts are accurate)
     exclude_ids: set = set()
     if advanced_settings.avoid_resurface:
         storage.validate_suggested(all_movies)
@@ -318,7 +318,8 @@ def main(addon_id: str = ADDON_ID) -> None:
 
 
 def _check_in_progress(
-    log, advanced_settings: AdvancedSettings, addon_id: str
+    log, advanced_settings: AdvancedSettings, addon_id: str,
+    storage: Optional['StorageManager'] = None,
 ) -> bool:
     """Check for in-progress movies and offer to resume."""
     result = json_query(get_in_progress_movies_query())
@@ -346,7 +347,7 @@ def _check_in_progress(
     )
 
     if confirmed:
-        play_movie(movie, resume=True)
+        play_movie(movie, resume=True, storage=storage)
         return True
     return False
 
@@ -716,7 +717,7 @@ def _run_browse_mode(
             movie = random.choice(results)
             log.info("Surprise Me", event="ui.surprise",
                      title=movie.get("title", ""))
-            play_movie(movie)
+            play_movie(movie, storage=storage)
             break
         elif isinstance(result, dict) and result.get("__play_set__"):
             # Play Full Set from context menu
@@ -736,7 +737,7 @@ def _run_browse_mode(
             log.info("Playing movie", event="playback.start",
                      title=result.get("title", ""),
                      movieid=result.get("movieid", 0))
-            play_movie(result)
+            play_movie(result, storage=storage)
             break
         else:
             break  # User closed
