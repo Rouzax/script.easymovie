@@ -13,7 +13,7 @@ Logging:
     See LOGGING.md for full guidelines.
 """
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional, Set
 
 from resources.lib.constants import WATCHED_BOTH, WATCHED_UNWATCHED, WATCHED_WATCHED
 from resources.lib.utils import get_logger
@@ -131,6 +131,21 @@ def apply_filters(
     log.debug("Filters applied", event="filter.apply",
               reason=reason, input_count=len(movies), result_count=len(result))
     return result
+
+
+def filter_by_playlist_ids(
+    movies: List[Dict[str, Any]], playlist_ids: Set[int],
+) -> List[Dict[str, Any]]:
+    """Filter movies to only those present in a smart playlist.
+
+    Args:
+        movies: Full movie list from library query.
+        playlist_ids: Set of movie IDs from the smart playlist.
+
+    Returns:
+        Movies whose movieid is in playlist_ids.
+    """
+    return [m for m in movies if m.get("movieid", 0) in playlist_ids]
 
 
 def extract_unique_genres(movies: List[Dict[str, Any]]) -> List[str]:

@@ -1,5 +1,5 @@
 """Tests for the movie filter engine."""
-from resources.lib.data.filters import FilterConfig, apply_filters, extract_unique_genres, extract_unique_mpaa
+from resources.lib.data.filters import FilterConfig, apply_filters, extract_unique_genres, extract_unique_mpaa, filter_by_playlist_ids
 
 # Sample movie data matching Kodi JSON-RPC response format
 SAMPLE_MOVIES = [
@@ -165,3 +165,23 @@ def test_extract_unique_mpaa():
     assert "Rated R" in ratings
     assert "Rated PG" in ratings
     assert len(ratings) == 3
+
+
+def test_filter_by_playlist_ids():
+    """Should keep only movies whose movieid is in the playlist set."""
+    playlist_ids = {1, 3}
+    result = filter_by_playlist_ids(SAMPLE_MOVIES, playlist_ids)
+    assert len(result) == 2
+    assert {m["movieid"] for m in result} == {1, 3}
+
+
+def test_filter_by_playlist_ids_empty():
+    """Empty playlist IDs should return empty list."""
+    result = filter_by_playlist_ids(SAMPLE_MOVIES, set())
+    assert len(result) == 0
+
+
+def test_filter_by_playlist_ids_no_match():
+    """No matching IDs should return empty list."""
+    result = filter_by_playlist_ids(SAMPLE_MOVIES, {999, 998})
+    assert len(result) == 0
