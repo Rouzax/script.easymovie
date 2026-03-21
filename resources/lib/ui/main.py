@@ -389,6 +389,9 @@ def _ask_mode(log, addon_id: str = ADDON_ID) -> Optional[int]:
 def _build_wizard_settings(filter_settings: FilterSettings) -> Dict[str, Any]:
     """Convert FilterSettings to the dict format WizardFlow expects."""
     return {
+        "ignore_genre_mode": filter_settings.ignore_genre_mode,
+        "ignore_genre_match_and": filter_settings.ignore_genre_match_and,
+        "preset_ignore_genres": filter_settings.preset_ignore_genres,
         "genre_mode": filter_settings.genre_mode,
         "genre_match_and": filter_settings.genre_match_and,
         "preset_genres": filter_settings.preset_genres,
@@ -454,7 +457,29 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
         filter_type = step.filter_type
         answer = None
 
-        if filter_type == "genre":
+        if filter_type == "ignore_genre":
+            genres = extract_unique_genres(all_movies)
+            pool = _count_pool()
+            if show_counts:
+                gcounts = {}
+                for m in pool:
+                    for g in m.get("genre", []):
+                        gcounts[g] = gcounts.get(g, 0) + 1
+                genre_labels = [_fmt(g, gcounts.get(g, 0)) for g in genres]
+            else:
+                genre_labels = genres
+            preselected = wizard.get_answers().get("ignore_genre", [])
+            pre_indices = [i for i, g in enumerate(genres) if g in preselected]
+            result = show_select_dialog(lang(32226), genre_labels,
+                                        multi_select=True, preselected=pre_indices,
+                                        addon_id=addon_id)
+            if result is None:
+                if not wizard.go_back():
+                    return None
+                continue
+            answer = [genres[i] for i in result]
+
+        elif filter_type == "genre":
             genres = extract_unique_genres(all_movies)
             pool = _count_pool()
             if show_counts:

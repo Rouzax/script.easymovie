@@ -2,6 +2,7 @@
 Genre/MPAA/Playlist Selector for EasyMovie.
 
 Launched from settings via RunScript(script.easymovie,selector,genres),
+RunScript(script.easymovie,selector,ignore_genres),
 RunScript(script.easymovie,selector,mpaa), or
 RunScript(script.easymovie,selector,playlist).
 
@@ -93,6 +94,53 @@ def _run_genre_selector() -> None:
     addon.setSetting('selected_genres_display', display)
 
     log.info("Genres saved", event="selector.save",
+             count=len(selected_genres), genres=selected_genres[:5])
+
+
+def _run_ignore_genre_selector() -> None:
+    """Show ignore-genre selection dialog and save to settings."""
+    log.info("Opening ignore genre selector", event="selector.open",
+             type="ignore_genres")
+
+    result = json_query(get_all_movies_query())
+    movies = result.get("movies", [])
+    if not movies:
+        log.warning("No movies in library", event="selector.open")
+        return
+
+    all_genres = extract_unique_genres(movies)
+    if not all_genres:
+        return
+
+    # Load previously selected ignore genres
+    addon = xbmcaddon.Addon()
+    saved_json = addon.getSetting('selected_ignore_genres')
+    saved_genres = []
+    if saved_json:
+        try:
+            saved_genres = json.loads(saved_json)
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    preselected = [i for i, g in enumerate(all_genres) if g in saved_genres]
+
+    selected_indices = show_select_dialog(
+        heading=lang(32226),  # "Ignore Genres"
+        items=all_genres,
+        multi_select=True,
+        preselected=preselected,
+    )
+
+    if selected_indices is None:
+        return  # Cancelled
+
+    selected_genres = [all_genres[i] for i in selected_indices]
+    addon.setSetting('selected_ignore_genres', json.dumps(selected_genres))
+
+    display = ", ".join(selected_genres) if selected_genres else "-"
+    addon.setSetting('ignore_genres_display', display)
+
+    log.info("Ignore genres saved", event="selector.save",
              count=len(selected_genres), genres=selected_genres[:5])
 
 
@@ -221,6 +269,8 @@ def main() -> None:
 
     if selector_type == 'genres':
         _run_genre_selector()
+    elif selector_type == 'ignore_genres':
+        _run_ignore_genre_selector()
     elif selector_type == 'mpaa':
         _run_mpaa_selector()
     elif selector_type == 'playlist':

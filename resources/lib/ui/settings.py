@@ -33,6 +33,9 @@ log = get_logger('ui')
 @dataclass
 class FilterSettings:
     """Pre-configured filter values from settings."""
+    ignore_genre_mode: int = FILTER_SKIP
+    ignore_genre_match_and: bool = False
+    preset_ignore_genres: Optional[List[str]] = None
     genre_mode: int = FILTER_ASK
     genre_match_and: bool = False
     preset_genres: Optional[List[str]] = None
@@ -136,6 +139,9 @@ def load_settings(
 
     # Filters
     filter_settings = FilterSettings(
+        ignore_genre_mode=get_int_setting('ignore_genre_mode', addon_id, default=FILTER_SKIP),
+        ignore_genre_match_and=get_int_setting('ignore_genre_match', addon_id, default=0) == 1,
+        preset_ignore_genres=_parse_json_list(get_string_setting('selected_ignore_genres', addon_id)),
         genre_mode=get_int_setting('genre_mode', addon_id, default=FILTER_ASK),
         genre_match_and=get_int_setting('genre_match', addon_id, default=0) == 1,
         preset_genres=_parse_json_list(get_string_setting('selected_genres', addon_id)),

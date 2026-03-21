@@ -27,10 +27,11 @@ log = get_logger('wizard')
 
 
 # The ordered list of filter types in the wizard
-FILTER_ORDER = ["genre", "watched", "mpaa", "runtime", "year", "score"]
+FILTER_ORDER = ["ignore_genre", "genre", "watched", "mpaa", "runtime", "year", "score"]
 
 # Mapping from filter type to settings mode key
 _MODE_KEYS = {
+    "ignore_genre": "ignore_genre_mode",
     "genre": "genre_mode",
     "watched": "watched_mode",
     "mpaa": "mpaa_mode",
@@ -50,6 +51,7 @@ class WizardStep:
 def _get_preset_value(settings: Dict[str, Any], filter_type: str) -> Any:
     """Get the preset value for a filter type, for logging."""
     key_map = {
+        "ignore_genre": "preset_ignore_genres",
         "genre": "preset_genres",
         "watched": "watched_preset",
         "mpaa": "preset_mpaa",
@@ -188,6 +190,15 @@ class WizardFlow:
         - SKIP: use default (no filter)
         """
         config = FilterConfig()
+
+        # Ignore genres
+        ignore_genre_mode = self._settings.get("ignore_genre_mode", FILTER_SKIP)
+        if ignore_genre_mode == FILTER_ASK:
+            config.ignore_genres = self._answers.get("ignore_genre")
+        elif ignore_genre_mode == FILTER_PRESET:
+            config.ignore_genres = self._settings.get("preset_ignore_genres")
+        config.ignore_genre_match_and = self._settings.get(
+            "ignore_genre_match_and", False)
 
         # Genre
         genre_mode = self._settings.get("genre_mode", FILTER_SKIP)

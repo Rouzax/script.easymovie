@@ -4,8 +4,9 @@ from resources.lib.constants import FILTER_ASK, FILTER_PRESET, FILTER_SKIP
 
 
 def test_all_filters_ask():
-    """When all filters are set to Ask, wizard has 6 steps."""
+    """When all filters are set to Ask, wizard has 7 steps."""
     settings = {
+        "ignore_genre_mode": FILTER_ASK,
         "genre_mode": FILTER_ASK,
         "watched_mode": FILTER_ASK,
         "mpaa_mode": FILTER_ASK,
@@ -14,7 +15,7 @@ def test_all_filters_ask():
         "score_mode": FILTER_ASK,
     }
     flow = WizardFlow(settings)
-    assert len(flow.steps) == 6
+    assert len(flow.steps) == 7
 
 
 def test_all_filters_preset():
@@ -200,3 +201,56 @@ def test_current_step_type():
     assert flow.current_step.filter_type == "genre"
     flow.advance()
     assert flow.current_step.filter_type == "mpaa"
+
+
+def test_ignore_genre_before_genre():
+    """Ignore genre step appears before genre step in wizard."""
+    settings = {
+        "ignore_genre_mode": FILTER_ASK,
+        "genre_mode": FILTER_ASK,
+        "watched_mode": FILTER_SKIP,
+        "mpaa_mode": FILTER_SKIP,
+        "runtime_mode": FILTER_SKIP,
+        "year_mode": FILTER_SKIP,
+        "score_mode": FILTER_SKIP,
+    }
+    flow = WizardFlow(settings)
+    assert len(flow.steps) == 2
+    assert flow.steps[0].filter_type == "ignore_genre"
+    assert flow.steps[1].filter_type == "genre"
+
+
+def test_build_filter_config_ignore_genre_ask():
+    """Wizard answers for ignore_genre flow through to FilterConfig."""
+    settings = {
+        "ignore_genre_mode": FILTER_ASK,
+        "genre_mode": FILTER_SKIP,
+        "watched_mode": FILTER_SKIP,
+        "mpaa_mode": FILTER_SKIP,
+        "runtime_mode": FILTER_SKIP,
+        "year_mode": FILTER_SKIP,
+        "score_mode": FILTER_SKIP,
+    }
+    flow = WizardFlow(settings)
+    flow.set_answer("ignore_genre", ["Horror", "Documentary"])
+    config = flow.build_filter_config()
+    assert config.ignore_genres == ["Horror", "Documentary"]
+
+
+def test_build_filter_config_ignore_genre_preset():
+    """Preset ignore genres flow through to FilterConfig."""
+    settings = {
+        "ignore_genre_mode": FILTER_PRESET,
+        "preset_ignore_genres": ["Horror"],
+        "ignore_genre_match_and": True,
+        "genre_mode": FILTER_SKIP,
+        "watched_mode": FILTER_SKIP,
+        "mpaa_mode": FILTER_SKIP,
+        "runtime_mode": FILTER_SKIP,
+        "year_mode": FILTER_SKIP,
+        "score_mode": FILTER_SKIP,
+    }
+    flow = WizardFlow(settings)
+    config = flow.build_filter_config()
+    assert config.ignore_genres == ["Horror"]
+    assert config.ignore_genre_match_and is True

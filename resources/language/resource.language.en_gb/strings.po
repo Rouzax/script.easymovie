@@ -360,6 +360,22 @@ msgctxt "#32179"
 msgid "Cumulative counts"
 msgstr ""
 
+msgctxt "#32180"
+msgid "Ignore genre filter"
+msgstr ""
+
+msgctxt "#32181"
+msgid "Ignore genre matching"
+msgstr ""
+
+msgctxt "#32182"
+msgid "Select genres to ignore..."
+msgstr ""
+
+msgctxt "#32183"
+msgid "Ignored genres"
+msgstr ""
+
 
 # =============================================================================
 # FILTER / WIZARD LABELS (32200-32299)
@@ -467,6 +483,10 @@ msgstr ""
 
 msgctxt "#32225"
 msgid "Any year"
+msgstr ""
+
+msgctxt "#32226"
+msgid "Ignore Genres"
 msgstr ""
 
 
@@ -974,6 +994,14 @@ msgstr ""
 
 msgctxt "#32642"
 msgid "If you start a movie but there's an earlier unwatched one in the same set, ask if you want to watch that instead."
+msgstr ""
+
+msgctxt "#32643"
+msgid "Ask: Show a dialog each time. Pre-set: Use the values below. Skip: Ignore this filter."
+msgstr ""
+
+msgctxt "#32644"
+msgid "OR: Exclude movies matching any ignored genre. AND: Only exclude movies matching all ignored genres."
 msgstr ""
 
 # =============================================================================

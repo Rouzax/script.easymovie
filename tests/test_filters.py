@@ -40,6 +40,57 @@ def test_no_filters_returns_all():
     assert len(result) == 4
 
 
+def test_ignore_genre_or():
+    """Ignore genres OR: exclude movies matching any ignored genre."""
+    config = FilterConfig(ignore_genres=["Action"], ignore_genre_match_and=False)
+    result = apply_filters(SAMPLE_MOVIES, config)
+    assert len(result) == 3
+    assert all("Action" not in m["genre"] for m in result)
+
+
+def test_ignore_genre_or_multiple():
+    """Ignore genres OR with multiple: exclude movies matching any."""
+    config = FilterConfig(ignore_genres=["Action", "Comedy"], ignore_genre_match_and=False)
+    result = apply_filters(SAMPLE_MOVIES, config)
+    assert len(result) == 2  # Drama Classic and Kids Adventure
+
+
+def test_ignore_genre_and():
+    """Ignore genres AND: only exclude movies having ALL ignored genres."""
+    config = FilterConfig(ignore_genres=["Action", "Thriller"], ignore_genre_match_and=True)
+    result = apply_filters(SAMPLE_MOVIES, config)
+    assert len(result) == 3  # Only Action Movie has both
+    assert all(m["title"] != "Action Movie" for m in result)
+
+
+def test_ignore_genre_and_no_full_match():
+    """Ignore genres AND: no movie has all ignored genres, nothing excluded."""
+    config = FilterConfig(ignore_genres=["Action", "Comedy"], ignore_genre_match_and=True)
+    result = apply_filters(SAMPLE_MOVIES, config)
+    assert len(result) == 4  # No movie has both Action and Comedy
+
+
+def test_ignore_genre_empty():
+    """No ignored genres means no exclusion."""
+    config = FilterConfig(ignore_genres=None)
+    result = apply_filters(SAMPLE_MOVIES, config)
+    assert len(result) == 4
+
+
+def test_ignore_then_include_genre():
+    """Ignore genres are applied before include genres."""
+    config = FilterConfig(
+        ignore_genres=["Thriller"],
+        ignore_genre_match_and=False,
+        genres=["Action", "Drama"],
+        genre_match_and=False,
+    )
+    result = apply_filters(SAMPLE_MOVIES, config)
+    # Action Movie is excluded by ignore (has Thriller), Drama Classic remains
+    assert len(result) == 1
+    assert result[0]["title"] == "Drama Classic"
+
+
 def test_genre_filter_or():
     config = FilterConfig(genres=["Action"], genre_match_and=False)
     result = apply_filters(SAMPLE_MOVIES, config)

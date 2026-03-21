@@ -24,6 +24,8 @@ log = get_logger('data')
 @dataclass
 class FilterConfig:
     """Configuration for movie filtering."""
+    ignore_genres: Optional[List[str]] = None
+    ignore_genre_match_and: bool = False  # False = OR, True = AND
     genres: Optional[List[str]] = None
     genre_match_and: bool = False  # False = OR, True = AND
     watched: int = WATCHED_BOTH  # 0=unwatched, 1=watched, 2=both
@@ -61,6 +63,21 @@ def apply_filters(
         if verbose:
             log.debug("Filter step", event="filter.step",
                       step="exclude_ids", remaining=len(result))
+
+    # Ignore genres filter (exclude matching movies)
+    if config.ignore_genres:
+        ignore_set = set(config.ignore_genres)
+        if config.ignore_genre_match_and:
+            # AND: only exclude if ALL ignored genres present
+            result = [m for m in result
+                      if not ignore_set.issubset(set(m.get("genre", [])))]
+        else:
+            # OR: exclude if ANY ignored genre present
+            result = [m for m in result
+                      if not ignore_set.intersection(set(m.get("genre", [])))]
+        if verbose:
+            log.debug("Filter step", event="filter.step",
+                      step="ignore_genres", remaining=len(result))
 
     # Genre filter
     if config.genres:
