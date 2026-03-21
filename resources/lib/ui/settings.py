@@ -16,8 +16,6 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 from resources.lib.utils import get_bool_setting, get_int_setting, get_string_setting, get_logger
-
-log = get_logger('ui')
 from resources.lib.constants import (
     FILTER_ASK, FILTER_SKIP,
     WATCHED_UNWATCHED,
@@ -28,6 +26,8 @@ from resources.lib.constants import (
     MODE_ASK,
     THEME_GOLDEN_HOUR,
 )
+
+log = get_logger('ui')
 
 
 @dataclass
