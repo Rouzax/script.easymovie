@@ -48,7 +48,8 @@ from resources.lib.data.queries import (
     get_movie_set_details_query,
     get_in_progress_movies_query,
 )
-from resources.lib.data.filters import apply_filters
+from resources.lib.data.filters import apply_filters, filter_by_playlist_ids
+from resources.lib.data.smart_playlists import extract_movie_ids_from_playlist
 from resources.lib.data.movie_sets import apply_set_substitutions
 from resources.lib.data.results import select_and_sort_results
 from resources.lib.data.storage import StorageManager
@@ -224,6 +225,23 @@ def main(addon_id: str = ADDON_ID) -> None:
         return
 
     log.debug("Movies loaded", count=len(all_movies))
+
+    # 6b. Apply playlist pool filter (narrow universe before anything else)
+    if advanced_settings.movie_pool_enabled and advanced_settings.movie_pool_path:
+        pool_ids = extract_movie_ids_from_playlist(advanced_settings.movie_pool_path)
+        if pool_ids:
+            all_movies = filter_by_playlist_ids(all_movies, pool_ids)
+            log.debug("Playlist pool applied", event="pool.filter",
+                      pool_movie_count=len(pool_ids), remaining=len(all_movies))
+            if not all_movies:
+                show_confirm_dialog(
+                    "No Movies",
+                    "No movies in your library match the selected playlist.",
+                    yes_label="OK", no_label="", addon_id=addon_id)
+                return
+        else:
+            log.warning("Playlist pool enabled but empty, using full library",
+                        event="pool.fallback")
 
     # 7. Get storage for history
     storage = _get_storage(addon_id)
