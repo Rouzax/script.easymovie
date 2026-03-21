@@ -191,6 +191,34 @@ class StorageManager:
         """Get all started movie IDs."""
         return {s.get("movieid", 0) for s in self._data["started"]}
 
+    def validate_started(self, movies: List[Dict[str, Any]]) -> None:
+        """Remove started entries for movies no longer in the library.
+
+        Kodi reuses movie IDs after deletion. Comparing stored titles
+        against current library titles detects and removes stale entries.
+
+        Args:
+            movies: Current library movies (must include movieid and title).
+        """
+        title_by_id = {m.get("movieid", 0): m.get("title", "") for m in movies}
+        before = len(self._data["started"])
+        self._data["started"] = [
+            s for s in self._data["started"]
+            if s.get("title") and s.get("movieid", 0) in title_by_id
+            and title_by_id[s.get("movieid", 0)] == s.get("title")
+        ]
+        after = len(self._data["started"])
+        if before != after:
+            try:
+                from resources.lib.utils import get_logger
+                get_logger('data').debug(
+                    "Stale started entries removed",
+                    event="history.validate_started",
+                    removed=before - after, remaining=after)
+            except Exception:
+                pass
+            self.save()
+
     def save_last_filters(self, filters: Dict[str, Any]) -> None:
         """Save wizard filter answers for next session.
 

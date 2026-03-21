@@ -61,3 +61,27 @@ def test_duplicate_suggested(storage):
     # Should not duplicate
     count = sum(1 for s in storage._data["suggested"] if s["movieid"] == 42)
     assert count == 1
+
+
+def test_validate_started_removes_stale(storage):
+    """Should remove started entries for movies no longer in library."""
+    storage.add_started(movieid=1, title="Movie A")
+    storage.add_started(movieid=2, title="Movie B")
+    storage.add_started(movieid=3, title="Movie C")
+    # Only movie 1 and 3 are still in library (movie 2 was removed)
+    library = [
+        {"movieid": 1, "title": "Movie A"},
+        {"movieid": 3, "title": "Movie C"},
+    ]
+    storage.validate_started(library)
+    ids = storage.get_started_ids()
+    assert ids == {1, 3}
+
+
+def test_validate_started_detects_id_reuse(storage):
+    """Should remove entries where movie ID was reused for a different title."""
+    storage.add_started(movieid=1, title="Old Movie")
+    library = [{"movieid": 1, "title": "New Movie"}]
+    storage.validate_started(library)
+    ids = storage.get_started_ids()
+    assert ids == set()
