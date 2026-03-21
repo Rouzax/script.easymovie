@@ -88,6 +88,26 @@ def get_playlist_files_query() -> Dict[str, Any]:
     }
 
 
+def build_playlist_get_movies_query(playlist_path: str) -> Dict[str, Any]:
+    """Get movie contents of a smart playlist file.
+
+    Uses Files.GetDirectory which evaluates the .xsp rules and returns
+    matching items, just like Kodi's UI would.
+
+    Args:
+        playlist_path: Full path to the .xsp file (special:// or filesystem).
+    """
+    return {
+        "jsonrpc": "2.0",
+        "method": "Files.GetDirectory",
+        "params": {
+            "directory": playlist_path,
+            "media": "video",
+        },
+        "id": 1,
+    }
+
+
 def get_clear_video_playlist_query() -> Dict[str, Any]:
     """Clear the video playlist."""
     return {

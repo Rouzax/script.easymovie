@@ -10,6 +10,7 @@ from resources.lib.data.queries import (
     build_play_movie_query,
     get_in_progress_movies_query,
     get_playing_item_query,
+    build_playlist_get_movies_query,
 )
 
 
@@ -113,3 +114,11 @@ def test_playing_item_query():
     assert "setid" in props
     assert "set" in props
     assert "type" in props
+
+
+def test_playlist_get_movies_query():
+    """Query should use Files.GetDirectory to read smart playlist contents."""
+    query = build_playlist_get_movies_query("special://profile/playlists/video/Movies.xsp")
+    assert query["method"] == "Files.GetDirectory"
+    assert query["params"]["directory"] == "special://profile/playlists/video/Movies.xsp"
+    assert query["params"]["media"] == "video"
