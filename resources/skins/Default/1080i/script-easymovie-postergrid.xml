@@ -55,6 +55,18 @@
                 <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
             </control>
 
+            <!-- Movie count -->
+            <control type="label">
+                <left>35</left>
+                <top>18</top>
+                <width>1400</width>
+                <height>30</height>
+                <align>right</align>
+                <font>font10</font>
+                <textcolor>FF888888</textcolor>
+                <label>$INFO[Container(655).CurrentItem] / $INFO[Container(655).NumItems]</label>
+            </control>
+
             <!-- Surprise Me Button (ID 10) — top-right -->
             <control type="button" id="10">
                 <left>1475</left>

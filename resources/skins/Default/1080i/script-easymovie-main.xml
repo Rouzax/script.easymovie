@@ -47,6 +47,18 @@
                 <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
             </control>
 
+            <!-- Movie count -->
+            <control type="label">
+                <left>40</left>
+                <top>20</top>
+                <width>1140</width>
+                <height>30</height>
+                <align>right</align>
+                <font>font10</font>
+                <textcolor>FF888888</textcolor>
+                <label>$INFO[Container(655).CurrentItem] / $INFO[Container(655).NumItems]</label>
+            </control>
+
             <!-- Accent line separator -->
             <control type="image">
                 <left>40</left>
