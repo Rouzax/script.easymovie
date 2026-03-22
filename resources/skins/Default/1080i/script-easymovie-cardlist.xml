@@ -95,10 +95,29 @@
                 <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
             </control>
 
+            <!-- Fanart strip -->
+            <control type="image">
+                <left>30</left>
+                <top>72</top>
+                <width>1340</width>
+                <height>100</height>
+                <aspectratio>scale</aspectratio>
+                <texture background="true" fallback="">$INFO[Container(655).ListItem.Art(fanart)]</texture>
+            </control>
+
+            <!-- Dark scrim over fanart bottom for text readability -->
+            <control type="image">
+                <left>30</left>
+                <top>132</top>
+                <width>1340</width>
+                <height>46</height>
+                <texture colordiffuse="E00D1117">common/white.png</texture>
+            </control>
+
             <!-- Info bar: focused movie details -->
             <control type="label">
                 <left>30</left>
-                <top>82</top>
+                <top>148</top>
                 <width>1340</width>
                 <height>25</height>
                 <align>center</align>
@@ -110,9 +129,9 @@
             <!-- Card list -->
             <control type="list" id="655">
                 <left>30</left>
-                <top>122</top>
+                <top>178</top>
                 <width>1340</width>
-                <height>558</height>
+                <height>502</height>
                 <orientation>vertical</orientation>
                 <scrolltime tween="sine" easing="out">200</scrolltime>
                 <onleft>655</onleft>
