@@ -174,7 +174,7 @@
                         <label>★ $INFO[ListItem.Rating]</label>
                     </control>
 
-                    <!-- Year · Runtime · MPAA (bottom left) -->
+                    <!-- Year · MPAA · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>70</left>
                         <top>42</top>
@@ -183,7 +183,21 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>FFAAAAAA</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                    </control>
+
+                    <!-- Year · Runtime (when no MPAA) -->
+                    <control type="label">
+                        <left>70</left>
+                        <top>42</top>
+                        <width>850</width>
+                        <height>26</height>
+                        <aligny>center</aligny>
+                        <font>font10</font>
+                        <textcolor>FFAAAAAA</textcolor>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                     </control>
 
                     <!-- Set name (bottom right) -->
@@ -266,7 +280,7 @@
                         <label>★ $INFO[ListItem.Rating]</label>
                     </control>
 
-                    <!-- Year · Runtime · MPAA (bottom left, white on focus) -->
+                    <!-- Year · MPAA · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>70</left>
                         <top>42</top>
@@ -275,7 +289,21 @@
                         <aligny>center</aligny>
                         <font>font10</font>
                         <textcolor>ffFFFFFF</textcolor>
-                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                    </control>
+
+                    <!-- Year · Runtime (when no MPAA) -->
+                    <control type="label">
+                        <left>70</left>
+                        <top>42</top>
+                        <width>850</width>
+                        <height>26</height>
+                        <aligny>center</aligny>
+                        <font>font10</font>
+                        <textcolor>ffFFFFFF</textcolor>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                     </control>
 
                     <!-- Set name (bottom right, white on focus) -->

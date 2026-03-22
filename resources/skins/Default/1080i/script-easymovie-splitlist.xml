@@ -122,7 +122,7 @@
                             <label>$INFO[ListItem.Label]</label>
                         </control>
 
-                        <!-- Year · Runtime · MPAA -->
+                        <!-- Year · MPAA · Runtime (when MPAA present) -->
                         <control type="label">
                             <left>15</left>
                             <top>32</top>
@@ -131,7 +131,21 @@
                             <aligny>center</aligny>
                             <font>font10</font>
                             <textcolor>FF888888</textcolor>
-                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
+                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                            <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                        </control>
+
+                        <!-- Year · Runtime (when no MPAA) -->
+                        <control type="label">
+                            <left>15</left>
+                            <top>32</top>
+                            <width>530</width>
+                            <height>24</height>
+                            <aligny>center</aligny>
+                            <font>font10</font>
+                            <textcolor>FF888888</textcolor>
+                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                            <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                         </control>
 
                         <!-- Watched icon -->
@@ -178,7 +192,7 @@
                             <label>$INFO[ListItem.Label]</label>
                         </control>
 
-                        <!-- Year · Runtime · MPAA -->
+                        <!-- Year · MPAA · Runtime (when MPAA present) -->
                         <control type="label">
                             <left>15</left>
                             <top>32</top>
@@ -187,7 +201,21 @@
                             <aligny>center</aligny>
                             <font>font10</font>
                             <textcolor>ffFFFFFF</textcolor>
-                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]  ·  $INFO[ListItem.Mpaa]</label>
+                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                            <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                        </control>
+
+                        <!-- Year · Runtime (when no MPAA) -->
+                        <control type="label">
+                            <left>15</left>
+                            <top>32</top>
+                            <width>530</width>
+                            <height>24</height>
+                            <aligny>center</aligny>
+                            <font>font10</font>
+                            <textcolor>ffFFFFFF</textcolor>
+                            <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                            <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                         </control>
 
                         <!-- Watched icon -->
