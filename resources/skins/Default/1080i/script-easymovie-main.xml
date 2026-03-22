@@ -36,10 +36,30 @@
                 <effect type="fade" start="100" end="0" tween="cubic" easing="out" time="300" />
             </animation>
 
+            <!-- Addon name heading -->
+            <control type="label">
+                <left>40</left>
+                <top>15</top>
+                <width>1140</width>
+                <height>40</height>
+                <font>font14_title</font>
+                <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
+            </control>
+
+            <!-- Accent line separator -->
+            <control type="image">
+                <left>40</left>
+                <top>52</top>
+                <width>1140</width>
+                <height>2</height>
+                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+            </control>
+
             <!-- ==================== LEFT SIDE: INFO PANEL ==================== -->
             <control type="group">
                 <left>40</left>
-                <top>60</top>
+                <top>65</top>
                 <width>660</width>
                 <height>960</height>
 
@@ -191,9 +211,9 @@
             <!-- ==================== RIGHT SIDE: POSTER GRID ==================== -->
             <control type="panel" id="655">
                 <left>720</left>
-                <top>40</top>
+                <top>65</top>
                 <width>1160</width>
-                <height>1000</height>
+                <height>975</height>
                 <orientation>vertical</orientation>
                 <onleft>10</onleft>
                 <onright>655</onright>
