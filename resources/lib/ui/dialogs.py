@@ -207,9 +207,9 @@ def show_select_dialog(
         return None
     selected = sorted(dialog.selected)
     if not selected:
-        log.debug("Select dialog cancelled", event="ui.dialog_cancel",
+        log.debug("Select dialog empty selection", event="ui.dialog_empty",
                   heading=heading)
-        return None  # OK with nothing selected = cancel
+        return []  # OK with nothing selected = no filter
     log.debug("Select dialog selection made", event="ui.dialog_select",
               heading=heading, selected_count=len(selected))
     return selected
