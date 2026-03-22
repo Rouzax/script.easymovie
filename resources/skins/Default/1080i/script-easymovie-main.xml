@@ -73,7 +73,19 @@
                     <label>$INFO[Container(655).ListItem.Label]</label>
                 </control>
 
-                <!-- Year · Rating · Runtime -->
+                <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
+                <control type="label">
+                    <left>0</left>
+                    <top>419</top>
+                    <width>620</width>
+                    <height>30</height>
+                    <font>font12</font>
+                    <textcolor>FFCCCCCC</textcolor>
+                    <label>$INFO[Container(655).ListItem.Year]  ·  $INFO[Container(655).ListItem.Mpaa]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Property(runtime_min)]</label>
+                    <visible>!String.IsEmpty(Container(655).ListItem.Mpaa)</visible>
+                </control>
+
+                <!-- Year · Rating · Runtime (when no MPAA) -->
                 <control type="label">
                     <left>0</left>
                     <top>419</top>
@@ -82,6 +94,7 @@
                     <font>font12</font>
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Property(runtime_min)]</label>
+                    <visible>String.IsEmpty(Container(655).ListItem.Mpaa)</visible>
                 </control>
 
                 <!-- Genre -->
