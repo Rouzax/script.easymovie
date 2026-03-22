@@ -24,15 +24,24 @@
             <texture colordiffuse="FF0D1117">common/white.png</texture>
         </control>
 
-        <!-- Info bar at top -->
+        <!-- Addon name heading -->
         <control type="label">
             <left>80</left>
-            <top>30</top>
+            <top>20</top>
             <width>1760</width>
-            <height>35</height>
-            <font>font10</font>
-            <textcolor>FFAAAAAA</textcolor>
-            <label>$INFO[Container(655).ListItem.Genre]  ·  $INFO[Container(655).ListItem.Year]  ·  ★ $INFO[Container(655).ListItem.Rating]  ·  $INFO[Container(655).ListItem.Property(runtime_min)]  ·  $INFO[Container(655).ListItem.Property(set_name)]</label>
+            <height>40</height>
+            <font>font14_title</font>
+            <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+            <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
+        </control>
+
+        <!-- Accent line separator -->
+        <control type="image">
+            <left>80</left>
+            <top>62</top>
+            <width>1760</width>
+            <height>2</height>
+            <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
         </control>
 
         <!-- Main content group -->
@@ -187,6 +196,20 @@
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
+                    <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
+                    <control type="label">
+                        <left>75</left>
+                        <top>42</top>
+                        <width>540</width>
+                        <height>25</height>
+                        <aligny>center</aligny>
+                        <font>font10</font>
+                        <textcolor>FF888888</textcolor>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                    </control>
+
+                    <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>75</left>
                         <top>42</top>
@@ -196,6 +219,7 @@
                         <font>font10</font>
                         <textcolor>FF888888</textcolor>
                         <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                     </control>
                 </itemlayout>
 
@@ -247,6 +271,20 @@
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
+                    <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
+                    <control type="label">
+                        <left>95</left>
+                        <top>42</top>
+                        <width>520</width>
+                        <height>25</height>
+                        <aligny>center</aligny>
+                        <font>font10</font>
+                        <textcolor>ffFFFFFF</textcolor>
+                        <label>$INFO[ListItem.Year]  ·  $INFO[ListItem.Mpaa]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>!String.IsEmpty(ListItem.Mpaa)</visible>
+                    </control>
+
+                    <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>95</left>
                         <top>42</top>
@@ -256,6 +294,7 @@
                         <font>font10</font>
                         <textcolor>ffFFFFFF</textcolor>
                         <label>$INFO[ListItem.Year]  ·  ★ $INFO[ListItem.Rating]  ·  $INFO[ListItem.Property(runtime_min)]</label>
+                        <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                     </control>
                     <control type="label">
                         <left>95</left>
