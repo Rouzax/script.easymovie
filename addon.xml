@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.easymovie" name="EasyMovie" version="1.0.0~alpha9" provider-name="Rouzax">
+<addon id="script.easymovie" name="EasyMovie" version="1.0.0~alpha10" provider-name="Rouzax">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
