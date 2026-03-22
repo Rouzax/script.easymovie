@@ -741,7 +741,7 @@ msgstr ""
 
 # View styles
 msgctxt "#32522"
-msgid "Poster Grid"
+msgid "Poster Wall"
 msgstr ""
 
 msgctxt "#32523"
