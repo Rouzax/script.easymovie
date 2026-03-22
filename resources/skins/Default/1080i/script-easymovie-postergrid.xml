@@ -39,14 +39,34 @@
                 <effect type="fade" start="100" end="0" tween="cubic" easing="out" time="300" />
             </animation>
 
+            <!-- Addon name heading -->
+            <control type="label">
+                <left>30</left>
+                <top>10</top>
+                <width>1860</width>
+                <height>40</height>
+                <font>font14_title</font>
+                <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
+            </control>
+
+            <!-- Accent line separator -->
+            <control type="image">
+                <left>30</left>
+                <top>48</top>
+                <width>1860</width>
+                <height>2</height>
+                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+            </control>
+
             <!-- ====================================================== -->
             <!-- LEFT SIDE: Poster Grid (4 cols x 2 rows)               -->
             <!-- ====================================================== -->
             <control type="panel" id="655">
                 <left>30</left>
-                <top>30</top>
+                <top>60</top>
                 <width>1100</width>
-                <height>938</height>
+                <height>893</height>
                 <orientation>vertical</orientation>
                 <scrolltime tween="sine" easing="out">300</scrolltime>
                 <onright>655</onright>
@@ -55,13 +75,13 @@
                 <itemgap>10</itemgap>
 
                 <!-- Unfocused poster cell -->
-                <itemlayout width="267" height="465">
+                <itemlayout width="250" height="441">
                     <!-- Poster image (2:3 ratio) -->
                     <control type="image">
                         <left>8</left>
                         <top>8</top>
-                        <width>251</width>
-                        <height>376</height>
+                        <width>234</width>
+                        <height>352</height>
                         <aspectratio aligny="top">scale</aspectratio>
                         <texture>$INFO[ListItem.Art(poster)]</texture>
                     </control>
@@ -88,7 +108,7 @@
 
                     <!-- Set scrim (top-right gradient) -->
                     <control type="image">
-                        <left>179</left>
+                        <left>162</left>
                         <top>8</top>
                         <width>80</width>
                         <height>80</height>
@@ -98,7 +118,7 @@
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>215</left>
+                        <left>198</left>
                         <top>12</top>
                         <width>40</width>
                         <height>40</height>
@@ -109,8 +129,8 @@
                     <!-- Title -->
                     <control type="label">
                         <left>8</left>
-                        <top>392</top>
-                        <width>251</width>
+                        <top>368</top>
+                        <width>234</width>
                         <height>34</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -123,8 +143,8 @@
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>8</left>
-                        <top>426</top>
-                        <width>251</width>
+                        <top>402</top>
+                        <width>234</width>
                         <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -136,8 +156,8 @@
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>8</left>
-                        <top>426</top>
-                        <width>251</width>
+                        <top>402</top>
+                        <width>234</width>
                         <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -148,13 +168,13 @@
                 </itemlayout>
 
                 <!-- Focused poster cell -->
-                <focusedlayout width="267" height="465">
+                <focusedlayout width="250" height="441">
                     <!-- Accent border (3px around poster) -->
                     <control type="image">
                         <left>5</left>
                         <top>5</top>
-                        <width>257</width>
-                        <height>382</height>
+                        <width>240</width>
+                        <height>358</height>
                         <texture border="3" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
                     </control>
 
@@ -162,8 +182,8 @@
                     <control type="image">
                         <left>8</left>
                         <top>8</top>
-                        <width>251</width>
-                        <height>376</height>
+                        <width>234</width>
+                        <height>352</height>
                         <aspectratio aligny="top">scale</aspectratio>
                         <texture>$INFO[ListItem.Art(poster)]</texture>
                     </control>
@@ -190,7 +210,7 @@
 
                     <!-- Set scrim (top-right gradient) -->
                     <control type="image">
-                        <left>179</left>
+                        <left>162</left>
                         <top>8</top>
                         <width>80</width>
                         <height>80</height>
@@ -200,7 +220,7 @@
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>215</left>
+                        <left>198</left>
                         <top>12</top>
                         <width>40</width>
                         <height>40</height>
@@ -211,8 +231,8 @@
                     <!-- Title (accent color on focus) -->
                     <control type="label">
                         <left>8</left>
-                        <top>392</top>
-                        <width>251</width>
+                        <top>368</top>
+                        <width>234</width>
                         <height>34</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -225,8 +245,8 @@
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>8</left>
-                        <top>426</top>
-                        <width>251</width>
+                        <top>402</top>
+                        <width>234</width>
                         <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -238,8 +258,8 @@
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>8</left>
-                        <top>426</top>
-                        <width>251</width>
+                        <top>402</top>
+                        <width>234</width>
                         <height>24</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -255,14 +275,14 @@
             <!-- ====================================================== -->
             <control type="group">
                 <left>1170</left>
-                <top>30</top>
+                <top>60</top>
                 <width>720</width>
-                <height>940</height>
+                <height>910</height>
 
                 <!-- Fanart image (top aligned with poster grid) -->
                 <control type="image">
                     <left>0</left>
-                    <top>8</top>
+                    <top>0</top>
                     <width>720</width>
                     <height>405</height>
                     <aspectratio>scale</aspectratio>
@@ -359,7 +379,7 @@
             <!-- ====================================================== -->
             <control type="group">
                 <left>30</left>
-                <top>1000</top>
+                <top>985</top>
                 <width>1100</width>
                 <height>50</height>
 
