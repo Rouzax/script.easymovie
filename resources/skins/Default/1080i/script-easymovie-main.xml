@@ -51,7 +51,7 @@
             <control type="label">
                 <left>40</left>
                 <top>20</top>
-                <width>1140</width>
+                <width>1840</width>
                 <height>30</height>
                 <align>right</align>
                 <font>font10</font>
@@ -62,8 +62,8 @@
             <!-- Accent line separator -->
             <control type="image">
                 <left>40</left>
-                <top>52</top>
-                <width>1140</width>
+                <top>60</top>
+                <width>1840</width>
                 <height>2</height>
                 <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
             </control>
@@ -71,7 +71,7 @@
             <!-- ==================== LEFT SIDE: INFO PANEL ==================== -->
             <control type="group">
                 <left>40</left>
-                <top>65</top>
+                <top>72</top>
                 <width>660</width>
                 <height>960</height>
 
@@ -152,16 +152,40 @@
                     <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                 </control>
 
-                <!-- Separator line -->
+                <!-- Separator: after genre when NO collection -->
+                <control type="image">
+                    <left>0</left>
+                    <top>490</top>
+                    <width>620</width>
+                    <height>2</height>
+                    <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                    <visible>String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
+                </control>
+
+                <!-- Separator: after set info when collection present -->
                 <control type="image">
                     <left>0</left>
                     <top>515</top>
                     <width>620</width>
                     <height>2</height>
                     <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                    <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                 </control>
 
-                <!-- Plot -->
+                <!-- Plot: positioned after separator (no collection) -->
+                <control type="textbox">
+                    <left>0</left>
+                    <top>502</top>
+                    <width>620</width>
+                    <height>395</height>
+                    <font>font12</font>
+                    <textcolor>FFAAAAAA</textcolor>
+                    <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
+                    <label>$INFO[Container(655).ListItem.Plot]</label>
+                    <visible>String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
+                </control>
+
+                <!-- Plot: positioned after separator (with collection) -->
                 <control type="textbox">
                     <left>0</left>
                     <top>527</top>
@@ -171,6 +195,7 @@
                     <textcolor>FFAAAAAA</textcolor>
                     <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
                     <label>$INFO[Container(655).ListItem.Plot]</label>
+                    <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                 </control>
 
                 <!-- Buttons -->
@@ -223,7 +248,7 @@
             <!-- ==================== RIGHT SIDE: POSTER GRID ==================== -->
             <control type="panel" id="655">
                 <left>720</left>
-                <top>65</top>
+                <top>72</top>
                 <width>1160</width>
                 <height>975</height>
                 <orientation>vertical</orientation>
