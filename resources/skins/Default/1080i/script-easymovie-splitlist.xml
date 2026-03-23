@@ -88,7 +88,7 @@
                     <!-- Movie count -->
                     <control type="label">
                         <left>0</left>
-                        <top>8</top>
+                        <top>5</top>
                         <width>730</width>
                         <height>30</height>
                         <align>right</align>
@@ -97,22 +97,23 @@
                         <label>$INFO[Container(655).CurrentItem] / $INFO[Container(655).NumItems]</label>
                     </control>
 
-                    <!-- Accent line separator -->
-                    <control type="image">
-                        <left>0</left>
-                        <top>46</top>
-                        <width>730</width>
-                        <height>2</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
-                    </control>
+                </control>
+
+                <!-- Full-width accent line separator (spans both panels) -->
+                <control type="image">
+                    <left>30</left>
+                    <top>66</top>
+                    <width>1340</width>
+                    <height>2</height>
+                    <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
                 </control>
 
                 <!-- Movie list -->
                 <control type="list" id="655">
                     <left>30</left>
-                    <top>71</top>
+                    <top>82</top>
                     <width>730</width>
-                    <height>640</height>
+                    <height>648</height>
                     <orientation>vertical</orientation>
                     <scrolltime tween="sine" easing="out">200</scrolltime>
                     <onleft>655</onleft>
@@ -121,7 +122,7 @@
                     <ondown>10</ondown>
 
                     <!-- Unfocused row -->
-                    <itemlayout width="730" height="64">
+                    <itemlayout width="730" height="68">
                         <!-- Movie title -->
                         <control type="label">
                             <left>15</left>
@@ -137,7 +138,7 @@
                         <!-- Year · MPAA · Runtime (when MPAA present) -->
                         <control type="label">
                             <left>15</left>
-                            <top>32</top>
+                            <top>38</top>
                             <width>530</width>
                             <height>24</height>
                             <aligny>center</aligny>
@@ -150,7 +151,7 @@
                         <!-- Year · Runtime (when no MPAA) -->
                         <control type="label">
                             <left>15</left>
-                            <top>32</top>
+                            <top>38</top>
                             <width>530</width>
                             <height>24</height>
                             <aligny>center</aligny>
@@ -182,13 +183,13 @@
                     </itemlayout>
 
                     <!-- Focused row -->
-                    <focusedlayout width="730" height="64">
+                    <focusedlayout width="730" height="68">
                         <!-- Accent background -->
                         <control type="image">
                             <left>0</left>
                             <top>0</top>
                             <width>730</width>
-                            <height>64</height>
+                            <height>68</height>
                             <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white.png</texture>
                         </control>
 
@@ -207,7 +208,7 @@
                         <!-- Year · MPAA · Runtime (when MPAA present) -->
                         <control type="label">
                             <left>15</left>
-                            <top>32</top>
+                            <top>38</top>
                             <width>530</width>
                             <height>24</height>
                             <aligny>center</aligny>
@@ -220,7 +221,7 @@
                         <!-- Year · Runtime (when no MPAA) -->
                         <control type="label">
                             <left>15</left>
-                            <top>32</top>
+                            <top>38</top>
                             <width>530</width>
                             <height>24</height>
                             <aligny>center</aligny>
@@ -255,7 +256,7 @@
                 <!-- Button Row -->
                 <control type="group">
                     <left>165</left>
-                    <top>730</top>
+                    <top>740</top>
                     <width>570</width>
                     <height>50</height>
 
