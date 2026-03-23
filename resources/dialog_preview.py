@@ -208,19 +208,19 @@ def preview_browse() -> None:
 
     from resources.lib.ui.browse_window import show_browse_window
     from resources.lib.constants import (
-        VIEW_POSTER_WALL, VIEW_CARD_LIST, VIEW_POSTERS,
+        VIEW_SHOWCASE, VIEW_CARD_LIST, VIEW_POSTERS,
         VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
     )
 
     view_names = [
-        "Poster Wall",
+        "Showcase",
         "Card List",
         "Posters",
         "Big Screen",
         "Split View",
     ]
     view_values = [
-        VIEW_POSTER_WALL, VIEW_CARD_LIST, VIEW_POSTERS,
+        VIEW_SHOWCASE, VIEW_CARD_LIST, VIEW_POSTERS,
         VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
     ]
 
