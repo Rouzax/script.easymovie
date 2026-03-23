@@ -577,13 +577,9 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             pool = _count_pool()
             buckets = extract_decade_buckets(pool if show_counts else all_movies)
 
-            # Build items: header + recency, header + decades, then "Any year"
+            # Build items: recency, then header + decades, then "Any year"
             items = []
             header_indices = set()
-
-            # "— Recent —" group header
-            header_indices.add(len(items))
-            items.append(lang(32205))
 
             for years_ago, label_id in RECENCY_RANGES:
                 if show_counts:
