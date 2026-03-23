@@ -27,7 +27,7 @@
         <!-- Addon name heading -->
         <control type="label">
             <left>80</left>
-            <top>20</top>
+            <top>15</top>
             <width>1760</width>
             <height>40</height>
             <font>font14_title</font>
@@ -38,7 +38,7 @@
         <!-- Movie count -->
         <control type="label">
             <left>80</left>
-            <top>25</top>
+            <top>20</top>
             <width>1760</width>
             <height>30</height>
             <align>right</align>
@@ -50,7 +50,7 @@
         <!-- Accent line separator -->
         <control type="image">
             <left>80</left>
-            <top>62</top>
+            <top>60</top>
             <width>1760</width>
             <height>2</height>
             <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -71,7 +71,7 @@
             <!-- ==================== LEFT SIDE: LARGE FANART ==================== -->
             <control type="group">
                 <left>25</left>
-                <top>75</top>
+                <top>72</top>
                 <width>1200</width>
                 <height>950</height>
 
@@ -158,7 +158,7 @@
             <!-- ==================== RIGHT SIDE: MOVIE LIST ==================== -->
             <control type="fixedlist" id="655">
                 <left>1260</left>
-                <top>75</top>
+                <top>72</top>
                 <width>630</width>
                 <height>930</height>
                 <orientation>vertical</orientation>
@@ -236,12 +236,12 @@
                 </itemlayout>
 
                 <!-- Focused row (expand to show more) -->
-                <focusedlayout width="630" height="120">
+                <focusedlayout width="630" height="125">
                     <control type="image">
                         <left>0</left>
                         <top>0</top>
                         <width>630</width>
-                        <height>120</height>
+                        <height>125</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white.png</texture>
                     </control>
                     <control type="image">
@@ -310,7 +310,7 @@
                     </control>
                     <control type="label">
                         <left>95</left>
-                        <top>68</top>
+                        <top>73</top>
                         <width>520</width>
                         <height>22</height>
                         <aligny>center</aligny>
@@ -320,7 +320,7 @@
                     </control>
                     <control type="label">
                         <left>95</left>
-                        <top>90</top>
+                        <top>100</top>
                         <width>520</width>
                         <height>22</height>
                         <aligny>center</aligny>
