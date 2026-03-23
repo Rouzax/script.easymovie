@@ -14,7 +14,7 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import List, Optional, cast
+from typing import List, Optional, Set, cast
 
 import xbmcgui
 
@@ -52,6 +52,7 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
         self.items: List[str] = []
         self.preselected: List[int] = []
         self.multi_select = True
+        self.headers: Set[int] = set()
         self.selected: List[int] = []
         self.cancelled = False
         self._back_pressed = False
@@ -68,7 +69,9 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
 
         for i, item_label in enumerate(self.items):
             li = xbmcgui.ListItem(item_label)
-            if i in self.preselected:
+            if i in self.headers:
+                li.setProperty('is_header', 'true')
+            elif i in self.preselected:
                 li.setProperty('checked', 'true')
                 self.selected.append(i)
             list_control.addItem(li)
@@ -87,6 +90,8 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
             if self.multi_select:
                 idx = list_control.getSelectedPosition()
                 li = list_control.getSelectedItem()
+                if li and li.getProperty('is_header') == 'true':
+                    return
                 if li.getProperty('checked') == 'true':
                     li.setProperty('checked', '')
                     if idx in self.selected:
@@ -96,7 +101,10 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
                     if idx not in self.selected:
                         self.selected.append(idx)
             else:
-                # Single select: close immediately
+                # Single select: close immediately (skip headers)
+                li = list_control.getSelectedItem()
+                if li and li.getProperty('is_header') == 'true':
+                    return
                 self.selected = [list_control.getSelectedPosition()]
                 self.close()
 
@@ -173,6 +181,7 @@ def show_select_dialog(
     multi_select: bool = True,
     preselected: Optional[List[int]] = None,
     addon_id: Optional[str] = None,
+    headers: Optional[Set[int]] = None,
 ) -> Optional[List[int]]:
     """Show a themed selection dialog.
 
@@ -182,6 +191,7 @@ def show_select_dialog(
         multi_select: If True, checkboxes. If False, single-select closes on pick.
         preselected: Indices of pre-selected items.
         addon_id: Optional addon ID (for clone support).
+        headers: Indices of non-selectable group header items.
 
     Returns:
         List of selected indices, or None if cancelled/back pressed.
@@ -199,6 +209,7 @@ def show_select_dialog(
     dialog.items = items
     dialog.multi_select = multi_select
     dialog.preselected = preselected or []
+    dialog.headers = headers or set()
     dialog.doModal()
 
     if dialog.cancelled:

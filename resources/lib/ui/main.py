@@ -577,8 +577,14 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             pool = _count_pool()
             buckets = extract_decade_buckets(pool if show_counts else all_movies)
 
-            # Build items: recency first, then decades, then "Any year"
+            # Build items: header + recency, header + decades, then "Any year"
             items = []
+            header_indices = set()
+
+            # "— Recent —" group header
+            header_indices.add(len(items))
+            items.append(lang(32205))
+
             for years_ago, label_id in RECENCY_RANGES:
                 if show_counts:
                     cutoff_year = current_year - years_ago
@@ -586,26 +592,38 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                     items.append(_fmt(lang(label_id), rcount))
                 else:
                     items.append(lang(label_id))
-            recency_count = len(RECENCY_RANGES)
+
+            # "— By decade —" group header (only if there are decade buckets)
+            if buckets:
+                header_indices.add(len(items))
+                items.append(lang(32206))
+
             for _, count, label in buckets:
                 items.append(_fmt(label, count) if show_counts else label)
             items.append(_fmt(lang(32220), len(pool)) if show_counts
                          else lang(32220))
 
             result = show_select_dialog(lang(32202), items, multi_select=False,
-                                        addon_id=addon_id)
+                                        addon_id=addon_id,
+                                        headers=header_indices)
             if result is None:
                 if not wizard.go_back():
                     return None
                 continue
+
+            # Map selected index back to data index (skip headers)
             idx = result[0]
-            if idx < recency_count:
+            headers_before = sum(1 for h in header_indices if h < idx)
+            data_idx = idx - headers_before
+
+            recency_count = len(RECENCY_RANGES)
+            if data_idx < recency_count:
                 # Recency selection
-                years_ago = RECENCY_RANGES[idx][0]
+                years_ago = RECENCY_RANGES[data_idx][0]
                 answer = {"from": current_year - years_ago, "to": 0}
-            elif idx < recency_count + len(buckets):
+            elif data_idx < recency_count + len(buckets):
                 # Decade selection
-                bucket_idx = idx - recency_count
+                bucket_idx = data_idx - recency_count
                 decade_start, _, _ = buckets[bucket_idx]
                 answer = {"from": decade_start, "to": decade_start + 9}
             else:

@@ -392,7 +392,7 @@ msgid "Select Age Ratings"
 msgstr ""
 
 msgctxt "#32202"
-msgid "Select Decade"
+msgid "Select Time Period"
 msgstr ""
 
 msgctxt "#32203"
@@ -401,6 +401,15 @@ msgstr ""
 
 msgctxt "#32204"
 msgid "Ignore Genres"
+msgstr ""
+
+# Wizard option: year filter group headers
+msgctxt "#32205"
+msgid "— Recent —"
+msgstr ""
+
+msgctxt "#32206"
+msgid "— By decade —"
 msgstr ""
 
 # Wizard option: year recency
