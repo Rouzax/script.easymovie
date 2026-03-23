@@ -403,11 +403,7 @@ msgctxt "#32204"
 msgid "Ignore Genres"
 msgstr ""
 
-# Wizard option: year filter group headers
-msgctxt "#32205"
-msgid "— Recent —"
-msgstr ""
-
+# Wizard option: year filter group header
 msgctxt "#32206"
 msgid "— By decade —"
 msgstr ""
