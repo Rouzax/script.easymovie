@@ -390,16 +390,40 @@
                         <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                     </control>
 
-                    <!-- Separator -->
+                    <!-- Separator: after genre when NO collection -->
+                    <control type="image">
+                        <left>0</left>
+                        <top>488</top>
+                        <width>590</width>
+                        <height>2</height>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                        <visible>String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
+                    </control>
+
+                    <!-- Separator: after set info when collection present -->
                     <control type="image">
                         <left>0</left>
                         <top>521</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                        <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                     </control>
 
-                    <!-- Plot -->
+                    <!-- Plot: positioned after separator (no collection) -->
+                    <control type="textbox">
+                        <left>0</left>
+                        <top>500</top>
+                        <width>590</width>
+                        <height>285</height>
+                        <font>font10</font>
+                        <textcolor>FFCCCCCC</textcolor>
+                        <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
+                        <label>$INFO[Container(655).ListItem.Plot]</label>
+                        <visible>String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
+                    </control>
+
+                    <!-- Plot: positioned after separator (with collection) -->
                     <control type="textbox">
                         <left>0</left>
                         <top>535</top>
@@ -409,6 +433,7 @@
                         <textcolor>FFCCCCCC</textcolor>
                         <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
                         <label>$INFO[Container(655).ListItem.Plot]</label>
+                        <visible>!String.IsEmpty(Container(655).ListItem.Property(set_name))</visible>
                     </control>
                 </control>
             </control>
