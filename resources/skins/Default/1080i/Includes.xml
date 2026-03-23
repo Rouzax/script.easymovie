@@ -101,17 +101,4 @@
     <!-- COMPONENT INCLUDES                                                 -->
     <!-- ================================================================= -->
 
-    <!-- Horizontal separator line (parameterized position) -->
-    <include name="EasyMovie_Separator">
-        <param name="top" />
-        <param name="left" default="0" />
-        <param name="width" />
-        <control type="image">
-            <left>$PARAM[left]</left>
-            <top>$PARAM[top]</top>
-            <width>$PARAM[width]</width>
-            <height>2</height>
-            <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
-        </control>
-    </include>
 </includes>

@@ -10,9 +10,6 @@ than hardcoding values elsewhere.
 ADDON_ID = "script.easymovie"
 ADDON_NAME = "EasyMovie"
 
-# Window property prefixes
-PROP_PREFIX = "EasyMovie"
-
 # Log file configuration
 LOG_DIR = "logs"
 LOG_FILENAME = "easymovie.log"
@@ -37,14 +34,8 @@ WATCHED_UNWATCHED = 0
 WATCHED_WATCHED = 1
 WATCHED_BOTH = 2
 
-# Genre matching modes
-GENRE_MATCH_OR = 0
-GENRE_MATCH_AND = 1
-
 # Year filter types
 YEAR_FILTER_AFTER = 0
-YEAR_FILTER_BEFORE = 1
-YEAR_FILTER_BETWEEN = 2
 YEAR_FILTER_RECENCY = 3
 
 # Sort options
@@ -144,15 +135,10 @@ SCORE_RANGES = [
 
 # Timing constants (milliseconds)
 NOTIFICATION_DURATION_MS = 5000
-DIALOG_WAIT_SLEEP_MS = 100
 PLAYLIST_ADD_DELAY_MS = 50
-
-# Playback
-PLAYBACK_COMPLETE_THRESHOLD = 0.90  # 90% watched = complete
 
 # Continuation prompt
 CONTINUATION_DEFAULT_CONTINUE_SET = 0
-CONTINUATION_DEFAULT_CONTINUE_PLAYLIST = 1
 
 # Window properties for service coordination
 PROP_PLAYLIST_RUNNING = "EasyMovie.PlaylistRunning"
@@ -164,8 +150,3 @@ PLAYER_STOP_DELAY_MS = 500
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK = 92
 ACTION_CONTEXT_MENU = 117
-
-# Version prerelease ordering
-VERSION_PRERELEASE_ALPHA = 0
-VERSION_PRERELEASE_BETA = 1
-VERSION_PRERELEASE_RELEASE = 2

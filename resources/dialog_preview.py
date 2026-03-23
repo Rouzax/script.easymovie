@@ -16,7 +16,7 @@ that addon's name, theme, and skin path (useful for testing clones).
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union, cast
 
 import xbmcgui
 import xbmcaddon
@@ -224,7 +224,8 @@ def preview_browse() -> None:
         VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
     ]
 
-    choice = dialog.select("Browse View Style", view_names)
+    choice = dialog.select("Browse View Style",
+                           cast(List[Union[str, xbmcgui.ListItem]], view_names))
     if choice < 0:
         return
 
