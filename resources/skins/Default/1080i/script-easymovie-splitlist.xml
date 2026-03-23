@@ -341,7 +341,7 @@
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>0</left>
-                        <top>458</top>
+                        <top>462</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -354,7 +354,7 @@
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>0</left>
-                        <top>458</top>
+                        <top>462</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -367,7 +367,7 @@
                     <!-- Genre -->
                     <control type="label">
                         <left>0</left>
-                        <top>486</top>
+                        <top>492</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -380,7 +380,7 @@
                     <!-- Set info -->
                     <control type="label">
                         <left>0</left>
-                        <top>514</top>
+                        <top>522</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -393,7 +393,7 @@
                     <!-- Separator: after genre when NO collection -->
                     <control type="image">
                         <left>0</left>
-                        <top>519</top>
+                        <top>525</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -403,7 +403,7 @@
                     <!-- Separator: after set info when collection present -->
                     <control type="image">
                         <left>0</left>
-                        <top>546</top>
+                        <top>554</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -413,7 +413,7 @@
                     <!-- Plot: positioned after separator (no collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>531</top>
+                        <top>537</top>
                         <width>590</width>
                         <height>250</height>
                         <font>font10</font>
@@ -426,9 +426,9 @@
                     <!-- Plot: positioned after separator (with collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>558</top>
+                        <top>566</top>
                         <width>590</width>
-                        <height>220</height>
+                        <height>212</height>
                         <font>font10</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
