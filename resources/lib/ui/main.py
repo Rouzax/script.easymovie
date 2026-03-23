@@ -35,7 +35,9 @@ from resources.lib.constants import (
     PROP_PLAYLIST_RUNNING,
     RESURFACE_WINDOWS,
 )
-from resources.lib.utils import get_logger, json_query, notify, log_timing, lang
+from resources.lib.utils import (
+    get_logger, invalidate_icon_cache, json_query, notify, log_timing, lang,
+)
 from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
 from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog
@@ -861,38 +863,6 @@ def _reopen_settings(addon_id: str) -> None:
     )
 
 
-def _invalidate_icon_cache(addon_id: str) -> None:
-    """Remove the addon icon from Kodi's texture cache.
-
-    Kodi caches textures by file path. After replacing icon.png,
-    the old cached version persists until removed via JSON-RPC.
-    """
-    _log = get_logger('default')
-    result = json_query({
-        "jsonrpc": "2.0",
-        "method": "Textures.GetTextures",
-        "params": {
-            "filter": {
-                "field": "url",
-                "operator": "contains",
-                "value": addon_id,
-            }
-        },
-        "id": 1,
-    })
-    for texture in result.get("textures", []):
-        tid = texture.get("textureid")
-        if tid:
-            json_query({
-                "jsonrpc": "2.0",
-                "method": "Textures.RemoveTexture",
-                "params": {"textureid": tid},
-                "id": 1,
-            }, return_result=False)
-    _log.debug("Icon texture cache invalidated", event="icon.cache_clear",
-               addon_id=addon_id)
-
-
 def _handle_entry_args(addon_id: str) -> bool:
     """Handle command-line arguments for special entry points.
 
@@ -930,6 +900,11 @@ def _handle_entry_args(addon_id: str) -> bool:
             "icon-golden-hour.png", "icon-ultraviolet.png",
             "icon-ember.png", "icon-nightfall.png",
         ]
+        from resources.lib.constants import CUSTOM_ICON_BACKUP
+        addon_data = _xbmcvfs.translatePath(
+            f'special://profile/addon_data/{addon_id}/'
+        )
+        backup_path = os.path.join(addon_data, CUSTOM_ICON_BACKUP)
         result = show_select_dialog(
             heading="Choose Icon",
             items=icon_names,
@@ -942,6 +917,10 @@ def _handle_entry_args(addon_id: str) -> bool:
             if idx < len(icon_files):
                 src = os.path.join(icons_dir, icon_files[idx])
                 ok = _xbmcvfs.copy(src, dst)
+                if ok:
+                    addon.setSetting('icon_choice',
+                                     f'built-in:{icon_files[idx]}')
+                    _xbmcvfs.copy(src, backup_path)
                 log.info("Icon set" if ok else "Icon set failed",
                          event="icon.set", source=src, target=dst, success=ok)
             else:
@@ -949,14 +928,18 @@ def _handle_entry_args(addon_id: str) -> bool:
                 image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
                 if image:
                     ok = _xbmcvfs.copy(cast(str, image), dst)
+                    if ok:
+                        addon.setSetting('icon_choice', 'custom')
+                        _xbmcvfs.copy(cast(str, image), backup_path)
                     log.info("Custom icon set" if ok else "Custom icon set failed",
                              event="icon.set", source=cast(str, image),
                              target=dst, success=ok)
-        _invalidate_icon_cache(addon_id)
+        invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':
         from resources.lib.utils import get_addon
+        from resources.lib.constants import CUSTOM_ICON_BACKUP
         import xbmcvfs as _xbmcvfs
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
@@ -964,7 +947,14 @@ def _handle_entry_args(addon_id: str) -> bool:
         icon_path = os.path.join(addon_path, 'icon.png')
         if _xbmcvfs.exists(default_icon):
             _xbmcvfs.copy(default_icon, icon_path)
-        _invalidate_icon_cache(addon_id)
+        addon.setSetting('icon_choice', '')
+        addon_data = _xbmcvfs.translatePath(
+            f'special://profile/addon_data/{addon_id}/'
+        )
+        backup_path = os.path.join(addon_data, CUSTOM_ICON_BACKUP)
+        if _xbmcvfs.exists(backup_path):
+            _xbmcvfs.delete(backup_path)
+        invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True
 

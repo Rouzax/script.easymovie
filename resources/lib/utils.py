@@ -367,6 +367,38 @@ def log_timing(
         )
 
 
+def invalidate_icon_cache(addon_id: str) -> None:
+    """Remove the addon icon from Kodi's texture cache.
+
+    Kodi caches textures by file path. After replacing icon.png,
+    the old cached version persists until removed via JSON-RPC.
+    """
+    _log = get_logger('default')
+    result = json_query({
+        "jsonrpc": "2.0",
+        "method": "Textures.GetTextures",
+        "params": {
+            "filter": {
+                "field": "url",
+                "operator": "contains",
+                "value": addon_id,
+            }
+        },
+        "id": 1,
+    })
+    for texture in result.get("textures", []):
+        tid = texture.get("textureid")
+        if tid:
+            json_query({
+                "jsonrpc": "2.0",
+                "method": "Textures.RemoveTexture",
+                "params": {"textureid": tid},
+                "id": 1,
+            }, return_result=False)
+    _log.debug("Icon texture cache invalidated", event="icon.cache_clear",
+               addon_id=addon_id)
+
+
 def json_query(query: Union[Dict[str, Any], List[Dict[str, Any]]], return_result: bool = True) -> Dict[str, Any]:
     """Execute a JSON-RPC query against Kodi.
 

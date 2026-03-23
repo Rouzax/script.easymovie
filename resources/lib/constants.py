@@ -10,6 +10,9 @@ than hardcoding values elsewhere.
 ADDON_ID = "script.easymovie"
 ADDON_NAME = "EasyMovie"
 
+# Icon persistence
+CUSTOM_ICON_BACKUP = "custom_icon.png"
+
 # Log file configuration
 LOG_DIR = "logs"
 LOG_FILENAME = "easymovie.log"
