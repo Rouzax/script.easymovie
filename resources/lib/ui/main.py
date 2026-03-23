@@ -606,6 +606,14 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 if not wizard.go_back():
                     return None
                 continue
+            if not result:
+                answer = {"from": 0, "to": 0}  # No filter, same as "Any year"
+                wizard.set_answer(filter_type, answer)
+                log.debug("Wizard answer", event="wizard.answer",
+                          filter_type=filter_type, answer=answer)
+                if not wizard.advance():
+                    break
+                continue
 
             # Map selected index back to data index (skip headers)
             idx = result[0]
@@ -640,6 +648,14 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             if result is None:
                 if not wizard.go_back():
                     return None
+                continue
+            if not result:
+                answer = 0  # No filter, same as "Any score"
+                wizard.set_answer(filter_type, answer)
+                log.debug("Wizard answer", event="wizard.answer",
+                          filter_type=filter_type, answer=answer)
+                if not wizard.advance():
+                    break
                 continue
             idx = result[0]
             answer = SCORE_RANGES[idx][0]
