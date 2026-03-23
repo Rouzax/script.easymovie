@@ -18,7 +18,13 @@ from typing import List, Optional, Set, cast
 
 import xbmcgui
 
-from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
+from resources.lib.constants import (
+    ACTION_MOVE_DOWN,
+    ACTION_MOVE_UP,
+    ACTION_NAV_BACK,
+    ACTION_PREVIOUS_MENU,
+    ADDON_ID,
+)
 from resources.lib.utils import get_logger
 
 # Control IDs matching the XML files
@@ -117,12 +123,22 @@ class SelectDialog(xbmcgui.WindowXMLDialog):
             self.close()
 
     def onAction(self, action):
-        """Handle back/escape actions."""
+        """Handle back/escape and skip header items on navigation."""
         action_id = action.getId()
         if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
             self._back_pressed = True
             self.cancelled = True
             self.close()
+        elif action_id in (ACTION_MOVE_UP, ACTION_MOVE_DOWN) and self.headers:
+            list_control = cast(xbmcgui.ControlList, self.getControl(SELECT_LIST))
+            pos = list_control.getSelectedPosition()
+            if pos in self.headers:
+                step = 1 if action_id == ACTION_MOVE_DOWN else -1
+                new_pos = pos + step
+                # Clamp to valid range
+                new_pos = max(0, min(new_pos, list_control.size() - 1))
+                if new_pos not in self.headers:
+                    list_control.selectItem(new_pos)
 
     @property
     def back_pressed(self) -> bool:
