@@ -307,12 +307,12 @@
                     <top>13</top>
                     <width>590</width>
 
-                    <!-- Movie poster (centered, 220x330) -->
+                    <!-- Movie poster (centered, 190x285) -->
                     <control type="image">
-                        <left>185</left>
+                        <left>200</left>
                         <top>20</top>
-                        <width>220</width>
-                        <height>330</height>
+                        <width>190</width>
+                        <height>285</height>
                         <texture background="true">$INFO[Container(655).ListItem.Art(poster)]</texture>
                         <aspectratio>keep</aspectratio>
                     </control>
@@ -320,7 +320,7 @@
                     <!-- Separator -->
                     <control type="image">
                         <left>0</left>
-                        <top>365</top>
+                        <top>320</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -329,7 +329,7 @@
                     <!-- Movie title -->
                     <control type="label">
                         <left>0</left>
-                        <top>377</top>
+                        <top>332</top>
                         <width>590</width>
                         <height>35</height>
                         <align>center</align>
@@ -341,7 +341,7 @@
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>0</left>
-                        <top>417</top>
+                        <top>367</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -354,7 +354,7 @@
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>0</left>
-                        <top>417</top>
+                        <top>367</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -367,7 +367,7 @@
                     <!-- Genre -->
                     <control type="label">
                         <left>0</left>
-                        <top>450</top>
+                        <top>395</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -380,7 +380,7 @@
                     <!-- Set info -->
                     <control type="label">
                         <left>0</left>
-                        <top>483</top>
+                        <top>423</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -393,7 +393,7 @@
                     <!-- Separator: after genre when NO collection -->
                     <control type="image">
                         <left>0</left>
-                        <top>488</top>
+                        <top>428</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -403,7 +403,7 @@
                     <!-- Separator: after set info when collection present -->
                     <control type="image">
                         <left>0</left>
-                        <top>521</top>
+                        <top>455</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -413,9 +413,9 @@
                     <!-- Plot: positioned after separator (no collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>500</top>
+                        <top>440</top>
                         <width>590</width>
-                        <height>285</height>
+                        <height>340</height>
                         <font>font10</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
@@ -426,9 +426,9 @@
                     <!-- Plot: positioned after separator (with collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>535</top>
+                        <top>467</top>
                         <width>590</width>
-                        <height>250</height>
+                        <height>315</height>
                         <font>font10</font>
                         <textcolor>FFCCCCCC</textcolor>
                         <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
