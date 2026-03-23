@@ -227,26 +227,26 @@
                 </itemlayout>
 
                 <!-- Focused row (expand to show more) -->
-                <focusedlayout width="630" height="125">
+                <focusedlayout width="630" height="135">
                     <control type="image">
                         <left>0</left>
                         <top>0</top>
                         <width>630</width>
-                        <height>125</height>
+                        <height>135</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white.png</texture>
                     </control>
                     <control type="image">
                         <left>10</left>
                         <top>5</top>
-                        <width>73</width>
-                        <height>110</height>
+                        <width>83</width>
+                        <height>125</height>
                         <texture background="true">$INFO[ListItem.Art(poster)]</texture>
                         <aspectratio>keep</aspectratio>
                     </control>
                     <control type="label">
-                        <left>95</left>
+                        <left>105</left>
                         <top>10</top>
-                        <width>460</width>
+                        <width>450</width>
                         <height>30</height>
                         <aligny>center</aligny>
                         <font>font12</font>
@@ -276,9 +276,9 @@
 
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
-                        <left>95</left>
+                        <left>105</left>
                         <top>42</top>
-                        <width>520</width>
+                        <width>510</width>
                         <height>25</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -289,9 +289,9 @@
 
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
-                        <left>95</left>
+                        <left>105</left>
                         <top>42</top>
-                        <width>520</width>
+                        <width>510</width>
                         <height>25</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -300,9 +300,9 @@
                         <visible>String.IsEmpty(ListItem.Mpaa)</visible>
                     </control>
                     <control type="label">
-                        <left>95</left>
+                        <left>105</left>
                         <top>73</top>
-                        <width>520</width>
+                        <width>510</width>
                         <height>22</height>
                         <aligny>center</aligny>
                         <font>font10</font>
@@ -310,9 +310,9 @@
                         <label>$INFO[ListItem.Genre]</label>
                     </control>
                     <control type="label">
-                        <left>95</left>
-                        <top>100</top>
-                        <width>520</width>
+                        <left>105</left>
+                        <top>105</top>
+                        <width>510</width>
                         <height>22</height>
                         <aligny>center</aligny>
                         <font>font10</font>
