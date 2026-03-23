@@ -30,10 +30,10 @@
 
         <!-- Context Menu Container -->
         <control type="group">
-            <left>770</left>
-            <top>370</top>
-            <width>380</width>
-            <height>340</height>
+            <left>720</left>
+            <top>455</top>
+            <width>480</width>
+            <height>170</height>
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" delay="100" />
                 <effect type="slide" start="0,-100" end="0" center="auto" tween="back" easing="out" time="600" delay="100" />
@@ -47,8 +47,8 @@
             <control type="image">
                 <left>-2</left>
                 <top>-2</top>
-                <width>384</width>
-                <height>344</height>
+                <width>484</width>
+                <height>174</height>
                 <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
             </control>
 
@@ -56,18 +56,18 @@
             <control type="image">
                 <left>0</left>
                 <top>0</top>
-                <width>380</width>
-                <height>340</height>
+                <width>480</width>
+                <height>170</height>
                 <texture border="12">common/menu.png</texture>
                 <colordiffuse>ffffffff</colordiffuse>
             </control>
 
             <!-- Menu Buttons -->
             <control type="grouplist" id="100">
-                <left>20</left>
+                <left>30</left>
                 <top>25</top>
-                <width>340</width>
-                <height>290</height>
+                <width>420</width>
+                <height>120</height>
                 <itemgap>12</itemgap>
                 <orientation>vertical</orientation>
                 <onleft>100</onleft>
@@ -77,7 +77,7 @@
 
                 <!-- Play -->
                 <control type="button" id="110">
-                    <width>340</width>
+                    <width>420</width>
                     <height>50</height>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -91,7 +91,7 @@
 
                 <!-- Play Full Set -->
                 <control type="button" id="120">
-                    <width>340</width>
+                    <width>420</width>
                     <height>50</height>
                     <align>left</align>
                     <aligny>center</aligny>

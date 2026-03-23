@@ -60,8 +60,6 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
             lang(32305))  # "Play"
 
         set_label = lang(32306)  # "Play Full Set"
-        if self._set_name:
-            set_label = f"{set_label} ({self._set_name})"
         cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SET)).setLabel(
             set_label)
 
