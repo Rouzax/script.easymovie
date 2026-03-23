@@ -20,7 +20,7 @@ from resources.lib.constants import (
     FILTER_ASK, FILTER_SKIP,
     WATCHED_UNWATCHED,
     YEAR_FILTER_AFTER,
-    VIEW_POSTER_WALL,
+    VIEW_SHOWCASE,
     SORT_RANDOM, SORT_DESC,
     CONTINUATION_DEFAULT_CONTINUE_SET,
     MODE_ASK,
@@ -58,7 +58,7 @@ class FilterSettings:
 @dataclass
 class BrowseSettings:
     """Browse mode configuration."""
-    view_style: int = VIEW_POSTER_WALL
+    view_style: int = VIEW_SHOWCASE
     return_to_list: bool = True
     result_count: int = 10
     sort_by: int = SORT_RANDOM
@@ -163,7 +163,7 @@ def load_settings(
 
     # Browse
     browse_settings = BrowseSettings(
-        view_style=get_int_setting('view_style', addon_id, default=VIEW_POSTER_WALL),
+        view_style=get_int_setting('view_style', addon_id, default=VIEW_SHOWCASE),
         return_to_list=get_bool_setting('return_to_list', addon_id),
         result_count=get_int_setting('browse_count', addon_id, default=10),
         sort_by=get_int_setting('browse_sort', addon_id, default=SORT_RANDOM),

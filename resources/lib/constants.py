@@ -60,7 +60,7 @@ SORT_ASC = 0
 SORT_DESC = 1
 
 # View styles
-VIEW_POSTER_WALL = 0  # New EasyMovie default
+VIEW_SHOWCASE = 0  # Horizontal filmstrip carousel
 VIEW_CARD_LIST = 1
 VIEW_POSTERS = 2
 VIEW_BIG_SCREEN = 3

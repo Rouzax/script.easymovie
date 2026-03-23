@@ -26,7 +26,7 @@ from resources.lib.constants import (
     ACTION_NAV_BACK,
     ACTION_PREVIOUS_MENU,
     ADDON_ID,
-    VIEW_POSTER_WALL,
+    VIEW_SHOWCASE,
     VIEW_CARD_LIST,
     VIEW_POSTERS,
     VIEW_BIG_SCREEN,
@@ -44,7 +44,7 @@ RESULT_REROLL = "__reroll__"
 RESULT_SURPRISE = "__surprise__"
 # View style to XML filename mapping
 VIEW_XML_MAP = {
-    VIEW_POSTER_WALL: "script-easymovie-postergrid.xml",
+    VIEW_SHOWCASE: "script-easymovie-postergrid.xml",
     VIEW_CARD_LIST: "script-easymovie-cardlist.xml",
     VIEW_POSTERS: "script-easymovie-main.xml",
     VIEW_BIG_SCREEN: "script-easymovie-BigScreenList.xml",
@@ -210,13 +210,13 @@ def show_browse_window(
 
     Args:
         movies: List of movie dicts (with art) to display.
-        view_style: View style constant (VIEW_POSTER_WALL, etc.)
+        view_style: View style constant (VIEW_SHOWCASE, etc.)
         addon_id: Addon ID (for clone support).
 
     Returns:
         Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
     """
-    xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_POSTER_WALL])
+    xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_SHOWCASE])
     addon_path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
 
     window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
