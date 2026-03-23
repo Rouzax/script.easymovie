@@ -25,7 +25,7 @@ from __future__ import annotations
 import os
 import random
 import sys
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, cast
+from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING, Tuple, cast
 
 import xbmcvfs
 
@@ -55,9 +55,6 @@ from resources.lib.data.smart_playlists import extract_movie_ids_from_playlist
 from resources.lib.data.movie_sets import apply_set_substitutions
 from resources.lib.data.results import select_and_sort_results
 from resources.lib.data.storage import StorageManager
-from resources.lib.playback.player import play_movie, get_resume_info
-from resources.lib.playback.playlist_builder import build_and_play_playlist
-from resources.lib.playback.playback_monitor import PlaybackMonitor
 
 if TYPE_CHECKING:
     from resources.lib.ui.settings import (
@@ -132,6 +129,110 @@ def _check_clone_version(addon_id: str, addon_path: str) -> bool:
         )
 
     return False  # Don't proceed — either updating or user cancelled
+
+
+def _prepare_movie_pool(
+    log,
+    all_movies: List[Dict[str, Any]],
+    advanced_settings: AdvancedSettings,
+    storage: StorageManager,
+    addon_id: str,
+) -> Optional[Tuple[List[Dict[str, Any]], set]]:
+    """Apply playlist pool filter and prepare resurface exclusions.
+
+    Returns:
+        (movies, exclude_ids) on success, or None if the pool is empty
+        and the user was notified.
+    """
+    # Apply playlist pool filter (narrow universe before anything else)
+    if advanced_settings.movie_pool_enabled and advanced_settings.movie_pool_path:
+        pool_ids = extract_movie_ids_from_playlist(advanced_settings.movie_pool_path)
+        if pool_ids:
+            all_movies = filter_by_playlist_ids(all_movies, pool_ids)
+            log.debug("Playlist pool applied", event="pool.filter",
+                      pool_movie_count=len(pool_ids), remaining=len(all_movies))
+            if not all_movies:
+                show_confirm_dialog(
+                    "No Movies",
+                    "No movies in your library match the selected playlist.",
+                    yes_label="OK", no_label="", addon_id=addon_id)
+                return None
+        else:
+            log.warning("Playlist pool enabled but empty, using full library",
+                        event="pool.fallback")
+
+    # Prepare resurface exclusion (before wizard, so counts are accurate)
+    exclude_ids: set = set()
+    if advanced_settings.avoid_resurface:
+        storage.validate_suggested(all_movies)
+        resurface_hours = RESURFACE_WINDOWS.get(advanced_settings.resurface_window, 24)
+        storage.prune_suggested(resurface_hours)
+        exclude_ids = storage.get_suggested_ids()
+        if exclude_ids:
+            log.debug("Resurface exclusion prepared",
+                      event="history.exclude_prepared",
+                      exclude_count=len(exclude_ids),
+                      window_hours=resurface_hours)
+    else:
+        storage.clear_suggested()
+
+    return all_movies, exclude_ids
+
+
+def _run_wizard_and_filter(
+    log,
+    all_movies: List[Dict[str, Any]],
+    filter_settings: FilterSettings,
+    advanced_settings: AdvancedSettings,
+    storage: StorageManager,
+    exclude_ids: set,
+    addon_id: str,
+) -> Optional[List[Dict[str, Any]]]:
+    """Run filter wizard and apply filters.
+
+    Returns:
+        Filtered movie list, or None if cancelled or no results.
+    """
+    wizard = WizardFlow(_build_wizard_settings(filter_settings))
+    if advanced_settings.remember_filters:
+        wizard.load_last_answers(storage.load_last_filters())
+
+    filter_config = _run_wizard(log, wizard, all_movies, addon_id,
+                               show_counts=advanced_settings.show_counts,
+                               cumulative_counts=advanced_settings.cumulative_counts,
+                               exclude_ids=exclude_ids)
+    if filter_config is None:
+        log.info("Wizard cancelled", event="wizard.cancel")
+        return None
+
+    # Apply filters (include resurface exclusions)
+    if exclude_ids:
+        filter_config.exclude_ids = list(exclude_ids)
+    filtered = apply_filters(all_movies, filter_config)
+    if not filtered:
+        if exclude_ids:
+            log.info("All movies excluded by filters and resurface window",
+                     event="history.exhausted",
+                     total=len(all_movies), excluded=len(exclude_ids))
+            show_confirm_dialog("No Results",
+                                "All matching movies were recently suggested. "
+                                "Try again later or adjust your re-suggestion window.",
+                                yes_label="OK", no_label="", addon_id=addon_id)
+        else:
+            log.info("No movies after filtering", event="filter.no_results",
+                     total=len(all_movies))
+            show_confirm_dialog("No Results",
+                                "No movies match your filters.\nTry relaxing your criteria.",
+                                yes_label="OK", no_label="", addon_id=addon_id)
+        return None
+
+    log.debug("Filtered movies", count=len(filtered), total=len(all_movies))
+
+    # Save wizard answers for next time
+    if advanced_settings.remember_filters:
+        storage.save_last_filters(wizard.get_answers())
+
+    return filtered
 
 
 def main(addon_id: str = ADDON_ID) -> None:
@@ -234,77 +335,19 @@ def main(addon_id: str = ADDON_ID) -> None:
     # 6a. Clean up stale started entries (housekeeping)
     storage.validate_started(all_movies)
 
-    # 6b. Apply playlist pool filter (narrow universe before anything else)
-    if advanced_settings.movie_pool_enabled and advanced_settings.movie_pool_path:
-        pool_ids = extract_movie_ids_from_playlist(advanced_settings.movie_pool_path)
-        if pool_ids:
-            all_movies = filter_by_playlist_ids(all_movies, pool_ids)
-            log.debug("Playlist pool applied", event="pool.filter",
-                      pool_movie_count=len(pool_ids), remaining=len(all_movies))
-            if not all_movies:
-                show_confirm_dialog(
-                    "No Movies",
-                    "No movies in your library match the selected playlist.",
-                    yes_label="OK", no_label="", addon_id=addon_id)
-                return
-        else:
-            log.warning("Playlist pool enabled but empty, using full library",
-                        event="pool.fallback")
-
-    # 7. Prepare resurface exclusion (before wizard, so counts are accurate)
-    exclude_ids: set = set()
-    if advanced_settings.avoid_resurface:
-        storage.validate_suggested(all_movies)
-        resurface_hours = RESURFACE_WINDOWS.get(advanced_settings.resurface_window, 24)
-        storage.prune_suggested(resurface_hours)
-        exclude_ids = storage.get_suggested_ids()
-        if exclude_ids:
-            log.debug("Resurface exclusion prepared",
-                      event="history.exclude_prepared",
-                      exclude_count=len(exclude_ids),
-                      window_hours=resurface_hours)
-    else:
-        storage.clear_suggested()
-
-    # 9. Run filter wizard
-    wizard = WizardFlow(_build_wizard_settings(filter_settings))
-    if advanced_settings.remember_filters:
-        wizard.load_last_answers(storage.load_last_filters())
-
-    filter_config = _run_wizard(log, wizard, all_movies, addon_id,
-                               show_counts=advanced_settings.show_counts,
-                               cumulative_counts=advanced_settings.cumulative_counts,
-                               exclude_ids=exclude_ids)
-    if filter_config is None:
-        log.info("Wizard cancelled", event="wizard.cancel")
-        return  # User cancelled
-
-    # 10. Apply filters (include resurface exclusions)
-    if exclude_ids:
-        filter_config.exclude_ids = list(exclude_ids)
-    filtered = apply_filters(all_movies, filter_config)
-    if not filtered:
-        if exclude_ids:
-            log.info("All movies excluded by filters and resurface window",
-                     event="history.exhausted",
-                     total=len(all_movies), excluded=len(exclude_ids))
-            show_confirm_dialog("No Results",
-                                "All matching movies were recently suggested. "
-                                "Try again later or adjust your re-suggestion window.",
-                                yes_label="OK", no_label="", addon_id=addon_id)
-        else:
-            log.info("No movies after filtering", event="filter.no_results",
-                     total=len(all_movies))
-            show_confirm_dialog("No Results",
-                                "No movies match your filters.\nTry relaxing your criteria.",
-                                yes_label="OK", no_label="", addon_id=addon_id)
+    # 6b–7. Apply pool filter and prepare resurface exclusions
+    pool_result = _prepare_movie_pool(log, all_movies, advanced_settings,
+                                      storage, addon_id)
+    if pool_result is None:
         return
+    all_movies, exclude_ids = pool_result
 
-    log.debug("Filtered movies", count=len(filtered), total=len(all_movies))
-
-    # 11. Save wizard answers for next time
-    if advanced_settings.remember_filters:
-        storage.save_last_filters(wizard.get_answers())
+    # 8–10. Run wizard, apply filters, save answers
+    filtered = _run_wizard_and_filter(log, all_movies, filter_settings,
+                                      advanced_settings, storage,
+                                      exclude_ids, addon_id)
+    if filtered is None:
+        return
 
     # 12. Execute mode
     # Set window property so background service skips set-awareness check
@@ -327,6 +370,7 @@ def _check_in_progress(
     storage: Optional['StorageManager'] = None,
 ) -> bool:
     """Check for in-progress movies started by EasyMovie and offer to resume."""
+    from resources.lib.playback.player import play_movie, get_resume_info
     result = json_query(get_in_progress_movies_query())
     movies = result.get("movies", [])
     if not movies:
@@ -414,6 +458,86 @@ def _build_wizard_settings(filter_settings: FilterSettings) -> Dict[str, Any]:
     }
 
 
+def _run_multi_select_step(
+    items: List[str],
+    pool: list,
+    value_fn: Callable[[Dict[str, Any]], List[str]],
+    dialog_title: str,
+    preselected: List[str],
+    addon_id: str,
+    show_counts: bool,
+    fmt_fn: Callable[[str, int], str],
+) -> Optional[List[str]]:
+    """Run a multi-select filter step with optional counts.
+
+    Args:
+        items: The unique values to display (e.g. genre names).
+        pool: Movie pool for counting.
+        value_fn: Extracts matching values from a movie dict
+                  (e.g. ``lambda m: m.get("genre", [])``).
+        dialog_title: Heading for the select dialog.
+        preselected: Previously selected values (for back-navigation).
+        addon_id: Addon ID for theming.
+        show_counts: Whether to append counts to labels.
+        fmt_fn: Formats a label with its count.
+
+    Returns:
+        List of selected values, or None if cancelled.
+    """
+    if show_counts:
+        counts: Dict[str, int] = {}
+        for m in pool:
+            for v in value_fn(m):
+                counts[v] = counts.get(v, 0) + 1
+        labels = [fmt_fn(item, counts.get(item, 0)) for item in items]
+    else:
+        labels = list(items)
+    pre_indices = [i for i, item in enumerate(items) if item in preselected]
+    result = show_select_dialog(dialog_title, labels,
+                                multi_select=True, preselected=pre_indices,
+                                addon_id=addon_id)
+    if result is None:
+        return None
+    return [items[i] for i in result]
+
+
+def _run_range_select_step(
+    ranges: list,
+    pool: list,
+    match_fn: Callable[[Dict[str, Any], tuple], bool],
+    label_fn: Callable[[tuple], str],
+    dialog_title: str,
+    addon_id: str,
+    show_counts: bool,
+    fmt_fn: Callable[[str, int], str],
+) -> Optional[List[int]]:
+    """Run a single-select range filter step with optional counts.
+
+    Args:
+        ranges: List of range tuples from constants.
+        pool: Movie pool for counting.
+        match_fn: Tests whether a movie matches a given range tuple.
+        label_fn: Extracts the display label from a range tuple.
+        dialog_title: Heading for the select dialog.
+        addon_id: Addon ID for theming.
+        show_counts: Whether to append counts to labels.
+        fmt_fn: Formats a label with its count.
+
+    Returns:
+        Dialog result (list of selected indices), or None if cancelled.
+    """
+    items: List[str] = []
+    for r in ranges:
+        label = label_fn(r)
+        if show_counts:
+            count = sum(1 for m in pool if match_fn(m, r))
+            items.append(fmt_fn(label, count))
+        else:
+            items.append(label)
+    return show_select_dialog(dialog_title, items, multi_select=False,
+                              addon_id=addon_id)
+
+
 def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 addon_id: str = ADDON_ID,
                 show_counts: bool = True,
@@ -461,47 +585,31 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
 
         if filter_type == "ignore_genre":
             genres = extract_unique_genres(all_movies)
-            pool = _count_pool()
-            if show_counts:
-                gcounts = {}
-                for m in pool:
-                    for g in m.get("genre", []):
-                        gcounts[g] = gcounts.get(g, 0) + 1
-                genre_labels = [_fmt(g, gcounts.get(g, 0)) for g in genres]
-            else:
-                genre_labels = genres
-            preselected = wizard.get_answers().get("ignore_genre", [])
-            pre_indices = [i for i, g in enumerate(genres) if g in preselected]
-            result = show_select_dialog(lang(32204), genre_labels,
-                                        multi_select=True, preselected=pre_indices,
-                                        addon_id=addon_id)
-            if result is None:
+            answer = _run_multi_select_step(
+                genres, _count_pool(),
+                lambda m: m.get("genre", []),
+                lang(32204),
+                wizard.get_answers().get("ignore_genre", []),
+                addon_id, show_counts, _fmt,
+            )
+            if answer is None:
                 if not wizard.go_back():
                     return None
                 continue
-            answer = [genres[i] for i in result]
 
         elif filter_type == "genre":
             genres = extract_unique_genres(all_movies)
-            pool = _count_pool()
-            if show_counts:
-                gcounts = {}
-                for m in pool:
-                    for g in m.get("genre", []):
-                        gcounts[g] = gcounts.get(g, 0) + 1
-                genre_labels = [_fmt(g, gcounts.get(g, 0)) for g in genres]
-            else:
-                genre_labels = genres
-            preselected_genres = wizard.get_answers().get("genre", [])
-            pre_indices = [i for i, g in enumerate(genres) if g in preselected_genres]
-            result = show_select_dialog("Select Genres", genre_labels,
-                                        multi_select=True, preselected=pre_indices,
-                                        addon_id=addon_id)
-            if result is None:
+            answer = _run_multi_select_step(
+                genres, _count_pool(),
+                lambda m: m.get("genre", []),
+                "Select Genres",
+                wizard.get_answers().get("genre", []),
+                addon_id, show_counts, _fmt,
+            )
+            if answer is None:
                 if not wizard.go_back():
                     return None
                 continue
-            answer = [genres[i] for i in result]
 
         elif filter_type == "watched":
             pool = _count_pool()
@@ -525,40 +633,26 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
 
         elif filter_type == "mpaa":
             ratings = extract_unique_mpaa(all_movies)
-            pool = _count_pool()
-            if show_counts:
-                mcounts = {}
-                for m in pool:
-                    r = m.get("mpaa", "")
-                    if r:
-                        mcounts[r] = mcounts.get(r, 0) + 1
-                rating_labels = [_fmt(r, mcounts.get(r, 0)) for r in ratings]
-            else:
-                rating_labels = list(ratings)
-            preselected_mpaa = wizard.get_answers().get("mpaa", [])
-            pre_indices = [i for i, r in enumerate(ratings) if r in preselected_mpaa]
-            result = show_select_dialog("Select Age Ratings", rating_labels,
-                                        multi_select=True, preselected=pre_indices,
-                                        addon_id=addon_id)
-            if result is None:
+            answer = _run_multi_select_step(
+                ratings, _count_pool(),
+                lambda m: [m.get("mpaa", "")] if m.get("mpaa", "") else [],
+                "Select Age Ratings",
+                wizard.get_answers().get("mpaa", []),
+                addon_id, show_counts, _fmt,
+            )
+            if answer is None:
                 if not wizard.go_back():
                     return None
                 continue
-            answer = [ratings[i] for i in result]
 
         elif filter_type == "runtime":
-            pool = _count_pool()
-            items = []
-            for rt_lo, rt_hi, label in RUNTIME_RANGES:
-                if show_counts:
-                    count = sum(1 for m in pool
-                                if (rt_lo == 0 or m.get("runtime", 0) >= rt_lo * 60)
-                                and (rt_hi == 0 or m.get("runtime", 0) <= rt_hi * 60))
-                    items.append(_fmt(label, count))
-                else:
-                    items.append(label)
-            result = show_select_dialog("Select Runtime", items, multi_select=False,
-                                        addon_id=addon_id)
+            result = _run_range_select_step(
+                RUNTIME_RANGES, _count_pool(),
+                lambda m, r: ((r[0] == 0 or m.get("runtime", 0) >= r[0] * 60)
+                              and (r[1] == 0 or m.get("runtime", 0) <= r[1] * 60)),
+                lambda r: r[2],
+                "Select Runtime", addon_id, show_counts, _fmt,
+            )
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -634,17 +728,12 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 answer = {"from": 0, "to": 0}
 
         elif filter_type == "score":
-            pool = _count_pool()
-            items = []
-            for min_score, label in SCORE_RANGES:
-                if show_counts:
-                    scount = sum(1 for m in pool
-                                 if m.get("rating", 0.0) * 10 >= min_score)
-                    items.append(_fmt(label, scount))
-                else:
-                    items.append(label)
-            result = show_select_dialog("Select Score", items, multi_select=False,
-                                        addon_id=addon_id)
+            result = _run_range_select_step(
+                SCORE_RANGES, _count_pool(),
+                lambda m, r: m.get("rating", 0.0) * 10 >= r[0],
+                lambda r: r[1],
+                "Select Score", addon_id, show_counts, _fmt,
+            )
             if result is None:
                 if not wizard.go_back():
                     return None
@@ -736,6 +825,8 @@ def _run_browse_mode(
     addon_id: str,
 ) -> None:
     """Run the browse mode loop with Re-roll support."""
+    from resources.lib.playback.player import play_movie
+    from resources.lib.playback.playlist_builder import build_and_play_playlist
     while True:
         # Exclude previously suggested from this session's pool
         if advanced_settings.avoid_resurface:
@@ -829,6 +920,8 @@ def _run_playlist_mode(
     addon_id: str,
 ) -> None:
     """Run playlist mode."""
+    from resources.lib.playback.playlist_builder import build_and_play_playlist
+    from resources.lib.playback.playback_monitor import PlaybackMonitor
     # Select and sort
     results = select_and_sort_results(
         filtered, playlist_settings.movie_count,

@@ -18,7 +18,7 @@ Logging:
 import json
 import os
 import time
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set, Union
 
 
 class StorageManager:
@@ -39,12 +39,24 @@ class StorageManager:
             path: Full path to the JSON storage file.
         """
         self._path = path
+        self._logger: Optional[Union[object, bool]] = None
         self._data: Dict[str, Any] = {
             "suggested": [],
             "started": [],
             "last_filters": {},
         }
         self._load()
+
+    @property
+    def _log(self) -> Optional[Any]:
+        """Lazy-init logger to avoid circular imports at module load time."""
+        if self._logger is None:
+            try:
+                from resources.lib.utils import get_logger
+                self._logger = get_logger('data')
+            except Exception:
+                self._logger = False  # Sentinel: don't retry
+        return self._logger if self._logger else None
 
     def _load(self) -> None:
         """Load data from disk."""
@@ -57,14 +69,11 @@ class StorageManager:
                     self._data["started"] = loaded.get("started", [])
                     self._data["last_filters"] = loaded.get("last_filters", {})
             except (json.JSONDecodeError, IOError, OSError):
-                try:
-                    from resources.lib.utils import get_logger
-                    get_logger('data').warning(
+                if self._log:
+                    self._log.warning(
                         "Storage file corrupt or unreadable",
                         event="history.load_fail",
                         path=self._path)
-                except Exception:
-                    pass
 
     def save(self) -> None:
         """Write data to disk."""
@@ -75,13 +84,53 @@ class StorageManager:
             with open(self._path, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, indent=2)
         except (IOError, OSError) as exc:
-            try:
-                from resources.lib.utils import get_logger
-                get_logger('data').warning("Failed to save storage",
-                                           event="history.save_fail",
-                                           path=self._path, error=str(exc))
-            except Exception:
-                pass
+            if self._log:
+                self._log.warning("Failed to save storage",
+                                  event="history.save_fail",
+                                  path=self._path, error=str(exc))
+
+    # ------------------------------------------------------------------
+    # Internal helpers for suggested/started entry management
+    # ------------------------------------------------------------------
+
+    def _add_entry(self, key: str, movieid: int, title: str) -> None:
+        """Add a movie entry, avoiding duplicates."""
+        existing_ids = {s.get("movieid", 0) for s in self._data[key]}
+        if movieid not in existing_ids:
+            self._data[key].append({
+                "movieid": movieid,
+                "title": title,
+                "timestamp": time.time(),
+            })
+            self.save()
+
+    def _validate_entries(
+        self, key: str, movies: List[Dict[str, Any]], event: str,
+    ) -> None:
+        """Remove entries whose movie ID was reused for a different title.
+
+        Kodi reuses movie IDs after deletion. By comparing stored titles
+        against current library titles, we detect and remove stale entries.
+        """
+        title_by_id = {m.get("movieid", 0): m.get("title", "") for m in movies}
+        before = len(self._data[key])
+        self._data[key] = [
+            s for s in self._data[key]
+            if s.get("title") and s.get("movieid", 0) in title_by_id
+            and title_by_id[s.get("movieid", 0)] == s.get("title")
+        ]
+        after = len(self._data[key])
+        if before != after:
+            if self._log:
+                self._log.debug(
+                    "Stale %s entries removed" % key,
+                    event=event,
+                    removed=before - after, remaining=after)
+            self.save()
+
+    # ------------------------------------------------------------------
+    # Suggested movie tracking (re-suggestion avoidance)
+    # ------------------------------------------------------------------
 
     def add_suggested(self, movieid: int, title: str = "") -> None:
         """Record a movie as suggested (for re-suggestion avoidance).
@@ -90,15 +139,7 @@ class StorageManager:
             movieid: The Kodi movie ID.
             title: Movie title (stored for debugging, not used in logic).
         """
-        # Avoid duplicates
-        existing_ids = {s.get("movieid", 0) for s in self._data["suggested"]}
-        if movieid not in existing_ids:
-            self._data["suggested"].append({
-                "movieid": movieid,
-                "title": title,
-                "timestamp": time.time(),
-            })
-            self.save()
+        self._add_entry("suggested", movieid, title)
 
     def get_suggested_ids(self) -> Set[int]:
         """Get all suggested movie IDs."""
@@ -110,41 +151,18 @@ class StorageManager:
             count = len(self._data["suggested"])
             self._data["suggested"] = []
             self.save()
-            try:
-                from resources.lib.utils import get_logger
-                get_logger('data').debug(
+            if self._log:
+                self._log.debug(
                     "Suggested history cleared",
                     event="history.clear", removed=count)
-            except Exception:
-                pass
 
     def validate_suggested(self, movies: List[Dict[str, Any]]) -> None:
         """Remove suggested entries where the ID was reused for a different movie.
 
-        Kodi reuses movie IDs after deletion. By comparing stored titles
-        against current library titles, we detect and remove stale entries.
-
         Args:
             movies: Current library movies (must include movieid and title).
         """
-        title_by_id = {m.get("movieid", 0): m.get("title", "") for m in movies}
-        before = len(self._data["suggested"])
-        self._data["suggested"] = [
-            s for s in self._data["suggested"]
-            if s.get("title") and s.get("movieid", 0) in title_by_id
-            and title_by_id[s.get("movieid", 0)] == s.get("title")
-        ]
-        after = len(self._data["suggested"])
-        if before != after:
-            try:
-                from resources.lib.utils import get_logger
-                get_logger('data').debug(
-                    "Stale suggested entries removed",
-                    event="history.validate",
-                    removed=before - after, remaining=after)
-            except Exception:
-                pass
-            self.save()
+        self._validate_entries("suggested", movies, "history.validate")
 
     def prune_suggested(self, max_age_hours: int) -> None:
         """Remove suggested entries older than max_age_hours.
@@ -160,16 +178,17 @@ class StorageManager:
         ]
         after = len(self._data["suggested"])
         if before != after:
-            try:
-                from resources.lib.utils import get_logger
-                get_logger('data').debug(
+            if self._log:
+                self._log.debug(
                     "Old suggested entries pruned",
                     event="history.prune",
                     removed=before - after, remaining=after,
                     max_age_hours=max_age_hours)
-            except Exception:
-                pass
             self.save()
+
+    # ------------------------------------------------------------------
+    # Started movie tracking (in-progress detection)
+    # ------------------------------------------------------------------
 
     def add_started(self, movieid: int, title: str = "") -> None:
         """Record a movie as started through EasyMovie.
@@ -178,14 +197,7 @@ class StorageManager:
             movieid: The Kodi movie ID.
             title: Movie title (stored for debugging, not used in logic).
         """
-        existing_ids = {s.get("movieid", 0) for s in self._data["started"]}
-        if movieid not in existing_ids:
-            self._data["started"].append({
-                "movieid": movieid,
-                "title": title,
-                "timestamp": time.time(),
-            })
-            self.save()
+        self._add_entry("started", movieid, title)
 
     def get_started_ids(self) -> Set[int]:
         """Get all started movie IDs."""
@@ -194,30 +206,14 @@ class StorageManager:
     def validate_started(self, movies: List[Dict[str, Any]]) -> None:
         """Remove started entries for movies no longer in the library.
 
-        Kodi reuses movie IDs after deletion. Comparing stored titles
-        against current library titles detects and removes stale entries.
-
         Args:
             movies: Current library movies (must include movieid and title).
         """
-        title_by_id = {m.get("movieid", 0): m.get("title", "") for m in movies}
-        before = len(self._data["started"])
-        self._data["started"] = [
-            s for s in self._data["started"]
-            if s.get("title") and s.get("movieid", 0) in title_by_id
-            and title_by_id[s.get("movieid", 0)] == s.get("title")
-        ]
-        after = len(self._data["started"])
-        if before != after:
-            try:
-                from resources.lib.utils import get_logger
-                get_logger('data').debug(
-                    "Stale started entries removed",
-                    event="history.validate_started",
-                    removed=before - after, remaining=after)
-            except Exception:
-                pass
-            self.save()
+        self._validate_entries("started", movies, "history.validate_started")
+
+    # ------------------------------------------------------------------
+    # Filter persistence
+    # ------------------------------------------------------------------
 
     def save_last_filters(self, filters: Dict[str, Any]) -> None:
         """Save wizard filter answers for next session.

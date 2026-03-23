@@ -877,6 +877,38 @@ msgctxt "#32644"
 msgid "OR: Exclude movies matching any ignored genre. AND: Only exclude movies matching all ignored genres."
 msgstr ""
 
+msgctxt "#32645"
+msgid "Open selector to choose genres that will be excluded from results."
+msgstr ""
+
+msgctxt "#32646"
+msgid "Genres currently excluded from results."
+msgstr ""
+
+msgctxt "#32647"
+msgid "Open selector to choose which genres to include in results."
+msgstr ""
+
+msgctxt "#32648"
+msgid "Genres currently included in results."
+msgstr ""
+
+msgctxt "#32649"
+msgid "Open selector to choose which age ratings to include in results."
+msgstr ""
+
+msgctxt "#32650"
+msgid "Age ratings currently included in results."
+msgstr ""
+
+msgctxt "#32651"
+msgid "Select a Kodi smart playlist (.xsp) file to use as the movie pool."
+msgstr ""
+
+msgctxt "#32652"
+msgid "Smart playlist currently used as the movie pool."
+msgstr ""
+
 # =============================================================================
 # CLONE & UPDATE (32700-32799)
 # =============================================================================

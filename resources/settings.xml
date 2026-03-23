@@ -87,7 +87,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="run_ignore_genre_selector" type="action" label="32182" help="">
+				<setting id="run_ignore_genre_selector" type="action" label="32182" help="32645">
 					<level>0</level>
 					<dependencies>
 						<dependency type="visible" setting="ignore_genre_mode" operator="is">1</dependency>
@@ -98,7 +98,7 @@
 					</control>
 				</setting>
 
-				<setting id="ignore_genres_display" type="string" label="32183" help="">
+				<setting id="ignore_genres_display" type="string" label="32183" help="32646">
 					<level>0</level>
 					<default>-</default>
 					<dependencies>
@@ -136,7 +136,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="run_genre_selector" type="action" label="32112" help="">
+				<setting id="run_genre_selector" type="action" label="32112" help="32647">
 					<level>0</level>
 					<dependencies>
 						<dependency type="visible" setting="genre_mode" operator="is">1</dependency>
@@ -147,7 +147,7 @@
 					</control>
 				</setting>
 
-				<setting id="selected_genres_display" type="string" label="32113" help="">
+				<setting id="selected_genres_display" type="string" label="32113" help="32648">
 					<level>0</level>
 					<default>-</default>
 					<dependencies>
@@ -205,7 +205,7 @@
 					<control type="spinner" format="string" />
 				</setting>
 
-				<setting id="run_mpaa_selector" type="action" label="32117" help="">
+				<setting id="run_mpaa_selector" type="action" label="32117" help="32649">
 					<level>0</level>
 					<dependencies>
 						<dependency type="visible" setting="mpaa_mode" operator="is">1</dependency>
@@ -216,7 +216,7 @@
 					</control>
 				</setting>
 
-				<setting id="selected_mpaa_display" type="string" label="32118" help="">
+				<setting id="selected_mpaa_display" type="string" label="32118" help="32650">
 					<level>0</level>
 					<default>-</default>
 					<dependencies>
@@ -621,7 +621,7 @@
 					<control type="toggle" />
 				</setting>
 
-				<setting id="run_pool_selector" type="action" label="32171" help="">
+				<setting id="run_pool_selector" type="action" label="32171" help="32651">
 					<level>0</level>
 					<dependencies>
 						<dependency type="visible" setting="pool_enabled">true</dependency>
@@ -632,7 +632,7 @@
 					</control>
 				</setting>
 
-				<setting id="pool_display" type="string" label="32172" help="">
+				<setting id="pool_display" type="string" label="32172" help="32652">
 					<level>0</level>
 					<default>-</default>
 					<dependencies>
