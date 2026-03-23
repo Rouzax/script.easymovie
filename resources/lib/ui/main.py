@@ -318,7 +318,7 @@ def main(addon_id: str = ADDON_ID) -> None:
 
     # 5. Show processing notification
     if playback_settings.show_processing_notifications:
-        notify("Finding movies...")
+        notify(lang(32350))
 
     # 6. Query all movies (bulk, no art)
     with log_timing(log, "movie_query"):
@@ -348,6 +348,10 @@ def main(addon_id: str = ADDON_ID) -> None:
                                       exclude_ids, addon_id)
     if filtered is None:
         return
+
+    # 11. Show processing notification (wizard dismisses the earlier one)
+    if playback_settings.show_processing_notifications:
+        notify(lang(32350))
 
     # 12. Execute mode
     # Set window property so background service skips set-awareness check
@@ -875,7 +879,7 @@ def _run_browse_mode(
         if result == RESULT_REROLL:
             log.info("Re-rolling", event="ui.reroll")
             if playback_settings.show_processing_notifications:
-                notify("Finding movies...")
+                notify(lang(32350))
             continue
         elif result == RESULT_SURPRISE:
             if not results:

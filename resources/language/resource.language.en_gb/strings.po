@@ -512,6 +512,11 @@ msgctxt "#32342"
 msgid "Would you like to watch it instead?"
 msgstr ""
 
+# Notification toasts
+msgctxt "#32350"
+msgid "Finding movies..."
+msgstr ""
+
 
 # =============================================================================
 # SETTINGS OPTION VALUES / SPINNERS (32500-32599)
