@@ -337,34 +337,51 @@ def Main(override_addon_id: Optional[str] = None) -> None:
     script_path = addon.getAddonInfo('path')
     _notify_title = "%s Preview" % addon_name
 
-    options = [
-        "1. Confirm Dialog",
-        "2. Confirm Dialog (OK only)",
-        "3. Select Dialog (single)",
-        "4. Select Dialog (multi)",
-        "5. Browse Window",
-        "6. Context Menu",
-        "7. Continuation Dialog (countdown)",
-        "8. Set Warning Dialog (no countdown)",
-        "9. All Dialogs (cycle through)",
-    ]
+    # Theme picker — temporarily override for the preview session
+    theme_names = ["Golden Hour", "Ultraviolet", "Ember", "Nightfall"]
+    original_theme = addon.getSetting('theme') or '0'
+    current_name = theme_names[int(original_theme)] if original_theme.isdigit() and int(original_theme) < len(theme_names) else theme_names[0]
 
-    menu_title = "%s Dialog Preview [%s]" % (addon_name, addon_id)
-    choice = dialog.select(menu_title, options)  # type: ignore[arg-type]
+    theme_options = ["Keep current (%s)" % current_name] + theme_names
+    theme_choice = dialog.select("Theme Color", theme_options)  # type: ignore[arg-type]
+    if theme_choice < 0:
+        return
+    if theme_choice > 0:
+        addon.setSetting('theme', str(theme_choice - 1))
 
-    previews = [
-        preview_confirm,
-        preview_confirm_single,
-        preview_select_single,
-        preview_select_multi,
-        preview_browse,
-        preview_context_menu,
-        preview_continuation,
-        preview_set_warning,
-    ]
+    try:
+        options = [
+            "1. Confirm Dialog",
+            "2. Confirm Dialog (OK only)",
+            "3. Select Dialog (single)",
+            "4. Select Dialog (multi)",
+            "5. Browse Window",
+            "6. Context Menu",
+            "7. Continuation Dialog (countdown)",
+            "8. Set Warning Dialog (no countdown)",
+            "9. All Dialogs (cycle through)",
+        ]
 
-    if 0 <= choice < len(previews):
-        previews[choice]()
-    elif choice == len(previews):
-        for fn in previews:
-            fn()
+        menu_title = "%s Dialog Preview [%s]" % (addon_name, addon_id)
+        choice = dialog.select(menu_title, options)  # type: ignore[arg-type]
+
+        previews = [
+            preview_confirm,
+            preview_confirm_single,
+            preview_select_single,
+            preview_select_multi,
+            preview_browse,
+            preview_context_menu,
+            preview_continuation,
+            preview_set_warning,
+        ]
+
+        if 0 <= choice < len(previews):
+            previews[choice]()
+        elif choice == len(previews):
+            for fn in previews:
+                fn()
+    finally:
+        # Restore original theme
+        if theme_choice > 0:
+            addon.setSetting('theme', original_theme)
