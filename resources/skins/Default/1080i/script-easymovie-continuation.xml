@@ -40,7 +40,7 @@
             <left>560</left>
             <top>300</top>
             <width>800</width>
-            <height>480</height>
+            <height>490</height>
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" delay="100" />
                 <effect type="slide" start="0,-100" end="0" center="auto" tween="back" easing="out" time="600" delay="100" />
@@ -55,7 +55,7 @@
                 <left>-2</left>
                 <top>-2</top>
                 <width>804</width>
-                <height>484</height>
+                <height>494</height>
                 <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
             </control>
 
@@ -64,7 +64,7 @@
                 <left>0</left>
                 <top>0</top>
                 <width>800</width>
-                <height>480</height>
+                <height>490</height>
                 <texture border="12">common/menu.png</texture>
                 <colordiffuse>ffffffff</colordiffuse>
             </control>
@@ -126,23 +126,10 @@
                 <label>-</label>
             </control>
 
-            <!-- Timer Label (ID 3) — centered countdown near buttons -->
-            <control type="label" id="3">
-                <left>30</left>
-                <top>380</top>
-                <width>740</width>
-                <height>25</height>
-                <align>center</align>
-                <aligny>center</aligny>
-                <textcolor>FF888888</textcolor>
-                <font>font10</font>
-                <label>-</label>
-            </control>
-
             <!-- Button Row -->
             <control type="group">
                 <left>185</left>
-                <top>415</top>
+                <top>385</top>
                 <width>430</width>
                 <height>50</height>
 
@@ -181,6 +168,19 @@
                     <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
                     <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
                 </control>
+            </control>
+
+            <!-- Timer Label (ID 3) — auto-close countdown, below buttons -->
+            <control type="label" id="3">
+                <left>30</left>
+                <top>445</top>
+                <width>740</width>
+                <height>25</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FF888888</textcolor>
+                <font>font10</font>
+                <label>-</label>
             </control>
         </control>
     </controls>
