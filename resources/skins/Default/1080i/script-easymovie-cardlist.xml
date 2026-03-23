@@ -340,7 +340,7 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <label>$ADDON[script.easymovie 32303]</label>
+                    <label>$ADDON[script.easymovie 32310]</label>
                     <onup>655</onup>
                     <onright>11</onright>
                     <onleft>11</onleft>
@@ -360,7 +360,7 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <label>$ADDON[script.easymovie 32304]</label>
+                    <label>$ADDON[script.easymovie 32311]</label>
                     <onup>655</onup>
                     <onright>10</onright>
                     <onleft>10</onleft>

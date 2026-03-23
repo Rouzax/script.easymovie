@@ -470,7 +470,7 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 genre_labels = genres
             preselected = wizard.get_answers().get("ignore_genre", [])
             pre_indices = [i for i, g in enumerate(genres) if g in preselected]
-            result = show_select_dialog(lang(32226), genre_labels,
+            result = show_select_dialog(lang(32204), genre_labels,
                                         multi_select=True, preselected=pre_indices,
                                         addon_id=addon_id)
             if result is None:
@@ -587,10 +587,10 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
             recency_count = len(RECENCY_RANGES)
             for _, count, label in buckets:
                 items.append(_fmt(label, count) if show_counts else label)
-            items.append(_fmt(lang(32225), len(pool)) if show_counts
-                         else lang(32225))
+            items.append(_fmt(lang(32220), len(pool)) if show_counts
+                         else lang(32220))
 
-            result = show_select_dialog(lang(32203), items, multi_select=False,
+            result = show_select_dialog(lang(32202), items, multi_select=False,
                                         addon_id=addon_id)
             if result is None:
                 if not wizard.go_back():

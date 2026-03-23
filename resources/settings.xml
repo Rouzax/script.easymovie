@@ -685,7 +685,7 @@
 
 				<setting id="cumulative_counts" type="boolean" label="32179" help="32627">
 					<level>0</level>
-					<default>false</default>
+					<default>true</default>
 					<dependencies>
 						<dependency type="visible" setting="show_counts">true</dependency>
 					</dependencies>

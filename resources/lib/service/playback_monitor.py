@@ -166,10 +166,10 @@ class MoviePlaybackMonitor(xbmc.Player):
             addon_path, 'Default', '1080i',
             message=(
                 f"[B]{earlier_title}[/B] ({earlier_year})[CR]"
-                f"{lang(32327)} [B]{set_name}[/B][CR]"
-                f"{lang(32328)}"
+                f"{lang(32340)} [B]{set_name}[/B][CR]"
+                f"{lang(32341)}"
             ),
-            subtitle=lang(32329),
+            subtitle=lang(32342),
             yes_label=lang(32300),
             no_label=lang(32301),
             poster=poster,

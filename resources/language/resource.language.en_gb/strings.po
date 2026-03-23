@@ -22,11 +22,12 @@ msgstr ""
 #
 # 32000-32099: Settings categories and group labels
 # 32100-32199: Setting labels
-# 32200-32299: Filter labels (wizard dialogs)
+# 32200-32299: Filter/wizard labels and options
 # 32300-32399: UI labels (dialogs, buttons, browse views)
-# 32400-32499: Notification messages
+# 32400-32499: (reserved for future use)
 # 32500-32599: Settings option values (spinners)
 # 32600-32699: Help text for settings
+# 32700-32799: Clone and update messages
 #
 # =============================================================================
 
@@ -303,10 +304,6 @@ msgid "Seek to resume point for movies"
 msgstr ""
 
 # Category 6: Playback
-msgctxt "#32163"
-msgid "Warn about earlier unwatched movies in set"
-msgstr ""
-
 msgctxt "#32160"
 msgid "Check for in-progress movie on launch"
 msgstr ""
@@ -317,6 +314,10 @@ msgstr ""
 
 msgctxt "#32162"
 msgid "Show processing notifications"
+msgstr ""
+
+msgctxt "#32163"
+msgid "Warn about earlier unwatched movies in set"
 msgstr ""
 
 # Category 7: Advanced
@@ -381,6 +382,7 @@ msgstr ""
 # FILTER / WIZARD LABELS (32200-32299)
 # =============================================================================
 
+# Wizard dialog headings
 msgctxt "#32200"
 msgid "Select Genres"
 msgstr ""
@@ -390,103 +392,41 @@ msgid "Select Age Ratings"
 msgstr ""
 
 msgctxt "#32202"
-msgid "Select Runtime"
-msgstr ""
-
-msgctxt "#32203"
 msgid "Select Decade"
 msgstr ""
 
-msgctxt "#32204"
-msgid "Select Score"
-msgstr ""
-
-msgctxt "#32205"
-msgid "Watched Status"
-msgstr ""
-
-msgctxt "#32206"
-msgid "Under 90 minutes"
-msgstr ""
-
-msgctxt "#32207"
-msgid "90 – 120 minutes"
-msgstr ""
-
-msgctxt "#32208"
-msgid "120 – 150 minutes"
-msgstr ""
-
-msgctxt "#32209"
-msgid "Over 150 minutes"
-msgstr ""
-
-msgctxt "#32210"
-msgid "Any runtime"
-msgstr ""
-
-msgctxt "#32211"
-msgid "8.0+ (Excellent)"
-msgstr ""
-
-msgctxt "#32212"
-msgid "7.0+ (Good)"
-msgstr ""
-
-msgctxt "#32213"
-msgid "6.0+ (Above Average)"
-msgstr ""
-
-msgctxt "#32214"
-msgid "5.0+ (Average)"
-msgstr ""
-
-msgctxt "#32215"
-msgid "Any score"
-msgstr ""
-
-msgctxt "#32216"
-msgid "Unwatched only"
-msgstr ""
-
-msgctxt "#32217"
-msgid "Watched only"
-msgstr ""
-
-msgctxt "#32218"
-msgid "Both"
-msgstr ""
-
-msgctxt "#32219"
+msgctxt "#32203"
 msgid "Select Playlist"
 msgstr ""
 
-msgctxt "#32220"
+msgctxt "#32204"
+msgid "Ignore Genres"
+msgstr ""
+
+# Wizard option: year recency
+msgctxt "#32210"
 msgid "Last year"
 msgstr ""
 
-msgctxt "#32221"
+msgctxt "#32211"
 msgid "Last 2 years"
 msgstr ""
 
-msgctxt "#32222"
+msgctxt "#32212"
 msgid "Last 5 years"
 msgstr ""
 
-msgctxt "#32223"
+msgctxt "#32213"
 msgid "Last 10 years"
 msgstr ""
 
-msgctxt "#32224"
+msgctxt "#32214"
 msgid "Last 20 years"
 msgstr ""
 
-msgctxt "#32225"
+# Wizard option: year catch-all
+msgctxt "#32220"
 msgid "Any year"
-msgstr ""
-
-msgctxt "#32226"
-msgid "Ignore Genres"
 msgstr ""
 
 
@@ -494,6 +434,7 @@ msgstr ""
 # UI LABELS (32300-32399)
 # =============================================================================
 
+# Common dialog buttons
 msgctxt "#32300"
 msgid "OK"
 msgstr ""
@@ -506,70 +447,24 @@ msgctxt "#32302"
 msgid "Back"
 msgstr ""
 
-msgctxt "#32303"
+# Browse view buttons
+msgctxt "#32310"
 msgid "Surprise Me"
 msgstr ""
 
-msgctxt "#32304"
+msgctxt "#32311"
 msgid "Re-roll"
 msgstr ""
 
-msgctxt "#32305"
+msgctxt "#32312"
 msgid "Play"
 msgstr ""
 
-msgctxt "#32306"
+msgctxt "#32313"
 msgid "Play Full Set"
 msgstr ""
 
-msgctxt "#32308"
-msgid "Save"
-msgstr ""
-
-msgctxt "#32309"
-msgid "Enable All"
-msgstr ""
-
-msgctxt "#32310"
-msgid "Ignore All"
-msgstr ""
-
-msgctxt "#32311"
-msgid "No Movies Found"
-msgstr ""
-
-msgctxt "#32312"
-msgid "No movies match your filters. Try relaxing your criteria."
-msgstr ""
-
-msgctxt "#32313"
-msgid "Resume Movie?"
-msgstr ""
-
-msgctxt "#32314"
-msgid "You have an in-progress movie:"
-msgstr ""
-
-msgctxt "#32315"
-msgid "remaining"
-msgstr ""
-
-msgctxt "#32316"
-msgid "Watch Next"
-msgstr ""
-
-msgctxt "#32317"
-msgid "Skip"
-msgstr ""
-
-msgctxt "#32318"
-msgid "Next in"
-msgstr ""
-
-msgctxt "#32319"
-msgid "You just watched"
-msgstr ""
-
+# Mode selection
 msgctxt "#32320"
 msgid "Choose Mode"
 msgstr ""
@@ -582,61 +477,34 @@ msgctxt "#32322"
 msgid "Playlist"
 msgstr ""
 
-msgctxt "#32323"
-msgid "Search..."
+# Continuation prompts
+msgctxt "#32330"
+msgid "Watch Next"
 msgstr ""
 
-msgctxt "#32324"
-msgid "No Movies"
+msgctxt "#32331"
+msgid "Skip"
 msgstr ""
 
-msgctxt "#32325"
-msgid "Your library has no movies."
+msgctxt "#32332"
+msgid "Next in"
 msgstr ""
 
-msgctxt "#32326"
-msgid "earlier movie in set"
+msgctxt "#32333"
+msgid "You just watched"
 msgstr ""
 
-msgctxt "#32327"
+# Set warning dialog
+msgctxt "#32340"
 msgid "from"
 msgstr ""
 
-msgctxt "#32328"
+msgctxt "#32341"
 msgid "is in your library and unwatched."
 msgstr ""
 
-msgctxt "#32329"
+msgctxt "#32342"
 msgid "Would you like to watch it instead?"
-msgstr ""
-
-
-# =============================================================================
-# NOTIFICATION MESSAGES (32400-32499)
-# =============================================================================
-
-msgctxt "#32400"
-msgid "Finding movies..."
-msgstr ""
-
-msgctxt "#32401"
-msgid "Building playlist..."
-msgstr ""
-
-msgctxt "#32402"
-msgid "Loading movie data..."
-msgstr ""
-
-msgctxt "#32403"
-msgid "Applying filters..."
-msgstr ""
-
-msgctxt "#32404"
-msgid "Clone created successfully"
-msgstr ""
-
-msgctxt "#32405"
-msgid "Clone creation failed"
 msgstr ""
 
 
@@ -1005,7 +873,7 @@ msgid "OR: Exclude movies matching any ignored genre. AND: Only exclude movies m
 msgstr ""
 
 # =============================================================================
-# CLONE & UPDATE (327xx)
+# CLONE & UPDATE (32700-32799)
 # =============================================================================
 
 msgctxt "#32700"

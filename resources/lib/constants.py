@@ -117,11 +117,11 @@ RUNTIME_RANGES = [
 
 # Recency ranges for year filter wizard (years_ago, lang_id)
 RECENCY_RANGES = [
-    (1, 32220),   # "Last year"
-    (2, 32221),   # "Last 2 years"
-    (5, 32222),   # "Last 5 years"
-    (10, 32223),  # "Last 10 years"
-    (20, 32224),  # "Last 20 years"
+    (1, 32210),   # "Last year"
+    (2, 32211),   # "Last 2 years"
+    (5, 32212),   # "Last 5 years"
+    (10, 32213),  # "Last 10 years"
+    (20, 32214),  # "Last 20 years"
 ]
 
 # Score filter ranges for wizard

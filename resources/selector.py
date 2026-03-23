@@ -125,7 +125,7 @@ def _run_ignore_genre_selector() -> None:
     preselected = [i for i, g in enumerate(all_genres) if g in saved_genres]
 
     selected_indices = show_select_dialog(
-        heading=lang(32226),  # "Ignore Genres"
+        heading=lang(32204),  # "Ignore Genres"
         items=all_genres,
         multi_select=True,
         preselected=preselected,
@@ -241,7 +241,7 @@ def _run_playlist_selector() -> None:
         return
 
     selected_indices = show_select_dialog(
-        heading=lang(32219),  # "Select Playlist"
+        heading=lang(32203),  # "Select Playlist"
         items=names,
         multi_select=False,
     )

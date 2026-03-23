@@ -265,10 +265,10 @@ def preview_continuation() -> None:
     cd = ContinuationDialog(
         'script-easymovie-continuation.xml',
         script_path, 'Default', '1080i',
-        message=f"{lang(32319)}[CR][B]{finished_title}[/B]",
-        subtitle=f"{lang(32318)} [B]{set_name}[/B]:[CR]{next_title}",
-        yes_label=lang(32316),
-        no_label=lang(32317),
+        message=f"{lang(32333)}[CR][B]{finished_title}[/B]",
+        subtitle=f"{lang(32332)} [B]{set_name}[/B]:[CR]{next_title}",
+        yes_label=lang(32330),
+        no_label=lang(32331),
         poster=poster,
         duration=15,
         default_yes=True,
@@ -301,10 +301,10 @@ def preview_set_warning() -> None:
         script_path, 'Default', '1080i',
         message=(
             f"[B]{title}[/B] ({year})[CR]"
-            f"{lang(32327)} [B]{set_name}[/B][CR]"
-            f"{lang(32328)}"
+            f"{lang(32340)} [B]{set_name}[/B][CR]"
+            f"{lang(32341)}"
         ),
-        subtitle=lang(32329),
+        subtitle=lang(32342),
         yes_label=lang(32300),
         no_label=lang(32301),
         poster=poster,
