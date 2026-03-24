@@ -4,6 +4,8 @@
 
 EasyMovie helps you pick movies for movie night. Answer a few questions (genre, rating, runtime) and get a curated random selection from your library. Supports movie set awareness, multiple viewing modes, and playlist generation.
 
+![EasyMovie Showcase View](https://raw.githubusercontent.com/wiki/Rouzax/script.easymovie/images/view-showcase-golden-hour.png)
+
 Built for Kodi 21+ (Omega and newer).
 
 ---
@@ -24,7 +26,7 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 ## Key Features
 
 - **Filter Wizard** — Quick questions for genre, rating, runtime, year, and more
-- **5 Viewing Modes** — PosterGrid (default), CardList, Posters, BigScreen, SplitView
+- **5 Viewing Modes** — Showcase (default), Card List, Posters, Big Screen, Split View
 - **Movie Set Awareness** — Automatically suggests the next unwatched movie in a collection
 - **Set Continuation** — After finishing a set movie, get prompted to watch the next one
 - **Playlist Mode** — Build and play movie marathons automatically
@@ -54,9 +56,27 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 
 ---
 
+## Documentation
+
+**Full documentation is available on the [Wiki](https://github.com/Rouzax/script.easymovie/wiki):**
+
+| Page | Description |
+|------|-------------|
+| [Installation](https://github.com/Rouzax/script.easymovie/wiki/Installation) | Setup and first run |
+| [Filter Wizard](https://github.com/Rouzax/script.easymovie/wiki/Filter-Wizard) | The filter flow explained |
+| [Browse Mode](https://github.com/Rouzax/script.easymovie/wiki/Browse-Mode) | View styles and browsing guide |
+| [Playlist Mode](https://github.com/Rouzax/script.easymovie/wiki/Playlist-Mode) | Movie marathon playlists |
+| [Movie Sets](https://github.com/Rouzax/script.easymovie/wiki/Movie-Sets) | Collection awareness and continuation |
+| [Settings Reference](https://github.com/Rouzax/script.easymovie/wiki/Settings-Reference) | All settings explained |
+| [Advanced Features](https://github.com/Rouzax/script.easymovie/wiki/Advanced-Features) | Clones, debugging, more |
+| [Troubleshooting & FAQ](https://github.com/Rouzax/script.easymovie/wiki/Troubleshooting-and-FAQ) | Common issues |
+
+---
+
 ## Quick Links
 
 - **[Report a Bug](https://github.com/Rouzax/script.easymovie/issues/new)**
+- **[Kodi Forum Thread](https://forum.kodi.tv/showthread.php?tid=385063)**
 - **[Changelog](changelog.txt)**
 
 ---
