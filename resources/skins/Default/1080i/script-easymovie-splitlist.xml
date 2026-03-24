@@ -329,7 +329,7 @@
                     <!-- Movie title -->
                     <control type="label">
                         <left>0</left>
-                        <top>425</top>
+                        <top>421</top>
                         <width>590</width>
                         <height>35</height>
                         <align>center</align>
@@ -341,7 +341,7 @@
                     <!-- Year · MPAA · Rating · Runtime (when MPAA present) -->
                     <control type="label">
                         <left>0</left>
-                        <top>462</top>
+                        <top>458</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -354,7 +354,7 @@
                     <!-- Year · Rating · Runtime (when no MPAA) -->
                     <control type="label">
                         <left>0</left>
-                        <top>462</top>
+                        <top>458</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -367,7 +367,7 @@
                     <!-- Genre -->
                     <control type="label">
                         <left>0</left>
-                        <top>492</top>
+                        <top>488</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -380,7 +380,7 @@
                     <!-- Set info -->
                     <control type="label">
                         <left>0</left>
-                        <top>522</top>
+                        <top>518</top>
                         <width>590</width>
                         <height>28</height>
                         <align>center</align>
@@ -393,7 +393,7 @@
                     <!-- Separator: after genre when NO collection -->
                     <control type="image">
                         <left>0</left>
-                        <top>525</top>
+                        <top>521</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -403,7 +403,7 @@
                     <!-- Separator: after set info when collection present -->
                     <control type="image">
                         <left>0</left>
-                        <top>554</top>
+                        <top>550</top>
                         <width>590</width>
                         <height>2</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
@@ -413,7 +413,7 @@
                     <!-- Plot: positioned after separator (no collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>537</top>
+                        <top>533</top>
                         <width>590</width>
                         <height>250</height>
                         <font>font10</font>
@@ -426,7 +426,7 @@
                     <!-- Plot: positioned after separator (with collection) -->
                     <control type="textbox">
                         <left>0</left>
-                        <top>566</top>
+                        <top>562</top>
                         <width>590</width>
                         <height>212</height>
                         <font>font10</font>
