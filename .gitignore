@@ -24,14 +24,27 @@ desktop.ini
 _temp/
 .ruff_cache/
 
-# Development docs (plans, source artwork)
+# Development docs (plans, source artwork, drafts)
 IMPLEMENTATION.md
-docs/
+docs/plans/
+docs/forum-post.txt
+docs/*.png
+docs/*.svg
+
+# Tests
+tests/
+conftest.py
+pytest.ini
+
+# Dev tooling config
+pyrightconfig.json
+.pyflakes
 
 # Claude Code
 CLAUDE.md
 .claude/
 .claudeignore
 .mcp.json
+
 # Worktrees
 .worktrees/
