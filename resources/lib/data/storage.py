@@ -76,13 +76,15 @@ class StorageManager:
                         path=self._path)
 
     def save(self) -> None:
-        """Write data to disk."""
+        """Write data to disk atomically (write to temp, then replace)."""
         try:
             dir_path = os.path.dirname(self._path)
-            if dir_path and not os.path.exists(dir_path):
+            if dir_path:
                 os.makedirs(dir_path, exist_ok=True)
-            with open(self._path, "w", encoding="utf-8") as f:
+            tmp_path = self._path + ".tmp"
+            with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, indent=2)
+            os.replace(tmp_path, self._path)
         except (IOError, OSError) as exc:
             if self._log:
                 self._log.warning("Failed to save storage",

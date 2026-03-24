@@ -122,7 +122,15 @@ def _check_clone_version(addon_id: str, addon_path: str) -> bool:
     if confirmed:
         # Use main addon's update_clone.py (latest update logic)
         parent_path = parent_addon.getAddonInfo('path')
+        if not os.path.isdir(parent_path):
+            log.error("Parent addon path invalid",
+                      event="clone.update_fail", path=parent_path)
+            return False
         update_script = os.path.join(parent_path, 'resources', 'update_clone.py')
+        if not os.path.isfile(update_script):
+            log.error("Update script not found",
+                      event="clone.update_fail", path=update_script)
+            return False
         xbmc.executebuiltin(
             f'RunScript({update_script},{parent_path},'
             f'{addon_path},{addon_id},{clone_name})'
