@@ -102,40 +102,20 @@
                         <texture background="true">$INFO[ListItem.Art(poster)]</texture>
                     </control>
 
-                    <!-- Watched scrim (top-left gradient) -->
-                    <control type="image">
-                        <left>14</left>
-                        <top>258</top>
-                        <width>60</width>
-                        <height>60</height>
-                        <texture>common/scrim_topleft.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
-                    </control>
-
                     <!-- Watched icon -->
                     <control type="image">
-                        <left>17</left>
-                        <top>261</top>
+                        <left>18</left>
+                        <top>262</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
 
-                    <!-- Set scrim (top-right gradient) -->
-                    <control type="image">
-                        <left>136</left>
-                        <top>258</top>
-                        <width>60</width>
-                        <height>60</height>
-                        <texture>common/scrim_topright.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
-                    </control>
-
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>172</left>
-                        <top>261</top>
+                        <left>168</left>
+                        <top>262</top>
                         <width>24</width>
                         <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
@@ -172,16 +152,6 @@
                             <texture background="true">$INFO[ListItem.Art(poster)]</texture>
                         </control>
 
-                        <!-- Watched scrim (top-left gradient) -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>80</top>
-                            <width>80</width>
-                            <height>80</height>
-                            <texture>common/scrim_topleft.png</texture>
-                            <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
-                        </control>
-
                         <!-- Watched icon -->
                         <control type="image">
                             <left>14</left>
@@ -190,16 +160,6 @@
                             <height>40</height>
                             <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
                             <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
-                        </control>
-
-                        <!-- Set scrim (top-right gradient) -->
-                        <control type="image">
-                            <left>350</left>
-                            <top>80</top>
-                            <width>80</width>
-                            <height>80</height>
-                            <texture>common/scrim_topright.png</texture>
-                            <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                         </control>
 
                         <!-- Set badge overlay -->

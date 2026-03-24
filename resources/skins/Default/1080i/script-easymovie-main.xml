@@ -271,16 +271,6 @@
                         <aspectratio aligny="top">scale</aspectratio>
                     </control>
 
-                    <!-- Watched scrim (top-left gradient) -->
-                    <control type="image">
-                        <left>15</left>
-                        <top>20</top>
-                        <width>50</width>
-                        <height>50</height>
-                        <texture>common/scrim_topleft.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
-                    </control>
-
                     <!-- Watched icon -->
                     <control type="image">
                         <left>19</left>
@@ -291,19 +281,9 @@
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
 
-                    <!-- Set scrim (top-right gradient) -->
-                    <control type="image">
-                        <left>155</left>
-                        <top>20</top>
-                        <width>50</width>
-                        <height>50</height>
-                        <texture>common/scrim_topright.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
-                    </control>
-
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>169</left>
+                        <left>177</left>
                         <top>24</top>
                         <width>24</width>
                         <height>24</height>
@@ -333,16 +313,6 @@
                         <aspectratio aligny="top">scale</aspectratio>
                     </control>
 
-                    <!-- Watched scrim (top-left gradient) -->
-                    <control type="image">
-                        <left>15</left>
-                        <top>20</top>
-                        <width>50</width>
-                        <height>50</height>
-                        <texture>common/scrim_topleft.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
-                    </control>
-
                     <!-- Watched icon -->
                     <control type="image">
                         <left>19</left>
@@ -353,19 +323,9 @@
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
 
-                    <!-- Set scrim (top-right gradient) -->
-                    <control type="image">
-                        <left>155</left>
-                        <top>20</top>
-                        <width>50</width>
-                        <height>50</height>
-                        <texture>common/scrim_topright.png</texture>
-                        <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
-                    </control>
-
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>169</left>
+                        <left>177</left>
                         <top>24</top>
                         <width>24</width>
                         <height>24</height>
