@@ -275,8 +275,8 @@
                     <control type="image">
                         <left>15</left>
                         <top>20</top>
-                        <width>80</width>
-                        <height>80</height>
+                        <width>50</width>
+                        <height>50</height>
                         <texture>common/scrim_topleft.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
@@ -285,28 +285,28 @@
                     <control type="image">
                         <left>19</left>
                         <top>24</top>
-                        <width>40</width>
-                        <height>40</height>
+                        <width>24</width>
+                        <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
 
                     <!-- Set scrim (top-right gradient) -->
                     <control type="image">
-                        <left>125</left>
+                        <left>155</left>
                         <top>20</top>
-                        <width>80</width>
-                        <height>80</height>
+                        <width>50</width>
+                        <height>50</height>
                         <texture>common/scrim_topright.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>161</left>
+                        <left>169</left>
                         <top>24</top>
-                        <width>40</width>
-                        <height>40</height>
+                        <width>24</width>
+                        <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
@@ -337,8 +337,8 @@
                     <control type="image">
                         <left>15</left>
                         <top>20</top>
-                        <width>80</width>
-                        <height>80</height>
+                        <width>50</width>
+                        <height>50</height>
                         <texture>common/scrim_topleft.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
@@ -347,28 +347,28 @@
                     <control type="image">
                         <left>19</left>
                         <top>24</top>
-                        <width>40</width>
-                        <height>40</height>
+                        <width>24</width>
+                        <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/IconWatched.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(watched))</visible>
                     </control>
 
                     <!-- Set scrim (top-right gradient) -->
                     <control type="image">
-                        <left>125</left>
+                        <left>155</left>
                         <top>20</top>
-                        <width>80</width>
-                        <height>80</height>
+                        <width>50</width>
+                        <height>50</height>
                         <texture>common/scrim_topright.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
 
                     <!-- Set badge overlay -->
                     <control type="image">
-                        <left>161</left>
+                        <left>169</left>
                         <top>24</top>
-                        <width>40</width>
-                        <height>40</height>
+                        <width>24</width>
+                        <height>24</height>
                         <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/movieset.png</texture>
                         <visible>!String.IsEmpty(ListItem.Property(set_name))</visible>
                     </control>
