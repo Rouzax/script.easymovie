@@ -196,7 +196,10 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             log.debug("Browse window closed by user", event="ui.browse_close")
             self._result = None
             self.close()
-        elif action_id == ACTION_TELETEXT_BLUE and self._preview_mode:
+        elif self._preview_mode and (
+            action_id == ACTION_TELETEXT_BLUE
+            or action.getButtonCode() == 0xF054
+        ):
             self._theme_index = (self._theme_index + 1) % len(THEME_COLORS)
             for prop, value in THEME_COLORS[self._theme_index].items():
                 self.setProperty(prop, value)
