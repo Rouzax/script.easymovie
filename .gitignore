@@ -37,7 +37,6 @@ conftest.py
 pytest.ini
 
 # Dev tooling config
-pyrightconfig.json
 .pyflakes
 
 # Claude Code
