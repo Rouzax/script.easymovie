@@ -206,7 +206,7 @@ def preview_browse() -> None:
                    "Browse preview requires a populated movie library.")
         return
 
-    from resources.lib.ui.browse_window import show_browse_window
+    from resources.lib.ui.browse_window import BrowseWindow, VIEW_XML_MAP
     from resources.lib.constants import (
         VIEW_SHOWCASE, VIEW_CARD_LIST, VIEW_POSTERS,
         VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
@@ -229,7 +229,21 @@ def preview_browse() -> None:
     if choice < 0:
         return
 
-    result = show_browse_window(movies, view_values[choice], addon_id)
+    addon = xbmcaddon.Addon(addon_id)
+    try:
+        theme_index = int(addon.getSetting('theme') or '0')
+    except (ValueError, TypeError):
+        theme_index = 0
+
+    xml_file = VIEW_XML_MAP.get(view_values[choice], VIEW_XML_MAP[VIEW_SHOWCASE])
+    addon_path = addon.getAddonInfo('path')
+    window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
+    window.set_movies(movies)
+    window.set_addon_id(addon_id)
+    window.set_preview_mode(theme_index)
+    window.doModal()
+
+    result = window.result
     if result is None:
         dialog.notification(_notify_title, "Browse: closed")
     elif isinstance(result, dict):

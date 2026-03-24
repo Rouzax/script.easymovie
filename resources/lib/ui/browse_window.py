@@ -25,7 +25,10 @@ from resources.lib.constants import (
     ACTION_CONTEXT_MENU,
     ACTION_NAV_BACK,
     ACTION_PREVIOUS_MENU,
+    ACTION_TELETEXT_BLUE,
     ADDON_ID,
+    THEME_COLORS,
+    THEME_NAMES,
     VIEW_SHOWCASE,
     VIEW_CARD_LIST,
     VIEW_POSTERS,
@@ -67,6 +70,8 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         self._movies: List[Dict[str, Any]] = []
         self._result: Optional[Any] = None
         self._addon_id: str = ADDON_ID
+        self._preview_mode: bool = False
+        self._theme_index: int = 0
 
     def set_movies(self, movies: List[Dict[str, Any]]) -> None:
         """Set the movies to display."""
@@ -75,6 +80,11 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
     def set_addon_id(self, addon_id: str) -> None:
         """Set the addon ID (for clone support)."""
         self._addon_id = addon_id
+
+    def set_preview_mode(self, theme_index: int) -> None:
+        """Enable preview mode with live theme cycling via blue button."""
+        self._preview_mode = True
+        self._theme_index = theme_index
 
     @property
     def result(self) -> Optional[Any]:
@@ -186,6 +196,12 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             log.debug("Browse window closed by user", event="ui.browse_close")
             self._result = None
             self.close()
+        elif action_id == ACTION_TELETEXT_BLUE and self._preview_mode:
+            self._theme_index = (self._theme_index + 1) % len(THEME_COLORS)
+            for prop, value in THEME_COLORS[self._theme_index].items():
+                self.setProperty(prop, value)
+            xbmcgui.Dialog().notification(
+                "Theme", THEME_NAMES[self._theme_index], time=1500)
         elif action_id == ACTION_CONTEXT_MENU:
             movie = self._get_focused_movie()
             if movie:
