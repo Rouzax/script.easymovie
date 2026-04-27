@@ -1,3 +1,26 @@
+v1.0.1 (2026-04-27)
+--------------------------
+Bug Fixes:
+  - Fixed: Resume from the "Resume Movie?" dialog now actually starts at the
+    saved position. The previous implementation called Player.Open and then
+    issued xbmc.Player().seekTime() after a 500 ms sleep — but the player was
+    rarely ready that quickly, so the seek was silently dropped and playback
+    started from zero. Now uses Kodi's native single-item Player.Open
+    options.resume with a Player.Position.Time object, which sets the file
+    item's start offset before the player initialises. A 10-second rewind is
+    applied for context, matching EasyTV's behavior.
+
+Internal:
+  - build_play_movie_query() in data/queries.py accepts an optional
+    resume_seconds argument and emits options.resume = {hours, minutes,
+    seconds} when set.
+  - Added RESUME_REWIND_SECONDS constant (10 seconds).
+  - Added regression tests covering the resume timecode split, including the
+    exact position from the original report (3266s = 0h54m26s).
+  - Verified live against Kodi 21: requested timecode is honoured, no
+    post-play seek required.
+
+
 v1.0.0 (2026-03-24)
 --------------------------
 New Features:
