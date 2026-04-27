@@ -149,6 +149,9 @@ PROP_PLAYLIST_RUNNING = "EasyMovie.PlaylistRunning"
 # Playback monitor timing (milliseconds)
 PLAYER_STOP_DELAY_MS = 500
 
+# Seconds to rewind from a saved resume point so the user catches context.
+RESUME_REWIND_SECONDS = 10
+
 # Kodi GUI action IDs
 ACTION_MOVE_UP = 3
 ACTION_MOVE_DOWN = 4

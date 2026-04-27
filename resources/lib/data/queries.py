@@ -5,7 +5,7 @@ All Kodi JSON-RPC queries are constructed here. No other module
 should build raw query dicts.
 
 """
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 
 def get_all_movies_query() -> Dict[str, Any]:
@@ -144,12 +144,31 @@ def build_play_playlist_query(position: int = 0) -> Dict[str, Any]:
     }
 
 
-def build_play_movie_query(movie_id: int) -> Dict[str, Any]:
-    """Play a single movie directly."""
+def build_play_movie_query(
+    movie_id: int, resume_seconds: Optional[int] = None,
+) -> Dict[str, Any]:
+    """Play a single movie directly.
+
+    Args:
+        movie_id: Kodi movie database ID.
+        resume_seconds: If set, start playback at this absolute timecode (in
+            whole seconds). Kodi sets the file item's start offset before the
+            player initializes, so playback begins at that point with no
+            post-play seek. None plays from the start.
+    """
+    params: Dict[str, Any] = {"item": {"movieid": movie_id}}
+    if resume_seconds is not None and resume_seconds > 0:
+        params["options"] = {
+            "resume": {
+                "hours": resume_seconds // 3600,
+                "minutes": (resume_seconds % 3600) // 60,
+                "seconds": resume_seconds % 60,
+            }
+        }
     return {
         "jsonrpc": "2.0",
         "method": "Player.Open",
-        "params": {"item": {"movieid": movie_id}},
+        "params": params,
         "id": 1,
     }
 
