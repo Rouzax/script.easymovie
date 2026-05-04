@@ -1,0 +1,79 @@
+# Structurally synced with script.easytv/mkdocs.yml. Keep parallel; per-addon
+# site_name, site_url, repo_url, repo_name, edit_uri, and nav are addon-specific.
+# Theme block, palette toggle structure, features list, and markdown_extensions
+# stay byte-identical across both repos.
+site_name: EasyMovie
+site_url: https://rouzax.github.io/script.easymovie/docs/
+site_description: "EasyMovie, filter-driven random movie picks for your Kodi library"
+repo_url: https://github.com/Rouzax/script.easymovie
+repo_name: Rouzax/script.easymovie
+edit_uri: edit/master/docs/
+
+site_dir: build/docs
+
+theme:
+  name: material
+  logo: assets/icon.png
+  favicon: assets/icon.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.integrate
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+exclude_docs: |
+  plans/
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Core Features:
+      - Filter Wizard: filter-wizard.md
+      - Browse Mode: browse-mode.md
+      - Playlist Mode: playlist-mode.md
+  - Configuration:
+      - Movie Sets: movie-sets.md
+      - Settings Reference: settings-reference.md
+  - Advanced: advanced-features.md
+  - Troubleshooting & FAQ: troubleshooting-and-faq.md
