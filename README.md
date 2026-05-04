@@ -4,7 +4,7 @@
 
 EasyMovie helps you pick movies for movie night. Answer a few questions (genre, rating, runtime) and get a curated random selection from your library. Supports movie set awareness, multiple viewing modes, and playlist generation.
 
-![EasyMovie Showcase View](https://raw.githubusercontent.com/wiki/Rouzax/script.easymovie/images/view-showcase-golden-hour.png)
+![EasyMovie Showcase View](docs/wiki-images/view-showcase-golden-hour.png)
 
 Built for Kodi 21+ (Omega and newer).
 
@@ -58,18 +58,18 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 
 ## Documentation
 
-**Full documentation is available on the [Wiki](https://github.com/Rouzax/script.easymovie/wiki):**
+**Full documentation is available on the [docs site](https://rouzax.github.io/script.easymovie/docs/):**
 
 | Page | Description |
 |------|-------------|
-| [Installation](https://github.com/Rouzax/script.easymovie/wiki/Installation) | Setup and first run |
-| [Filter Wizard](https://github.com/Rouzax/script.easymovie/wiki/Filter-Wizard) | The filter flow explained |
-| [Browse Mode](https://github.com/Rouzax/script.easymovie/wiki/Browse-Mode) | View styles and browsing guide |
-| [Playlist Mode](https://github.com/Rouzax/script.easymovie/wiki/Playlist-Mode) | Movie marathon playlists |
-| [Movie Sets](https://github.com/Rouzax/script.easymovie/wiki/Movie-Sets) | Collection awareness and continuation |
-| [Settings Reference](https://github.com/Rouzax/script.easymovie/wiki/Settings-Reference) | All settings explained |
-| [Advanced Features](https://github.com/Rouzax/script.easymovie/wiki/Advanced-Features) | Clones, debugging, more |
-| [Troubleshooting & FAQ](https://github.com/Rouzax/script.easymovie/wiki/Troubleshooting-and-FAQ) | Common issues |
+| [Installation](https://rouzax.github.io/script.easymovie/docs/installation/) | Setup and first run |
+| [Filter Wizard](https://rouzax.github.io/script.easymovie/docs/filter-wizard/) | The filter flow explained |
+| [Browse Mode](https://rouzax.github.io/script.easymovie/docs/browse-mode/) | View styles and browsing guide |
+| [Playlist Mode](https://rouzax.github.io/script.easymovie/docs/playlist-mode/) | Movie marathon playlists |
+| [Movie Sets](https://rouzax.github.io/script.easymovie/docs/movie-sets/) | Collection awareness and continuation |
+| [Settings Reference](https://rouzax.github.io/script.easymovie/docs/settings-reference/) | All settings explained |
+| [Advanced Features](https://rouzax.github.io/script.easymovie/docs/advanced-features/) | Clones, debugging, more |
+| [Troubleshooting & FAQ](https://rouzax.github.io/script.easymovie/docs/troubleshooting-and-faq/) | Common issues |
 
 ---
 
