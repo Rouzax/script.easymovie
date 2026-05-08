@@ -117,7 +117,7 @@ EasyMovie works out of the box with sensible defaults, but you may want to custo
 
 ### Clone Updates
 
-If you've created [clones](advanced-features.md#clone-feature), they detect the version change automatically:
+If you've created [clones](clones.md), they detect the version change automatically:
 
 1. Launch the clone after updating the main EasyMovie addon
 2. EasyMovie detects the version mismatch

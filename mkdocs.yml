@@ -78,5 +78,7 @@ nav:
   - Configuration:
       - Movie Sets: movie-sets.md
       - Settings Reference: settings-reference.md
-  - Advanced: advanced-features.md
+  - Advanced:
+      - Clones: clones.md
+      - Advanced Features: advanced-features.md
   - Troubleshooting & FAQ: troubleshooting-and-faq.md

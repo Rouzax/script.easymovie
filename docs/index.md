@@ -41,7 +41,7 @@ You can choose your preferred mode in settings, or have EasyMovie ask each time.
 ### Customization
 - **Smart Re-suggestion** — Avoids showing you the same movies again within a configurable time window (4 to 72 hours)
 - **Movie Pool Filtering** — Limit your movie pool to a Kodi smart playlist for family-friendly nights, holiday themes, or any custom selection
-- **[Clone Support](advanced-features.md#clone-feature)** — Create multiple copies of EasyMovie, each with its own settings — perfect for different profiles or rooms
+- **[Clone Support](clones.md)** — Create multiple copies of EasyMovie, each with its own settings, perfect for different profiles or rooms
 - **Custom Icons** — Choose from built-in icon themes or set your own image
 
 ---
