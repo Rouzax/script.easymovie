@@ -4,7 +4,7 @@
 
 EasyMovie helps you pick movies for movie night. Answer a few questions (genre, rating, runtime) and get a curated random selection from your library. Supports movie set awareness, multiple viewing modes, and playlist generation.
 
-![EasyMovie Showcase View](docs/wiki-images/view-showcase-golden-hour.png)
+![EasyMovie Showcase View](docs/assets/screenshots/view-showcase-golden-hour.png)
 
 Built for Kodi 21+ (Omega and newer).
 
@@ -49,10 +49,14 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 
 ## Installation
 
-1. Download the latest release from [Releases](https://github.com/Rouzax/script.easymovie/releases)
-2. In Kodi: **Settings → Add-ons → Install from zip file**
-3. Select the downloaded zip file
-4. Launch EasyMovie from **Add-ons → Program add-ons**
+Two ways to install. Pick whichever fits how you want updates delivered:
+
+- **[Rouzax Repository](https://github.com/Rouzax/repository.rouzax/releases)** *(recommended)*: install the repository zip once; Kodi auto-updates EasyMovie (and the other Rouzax addons) on every stable release.
+- **[GitHub releases](https://github.com/Rouzax/script.easymovie/releases)** (manual): download the `script.easymovie-vX.Y.Z.zip`, then **Settings > Add-ons > Install from zip file**. Use this for pre-releases or a specific version.
+
+After install, launch EasyMovie from **Add-ons > Program add-ons**.
+
+See the [Installation page in the docs](https://rouzax.github.io/script.easymovie/docs/installation/) for full step-by-step instructions, requirements, and first-run tips.
 
 ---
 
@@ -68,7 +72,8 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 | [Playlist Mode](https://rouzax.github.io/script.easymovie/docs/playlist-mode/) | Movie marathon playlists |
 | [Movie Sets](https://rouzax.github.io/script.easymovie/docs/movie-sets/) | Collection awareness and continuation |
 | [Settings Reference](https://rouzax.github.io/script.easymovie/docs/settings-reference/) | All settings explained |
-| [Advanced Features](https://rouzax.github.io/script.easymovie/docs/advanced-features/) | Clones, debugging, more |
+| [Clones](https://rouzax.github.io/script.easymovie/docs/clones/) | Multiple EasyMovie instances |
+| [Advanced Features](https://rouzax.github.io/script.easymovie/docs/advanced-features/) | Movie pool, re-suggestion, debugging |
 | [Troubleshooting & FAQ](https://rouzax.github.io/script.easymovie/docs/troubleshooting-and-faq/) | Common issues |
 
 ---

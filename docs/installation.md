@@ -17,12 +17,33 @@ Getting EasyMovie up and running takes just a few minutes.
 
 ## Installation Methods
 
-### From GitHub (Recommended)
+There are two ways to install EasyMovie. Pick the one that fits how you like to receive updates.
+
+| Method | Auto-updates? | Latest stable? | Setup |
+|--------|--------------|----------------|-------|
+| **Rouzax Repository** | Yes (via Kodi) | Yes, immediately | One-time repo install |
+| **GitHub release zip** | No (manual) | Yes, plus pre-releases | Per-release zip install |
+
+### From the Rouzax Repository (recommended)
+
+The Rouzax repository auto-updates EasyMovie (and the other Rouzax addons) every time a new stable release ships. One-time setup, then Kodi handles updates for you.
+
+1. Download the latest `repository.rouzax-X.Y.Z.zip` from [Rouzax Repository releases](https://github.com/Rouzax/repository.rouzax/releases)
+2. In Kodi, go to **Settings > Add-ons > Install from zip file**
+3. Select the downloaded zip. (Kodi may prompt you to enable "Unknown sources" first; see the GitHub method below for the toggle path.)
+4. After the repository installs, go to **Settings > Add-ons > Install from repository > Rouzax Repository > Program add-ons**
+5. Select **EasyMovie** and click **Install**
+
+Future EasyMovie updates arrive automatically through Kodi's add-on update cycle.
+
+### From GitHub (for the latest version, including pre-releases)
+
+Use this if you want a specific release or want to test a pre-release build.
 
 1. **Download the latest release**
    - Go to [Releases](https://github.com/Rouzax/script.easymovie/releases)
-   - Download the `.zip` file (e.g., `script.easymovie-1.0.0.zip`)
-   - **Do not extract the zip** — Kodi needs the zip file directly
+   - Download the `.zip` file (e.g., `script.easymovie-1.0.1.zip`)
+   - **Do not extract the zip** - Kodi needs the zip file directly
 
 2. **Install in Kodi**
    - Open Kodi
@@ -38,10 +59,6 @@ Getting EasyMovie up and running takes just a few minutes.
 
 4. **Confirmation**
    - You'll see a notification: "EasyMovie Add-on installed"
-
-### From Kodi Repository
-
-*(Coming soon — EasyMovie will be submitted to the official Kodi addon repository)*
 
 ---
 

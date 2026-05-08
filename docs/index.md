@@ -57,7 +57,7 @@ That's it. No background service to configure, no database to build. EasyMovie q
 
 ---
 
-## Wiki Navigation
+## Documentation
 
 | Page | Description |
 |------|-------------|
@@ -67,7 +67,8 @@ That's it. No background service to configure, no database to build. EasyMovie q
 | **[Playlist Mode](playlist-mode.md)** | Automatic playlist generation, sort options, resume |
 | **[Movie Sets](movie-sets.md)** | Set awareness, continuation prompts, earlier movie warnings |
 | **[Settings Reference](settings-reference.md)** | Complete reference for every setting |
-| **[Advanced Features](advanced-features.md)** | Movie pool, re-suggestion, clones, debug logging |
+| **[Clones](clones.md)** | Multiple EasyMovie instances with independent settings |
+| **[Advanced Features](advanced-features.md)** | Movie pool, re-suggestion, debug logging |
 | **[Troubleshooting & FAQ](troubleshooting-and-faq.md)** | Common questions and solutions |
 
 ---

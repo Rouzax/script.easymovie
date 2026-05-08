@@ -236,7 +236,7 @@ A: Only the re-suggestion history (which movies were recently shown) and your la
 |----------|------|
 | **GitHub Issues** | [Report a bug](https://github.com/Rouzax/script.easymovie/issues) |
 | **Kodi Forum** | [EasyMovie Thread](https://forum.kodi.tv/showthread.php?tid=385063) |
-| **Wiki** | You're here! |
+| **Documentation** | You're here! |
 
 ### When Asking for Help
 
