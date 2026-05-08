@@ -40,7 +40,7 @@ from resources.lib.utils import (
 )
 from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
-from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog
+from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog, show_resume_dialog
 from resources.lib.ui.browse_window import (
     show_browse_window, RESULT_REROLL, RESULT_SURPRISE,
 )
@@ -410,18 +410,24 @@ def _check_in_progress(
 
     title = movie.get("title", "Unknown")
     remaining = resume["remaining_minutes"]
+    poster_url = movie.get("art", {}).get("poster", "")
 
     log.info("In-progress movie found", event="launch.resume_offered",
              title=title, remaining_minutes=remaining)
 
-    confirmed = show_confirm_dialog(
+    confirmed = show_resume_dialog(
         "Resume Movie?",
-        f"{title}\n{remaining} minutes remaining",
+        title,
+        remaining,
+        poster_url=poster_url,
         yes_label="Resume",
         no_label="New Selection",
         addon_id=addon_id,
     )
 
+    if confirmed is None:
+        log.info("User cancelled resume prompt", event="launch.resume_exit")
+        return True
     if confirmed:
         play_movie(movie, resume=True, storage=storage)
         return True
