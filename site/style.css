@@ -181,9 +181,11 @@ a:hover {
 .flow-container {
     position: relative;
     width: 100%;
+    aspect-ratio: 16 / 9;
     border-radius: var(--radius);
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    background: #000;
 }
 
 .flow-image {
@@ -191,13 +193,10 @@ a:hover {
     top: 0;
     left: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
     opacity: 0;
     animation: flow8 21s infinite;
-}
-
-.flow-image:first-child {
-    position: relative;
 }
 
 .flow-1 { animation-delay: 0s; }
