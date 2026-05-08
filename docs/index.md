@@ -12,7 +12,7 @@ Ever opened Kodi, stared at hundreds of movies, and thought *"I don't know what 
 
 EasyMovie runs a short **filter wizard** that asks about your mood — genre, age rating, runtime, time period, and score. Based on your answers, it pulls a random selection from your library and presents them in a visual browse window. Don't like what you see? Hit **Re-roll** for a fresh set, or **Surprise Me** to skip straight to playback.
 
-![EasyMovie Showcase View](wiki-images/view-showcase-golden-hour.png)
+![EasyMovie Showcase View](assets/screenshots/view-showcase-golden-hour.png)
 
 ### Two Ways to Watch
 

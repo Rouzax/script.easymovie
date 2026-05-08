@@ -2,7 +2,7 @@
 
 The Filter Wizard is EasyMovie's signature feature. Instead of scrolling through your entire library, you answer a few quick questions and EasyMovie narrows down to movies that match your mood.
 
-![Select Genres dialog](wiki-images/dialog-select-genres.png)
+![Select Genres dialog](assets/screenshots/dialog-select-genres.png)
 
 ---
 
@@ -30,7 +30,7 @@ Filters set to "Skip" or "Pre-set" don't interrupt the flow, so you can make the
 
 Choose whether to include unwatched movies, watched movies, or both.
 
-![Watched Status dialog](wiki-images/dialog-watched-status.png)
+![Watched Status dialog](assets/screenshots/dialog-watched-status.png)
 
 | Option | Description |
 |--------|-------------|
@@ -44,7 +44,7 @@ Choose whether to include unwatched movies, watched movies, or both.
 
 Select genres you want to **exclude** from results. Useful for permanently filtering out genres you never want (e.g., Horror for family movie night).
 
-![Ignore Genres dialog](wiki-images/dialog-ignore-genres.png)
+![Ignore Genres dialog](assets/screenshots/dialog-ignore-genres.png)
 
 **Matching modes:**
 - **Any selected (OR)** — Exclude movies matching *any* ignored genre
@@ -56,7 +56,7 @@ Select genres you want to **exclude** from results. Useful for permanently filte
 
 Select genres you want to **include** in results.
 
-![Select Genres dialog](wiki-images/dialog-select-genres.png)
+![Select Genres dialog](assets/screenshots/dialog-select-genres.png)
 
 **Matching modes:**
 - **Any selected (OR)** — Include movies matching *any* selected genre (default)
@@ -70,7 +70,7 @@ Select genres you want to **include** in results.
 
 Filter by MPAA/certification ratings. The dialog shows all ratings found in your library.
 
-![Age Ratings dialog](wiki-images/dialog-age-ratings.png)
+![Age Ratings dialog](assets/screenshots/dialog-age-ratings.png)
 
 The available ratings come directly from your movie metadata — whatever ratings your library contains will appear here.
 
@@ -80,7 +80,7 @@ The available ratings come directly from your movie metadata — whatever rating
 
 Choose a runtime range. The wizard offers preset ranges for quick selection.
 
-![Runtime dialog](wiki-images/dialog-runtime.png)
+![Runtime dialog](assets/screenshots/dialog-runtime.png)
 
 | Option | Range |
 |--------|-------|
@@ -98,7 +98,7 @@ In Pre-set mode, you can configure exact minimum and maximum values (0–300 min
 
 Filter by release year. The wizard offers recency options and decade browsing.
 
-![Time Period dialog](wiki-images/dialog-time-period.png)
+![Time Period dialog](assets/screenshots/dialog-time-period.png)
 
 **Recency options:**
 - Last year
@@ -119,7 +119,7 @@ In Pre-set mode, you can configure: After year, Before year, Between years, or L
 
 Set a minimum rating threshold.
 
-![Score dialog](wiki-images/dialog-score.png)
+![Score dialog](assets/screenshots/dialog-score.png)
 
 | Option | Threshold |
 |--------|-----------|

@@ -2,7 +2,7 @@
 
 Browse Mode displays your filtered movie selection in a visual layout. You're in control — scan the results, pick what catches your eye, and start watching.
 
-![Showcase view](wiki-images/view-showcase-golden-hour.png)
+![Showcase view](assets/screenshots/view-showcase-golden-hour.png)
 
 ---
 
@@ -25,7 +25,7 @@ A horizontal filmstrip carousel with a large fanart backdrop. The focused movie 
 
 Best for: Immersive browsing with a rich visual experience.
 
-![Showcase - Golden Hour theme](wiki-images/view-showcase-golden-hour.png)
+![Showcase - Golden Hour theme](assets/screenshots/view-showcase-golden-hour.png)
 
 ### Card List
 
@@ -33,7 +33,7 @@ Compact rows with poster thumbnail, title, year, rating, runtime, and set inform
 
 Best for: Quick navigation with detailed information at a glance.
 
-![Card List view](wiki-images/view-card-list-golden-hour.png)
+![Card List view](assets/screenshots/view-card-list-golden-hour.png)
 
 ### Posters
 
@@ -41,7 +41,7 @@ A visual grid showing movie poster artwork. The focused movie displays details a
 
 Best for: Visual browsing, recognizing movies by artwork.
 
-![Posters view](wiki-images/view-posters-golden-hour.png)
+![Posters view](assets/screenshots/view-posters-golden-hour.png)
 
 ### Big Screen
 
@@ -49,7 +49,7 @@ Large poster artwork on the left with movie details and a scrollable list on the
 
 Best for: Living room viewing from a couch, remote control navigation.
 
-![Big Screen view](wiki-images/view-big-screen-golden-hour.png)
+![Big Screen view](assets/screenshots/view-big-screen-golden-hour.png)
 
 ### Split View
 
@@ -57,7 +57,7 @@ Two-column layout: a compact movie list on the left and a detail panel on the ri
 
 Best for: Balanced browsing with details always visible.
 
-![Split View](wiki-images/view-split-golden-hour.png)
+![Split View](assets/screenshots/view-split-golden-hour.png)
 
 ---
 
@@ -74,8 +74,8 @@ All views and dialogs use your selected accent color theme. Change via **Setting
 
 | | |
 |---|---|
-| ![Golden Hour](wiki-images/view-split-golden-hour.png) | ![Ultraviolet](wiki-images/view-split-ultraviolet.png) |
-| ![Ember](wiki-images/view-split-ember.png) | ![Nightfall](wiki-images/view-split-nightfall.png) |
+| ![Golden Hour](assets/screenshots/view-split-golden-hour.png) | ![Ultraviolet](assets/screenshots/view-split-ultraviolet.png) |
+| ![Ember](assets/screenshots/view-split-ember.png) | ![Nightfall](assets/screenshots/view-split-nightfall.png) |
 
 > **Tip:** Press the **T** key (or the blue button on your remote) in Browse Mode to preview theme colors without changing settings.
 

@@ -41,7 +41,7 @@ No browsing, no deciding — just movies.
 
 When a movie from a collection finishes playing and [continuation prompts](movie-sets.md) are enabled, EasyMovie offers to play the next movie in the set.
 
-![Set continuation prompt](wiki-images/dialog-continuation.png)
+![Set continuation prompt](assets/screenshots/dialog-continuation.png)
 
 ### How It Works
 

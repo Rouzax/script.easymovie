@@ -36,7 +36,7 @@ This appears in all view styles (Showcase, Card List, Posters, Big Screen, Split
 
 After finishing a collection movie, EasyMovie can prompt you to watch the next one in the set.
 
-![Set continuation prompt](wiki-images/dialog-continuation.png)
+![Set continuation prompt](assets/screenshots/dialog-continuation.png)
 
 ### How It Works
 
@@ -74,7 +74,7 @@ The prompt only appears when:
 
 If you're about to watch a movie but there's an earlier unwatched movie in the same set, EasyMovie warns you.
 
-![Set warning dialog](wiki-images/dialog-set-warning.png)
+![Set warning dialog](assets/screenshots/dialog-set-warning.png)
 
 ### Example
 

@@ -7,7 +7,7 @@ site_url: https://rouzax.github.io/script.easymovie/docs/
 site_description: "EasyMovie, filter-driven random movie picks for your Kodi library"
 repo_url: https://github.com/Rouzax/script.easymovie
 repo_name: Rouzax/script.easymovie
-edit_uri: edit/master/docs/
+edit_uri: edit/main/docs/
 
 site_dir: build/docs
 
@@ -62,6 +62,9 @@ markdown_extensions:
   - attr_list
   - md_in_html
 
+# docs/plans/ is gitignored, but `mkdocs build` will warn about untracked .md
+# files not in nav. exclude_docs prevents the warning and keeps plan content
+# out of any local builds.
 exclude_docs: |
   plans/
 
