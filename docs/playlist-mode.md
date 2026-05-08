@@ -6,11 +6,11 @@ Playlist Mode builds a movie marathon from your filtered selection. Instead of b
 
 ## How It Works
 
-1. **Run through the [Filter Wizard](filter-wizard.md)** — Same filters as Browse Mode
-2. **EasyMovie selects movies** — Based on your filters and playlist settings
-3. **Playback starts** — The playlist begins automatically
+1. **Run through the [Filter Wizard](filter-wizard.md)** - Same filters as Browse Mode
+2. **EasyMovie selects movies** - Based on your filters and playlist settings
+3. **Playback starts** - The playlist begins automatically
 
-No browsing, no deciding — just movies.
+No browsing, no deciding - just movies.
 
 ---
 
@@ -78,7 +78,7 @@ When you launch EasyMovie, it can check if you have a partially watched movie an
 
 ## Related Pages
 
-- **[Filter Wizard](filter-wizard.md)** — The filtering step before playlist generation
-- **[Browse Mode](browse-mode.md)** — The other way to watch
-- **[Movie Sets](movie-sets.md)** — Set continuation during playlists
-- **[Settings Reference](settings-reference.md)** — All Playlist Mode settings
+- **[Filter Wizard](filter-wizard.md)** - The filtering step before playlist generation
+- **[Browse Mode](browse-mode.md)** - The other way to watch
+- **[Movie Sets](movie-sets.md)** - Set continuation during playlists
+- **[Settings Reference](settings-reference.md)** - All Playlist Mode settings

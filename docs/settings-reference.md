@@ -37,8 +37,8 @@ EasyMovie organizes settings into seven categories:
 | Setting | Options | Default | Description |
 |---------|---------|---------|-------------|
 | **Theme** | Golden Hour / Ultraviolet / Ember / Nightfall | Golden Hour | Accent color theme for all windows and dialogs |
-| **Set custom icon** | (button) | — | Choose a custom addon icon |
-| **Reset to default icon** | (button) | — | Restore the original EasyMovie icon |
+| **Set custom icon** | (button) | - | Choose a custom addon icon |
+| **Reset to default icon** | (button) | - | Restore the original EasyMovie icon |
 
 ---
 
@@ -54,8 +54,8 @@ EasyMovie organizes settings into seven categories:
 |---------|---------|---------|-------------|
 | **Ignore genre filter** | Ask / Pre-set / Skip | Skip | Exclude genres from results |
 | **Ignore genre matching** | Any selected (OR) / All selected (AND) | Any (OR) | How to match ignored genres |
-| **Select genres to ignore...** | (button) | — | Open genre selector |
-| **Ignored genres** | (display) | — | Currently ignored genres |
+| **Select genres to ignore...** | (button) | - | Open genre selector |
+| **Ignored genres** | (display) | - | Currently ignored genres |
 
 **Select Genres:**
 
@@ -63,8 +63,8 @@ EasyMovie organizes settings into seven categories:
 |---------|---------|---------|-------------|
 | **Genre filter** | Ask / Pre-set / Skip | Ask | Include genres in results |
 | **Genre matching** | Any selected (OR) / All selected (AND) | Any (OR) | How to match selected genres |
-| **Select genres...** | (button) | — | Open genre selector |
-| **Selected genres** | (display) | — | Currently selected genres |
+| **Select genres...** | (button) | - | Open genre selector |
+| **Selected genres** | (display) | - | Currently selected genres |
 
 ### Watched
 
@@ -78,8 +78,8 @@ EasyMovie organizes settings into seven categories:
 | Setting | Options | Default | Description |
 |---------|---------|---------|-------------|
 | **Age rating filter** | Ask / Pre-set / Skip | Skip | Filter by MPAA/certification |
-| **Select ratings...** | (button) | — | Open rating selector |
-| **Selected ratings** | (display) | — | Currently selected ratings |
+| **Select ratings...** | (button) | - | Open rating selector |
+| **Selected ratings** | (display) | - | Currently selected ratings |
 
 ### Runtime
 
@@ -133,7 +133,7 @@ See [Movie Sets](movie-sets.md) for detailed feature documentation.
 
 ## Browse Mode
 
-*Settings for "Browse" mode — the visual results screen.*
+*Settings for "Browse" mode - the visual results screen.*
 
 ### Appearance
 
@@ -154,7 +154,7 @@ See [Movie Sets](movie-sets.md) for detailed feature documentation.
 
 ## Playlist Mode
 
-*Settings for "Playlist" mode — automatic movie marathon generation.*
+*Settings for "Playlist" mode - automatic movie marathon generation.*
 
 ### Basics
 
@@ -212,8 +212,8 @@ See [Movie Sets](movie-sets.md) for detailed feature documentation.
 | Setting | Options | Default | Description |
 |---------|---------|---------|-------------|
 | **Limit to smart playlist** | On / Off | Off | Restrict the movie pool to a Kodi smart playlist |
-| **Select playlist...** | (button) | — | Choose a `.xsp` file |
-| **Selected playlist** | (display) | — | Currently selected playlist |
+| **Select playlist...** | (button) | - | Choose a `.xsp` file |
+| **Selected playlist** | (display) | - | Currently selected playlist |
 
 ### Re-suggestion
 
@@ -242,7 +242,7 @@ Log location: `special://profile/addon_data/script.easymovie/logs/easymovie.log`
 
 | Setting | Options | Default | Description |
 |---------|---------|---------|-------------|
-| **Create EasyMovie copy...** | (button) | — | Create a clone with separate settings |
+| **Create EasyMovie copy...** | (button) | - | Create a clone with separate settings |
 
 ---
 
@@ -272,9 +272,9 @@ Some settings only appear based on other settings:
 
 ## Related Pages
 
-- **[Filter Wizard](filter-wizard.md)** — How filter settings affect the wizard
-- **[Browse Mode](browse-mode.md)** — How browse settings work in practice
-- **[Playlist Mode](playlist-mode.md)** — How playlist settings work in practice
-- **[Movie Sets](movie-sets.md)** — How set settings work
-- **[Advanced Features](advanced-features.md)** — Clone and debugging details
-- **[Troubleshooting](troubleshooting-and-faq.md)** — Debug logging explained
+- **[Filter Wizard](filter-wizard.md)** - How filter settings affect the wizard
+- **[Browse Mode](browse-mode.md)** - How browse settings work in practice
+- **[Playlist Mode](playlist-mode.md)** - How playlist settings work in practice
+- **[Movie Sets](movie-sets.md)** - How set settings work
+- **[Advanced Features](advanced-features.md)** - Clone and debugging details
+- **[Troubleshooting](troubleshooting-and-faq.md)** - Debug logging explained

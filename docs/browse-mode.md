@@ -1,6 +1,6 @@
 # Browse Mode
 
-Browse Mode displays your filtered movie selection in a visual layout. You're in control — scan the results, pick what catches your eye, and start watching.
+Browse Mode displays your filtered movie selection in a visual layout. You're in control - scan the results, pick what catches your eye, and start watching.
 
 ![Showcase view](assets/screenshots/view-showcase-golden-hour.png)
 
@@ -8,10 +8,10 @@ Browse Mode displays your filtered movie selection in a visual layout. You're in
 
 ## How It Works
 
-1. **Run through the [Filter Wizard](filter-wizard.md)** — Narrow your library by genre, rating, runtime, and more
-2. **EasyMovie selects random matches** — A configurable number of movies (1–50) are pulled from the filtered pool
-3. **Browse the results** — View them in your preferred layout
-4. **Pick a movie** — Select one to start playing, or use Re-roll / Surprise Me
+1. **Run through the [Filter Wizard](filter-wizard.md)** - Narrow your library by genre, rating, runtime, and more
+2. **EasyMovie selects random matches** - A configurable number of movies (1–50) are pulled from the filtered pool
+3. **Browse the results** - View them in your preferred layout
+4. **Pick a movie** - Select one to start playing, or use Re-roll / Surprise Me
 
 ---
 
@@ -111,7 +111,7 @@ Control how results are ordered. Change via **Settings > Browse Mode > Results >
 
 | Sort Method | Description |
 |-------------|-------------|
-| **Random** (default) | Shuffled order — different every time |
+| **Random** (default) | Shuffled order - different every time |
 | **Title** | Alphabetical by movie title |
 | **Year** | By release year |
 | **Rating** | By user/community rating |
@@ -155,7 +155,7 @@ When [set awareness](movie-sets.md) is enabled, movies that belong to collection
 
 ## Related Pages
 
-- **[Filter Wizard](filter-wizard.md)** — The filtering step before browsing
-- **[Playlist Mode](playlist-mode.md)** — The other way to watch
-- **[Movie Sets](movie-sets.md)** — How collections work in Browse Mode
-- **[Settings Reference](settings-reference.md)** — All Browse Mode settings
+- **[Filter Wizard](filter-wizard.md)** - The filtering step before browsing
+- **[Playlist Mode](playlist-mode.md)** - The other way to watch
+- **[Movie Sets](movie-sets.md)** - How collections work in Browse Mode
+- **[Settings Reference](settings-reference.md)** - All Browse Mode settings

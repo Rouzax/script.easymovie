@@ -10,7 +10,7 @@ EasyMovie transforms your Kodi movie library into a personal movie picker. It as
 
 Ever opened Kodi, stared at hundreds of movies, and thought *"I don't know what to watch"*? EasyMovie solves that.
 
-EasyMovie runs a short **filter wizard** that asks about your mood — genre, age rating, runtime, time period, and score. Based on your answers, it pulls a random selection from your library and presents them in a visual browse window. Don't like what you see? Hit **Re-roll** for a fresh set, or **Surprise Me** to skip straight to playback.
+EasyMovie runs a short **filter wizard** that asks about your mood - genre, age rating, runtime, time period, and score. Based on your answers, it pulls a random selection from your library and presents them in a visual browse window. Don't like what you see? Hit **Re-roll** for a fresh set, or **Surprise Me** to skip straight to playback.
 
 ![EasyMovie Showcase View](assets/screenshots/view-showcase-golden-hour.png)
 
@@ -28,30 +28,30 @@ You can choose your preferred mode in settings, or have EasyMovie ask each time.
 ## Quick Feature Overview
 
 ### Core
-- **[Filter Wizard](filter-wizard.md)** — Answer a few questions (genre, rating, runtime, year, score) to narrow your library down to movies that match your mood
-- **5 View Styles** — Showcase (default), Card List, Posters, Big Screen, and Split View
-- **4 Color Themes** — Golden Hour, Ultraviolet, Ember, and Nightfall
-- **Re-roll & Surprise Me** — Don't like the selection? Get a fresh set or jump straight into a random pick
+- **[Filter Wizard](filter-wizard.md)** - Answer a few questions (genre, rating, runtime, year, score) to narrow your library down to movies that match your mood
+- **5 View Styles** - Showcase (default), Card List, Posters, Big Screen, and Split View
+- **4 Color Themes** - Golden Hour, Ultraviolet, Ember, and Nightfall
+- **Re-roll & Surprise Me** - Don't like the selection? Get a fresh set or jump straight into a random pick
 
 ### Movie Sets
-- **[Set Awareness](movie-sets.md)** — When a movie belongs to a collection (like *The Lord of the Rings*), EasyMovie suggests the first unwatched entry instead of a random one
-- **Set Continuation** — After finishing a collection movie, EasyMovie offers to play the next one with a countdown prompt
-- **Earlier Movie Warnings** — About to watch a sequel without seeing the original? EasyMovie lets you know
+- **[Set Awareness](movie-sets.md)** - When a movie belongs to a collection (like *The Lord of the Rings*), EasyMovie suggests the first unwatched entry instead of a random one
+- **Set Continuation** - After finishing a collection movie, EasyMovie offers to play the next one with a countdown prompt
+- **Earlier Movie Warnings** - About to watch a sequel without seeing the original? EasyMovie lets you know
 
 ### Customization
-- **Smart Re-suggestion** — Avoids showing you the same movies again within a configurable time window (4 to 72 hours)
-- **Movie Pool Filtering** — Limit your movie pool to a Kodi smart playlist for family-friendly nights, holiday themes, or any custom selection
-- **[Clone Support](clones.md)** — Create multiple copies of EasyMovie, each with its own settings, perfect for different profiles or rooms
-- **Custom Icons** — Choose from built-in icon themes or set your own image
+- **Smart Re-suggestion** - Avoids showing you the same movies again within a configurable time window (4 to 72 hours)
+- **Movie Pool Filtering** - Limit your movie pool to a Kodi smart playlist for family-friendly nights, holiday themes, or any custom selection
+- **[Clone Support](clones.md)** - Create multiple copies of EasyMovie, each with its own settings, perfect for different profiles or rooms
+- **Custom Icons** - Choose from built-in icon themes or set your own image
 
 ---
 
 ## Getting Started
 
-1. **[Install EasyMovie](installation.md)** — Download from GitHub and install via zip
-2. **Launch EasyMovie** — Find it in your Add-ons menu
-3. **Answer a few filter questions** — Pick your genre, rating, runtime, and more
-4. **Watch** — Browse the results or let EasyMovie build you a playlist
+1. **[Install EasyMovie](installation.md)** - Download from GitHub and install via zip
+2. **Launch EasyMovie** - Find it in your Add-ons menu
+3. **Answer a few filter questions** - Pick your genre, rating, runtime, and more
+4. **Watch** - Browse the results or let EasyMovie build you a playlist
 
 That's it. No background service to configure, no database to build. EasyMovie queries your library live each time you launch it.
 
@@ -75,11 +75,11 @@ That's it. No background service to configure, no database to build. EasyMovie q
 
 ## Quick Links
 
-- **[GitHub Repository](https://github.com/Rouzax/script.easymovie)** — Source code and issue tracker
-- **[Latest Release](https://github.com/Rouzax/script.easymovie/releases/latest)** — Download the newest version
-- **[Report a Bug](https://github.com/Rouzax/script.easymovie/issues)** — Found something wrong? Let us know
-- **[Kodi Forum](https://forum.kodi.tv/showthread.php?tid=385063)** — Discussion and support
+- **[GitHub Repository](https://github.com/Rouzax/script.easymovie)** - Source code and issue tracker
+- **[Latest Release](https://github.com/Rouzax/script.easymovie/releases/latest)** - Download the newest version
+- **[Report a Bug](https://github.com/Rouzax/script.easymovie/issues)** - Found something wrong? Let us know
+- **[Kodi Forum](https://forum.kodi.tv/showthread.php?tid=385063)** - Discussion and support
 
 ---
 
-*EasyMovie — Because choosing what to watch shouldn't take longer than watching it.*
+*EasyMovie - Because choosing what to watch shouldn't take longer than watching it.*

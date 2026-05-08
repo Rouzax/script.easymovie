@@ -48,7 +48,7 @@ When a movie appears in your results, EasyMovie records the timestamp. That movi
 ### Tips
 
 - Re-roll multiple times and the system prevents repeats
-- Works across sessions — close and reopen EasyMovie and it still remembers
+- Works across sessions - close and reopen EasyMovie and it still remembers
 - If your library is small, a shorter window prevents running out of movies
 - Disable entirely if you don't mind seeing repeat suggestions
 
@@ -106,6 +106,6 @@ For troubleshooting issues, EasyMovie can write detailed logs to a separate file
 
 ## Related Pages
 
-- **[Installation](installation.md)** — Initial setup
-- **[Settings Reference](settings-reference.md)** — All settings explained
-- **[Troubleshooting](troubleshooting-and-faq.md)** — Common issues
+- **[Installation](installation.md)** - Initial setup
+- **[Settings Reference](settings-reference.md)** - All settings explained
+- **[Troubleshooting](troubleshooting-and-faq.md)** - Common issues

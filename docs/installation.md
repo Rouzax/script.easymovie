@@ -64,16 +64,16 @@ Use this if you want a specific release or want to test a pre-release build.
 
 ## First Run
 
-When you launch EasyMovie for the first time, it works immediately. There's no background service, no database to build, and no waiting — EasyMovie queries your library live each time.
+When you launch EasyMovie for the first time, it works immediately. There's no background service, no database to build, and no waiting - EasyMovie queries your library live each time.
 
 The **filter wizard** starts right away, walking you through:
 
-1. Watched status — Unwatched, watched, or both?
-2. Genres — What are you in the mood for?
-3. Age ratings — Filter by MPAA/certification
-4. Runtime — How much time do you have?
-5. Time period — Recent releases or classics?
-6. Score — Set a quality threshold
+1. Watched status - Unwatched, watched, or both?
+2. Genres - What are you in the mood for?
+3. Age ratings - Filter by MPAA/certification
+4. Runtime - How much time do you have?
+5. Time period - Recent releases or classics?
+6. Score - Set a quality threshold
 
 Each filter can be answered, skipped, or pre-configured in settings. After the wizard, EasyMovie presents your curated selection.
 
@@ -161,6 +161,6 @@ To fully remove all data, manually delete the `script.easymovie` folder from you
 
 ## Next Steps
 
-- **[Filter Wizard](filter-wizard.md)** — Learn how the wizard narrows your library
-- **[Browse Mode](browse-mode.md)** — Explore the visual browsing experience
-- **[Settings Reference](settings-reference.md)** — Fine-tune every aspect of EasyMovie
+- **[Filter Wizard](filter-wizard.md)** - Learn how the wizard narrows your library
+- **[Browse Mode](browse-mode.md)** - Explore the visual browsing experience
+- **[Settings Reference](settings-reference.md)** - Fine-tune every aspect of EasyMovie

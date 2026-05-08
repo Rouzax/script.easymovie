@@ -8,17 +8,17 @@ The Filter Wizard is EasyMovie's signature feature. Instead of scrolling through
 
 ## How It Works
 
-1. **Launch EasyMovie** — Choose Browse Mode or Playlist Mode
-2. **Answer filter questions** — Each step narrows down the pool
-3. **See your results** — A curated random selection from what matched
+1. **Launch EasyMovie** - Choose Browse Mode or Playlist Mode
+2. **Answer filter questions** - Each step narrows down the pool
+3. **See your results** - A curated random selection from what matched
 
 The wizard runs through up to seven filter steps. Each filter has three modes (configurable in **Settings > Filters**):
 
 | Mode | Behavior |
 |------|----------|
-| **Ask** | Show a dialog each time — you choose in the moment |
-| **Pre-set** | Use your saved values silently — no dialog shown |
-| **Skip** | Ignore this filter entirely — all movies pass through |
+| **Ask** | Show a dialog each time - you choose in the moment |
+| **Pre-set** | Use your saved values silently - no dialog shown |
+| **Skip** | Ignore this filter entirely - all movies pass through |
 
 Filters set to "Skip" or "Pre-set" don't interrupt the flow, so you can make the wizard as quick or detailed as you like.
 
@@ -47,8 +47,8 @@ Select genres you want to **exclude** from results. Useful for permanently filte
 ![Ignore Genres dialog](assets/screenshots/dialog-ignore-genres.png)
 
 **Matching modes:**
-- **Any selected (OR)** — Exclude movies matching *any* ignored genre
-- **All selected (AND)** — Only exclude movies matching *all* ignored genres
+- **Any selected (OR)** - Exclude movies matching *any* ignored genre
+- **All selected (AND)** - Only exclude movies matching *all* ignored genres
 
 ---
 
@@ -59,8 +59,8 @@ Select genres you want to **include** in results.
 ![Select Genres dialog](assets/screenshots/dialog-select-genres.png)
 
 **Matching modes:**
-- **Any selected (OR)** — Include movies matching *any* selected genre (default)
-- **All selected (AND)** — Only include movies matching *all* selected genres
+- **Any selected (OR)** - Include movies matching *any* selected genre (default)
+- **All selected (AND)** - Only include movies matching *all* selected genres
 
 > **Example:** Selecting "Action" and "Comedy" with OR matching returns action movies, comedies, *and* action-comedies. With AND matching, only action-comedies appear.
 
@@ -72,7 +72,7 @@ Filter by MPAA/certification ratings. The dialog shows all ratings found in your
 
 ![Age Ratings dialog](assets/screenshots/dialog-age-ratings.png)
 
-The available ratings come directly from your movie metadata — whatever ratings your library contains will appear here.
+The available ratings come directly from your movie metadata - whatever ratings your library contains will appear here.
 
 ---
 
@@ -141,7 +141,7 @@ The wizard can show how many movies match each option, helping you make informed
 
 ### Cumulative Counts
 
-When enabled, counts narrow as you progress through the wizard. After selecting "Action" in the genre step, the runtime step shows counts for action movies only — not your entire library.
+When enabled, counts narrow as you progress through the wizard. After selecting "Action" in the genre step, the runtime step shows counts for action movies only - not your entire library.
 
 **Enable in:** Settings > Advanced > Filters > **Cumulative counts**
 
@@ -159,14 +159,14 @@ EasyMovie can pre-fill the wizard with your previous answers, so you can quickly
 
 ## Navigation
 
-- **Select an option** — Click or press Enter to choose
-- **Back** — Go back to the previous step
-- **Cancel** — Exit the wizard entirely
+- **Select an option** - Click or press Enter to choose
+- **Back** - Go back to the previous step
+- **Cancel** - Exit the wizard entirely
 
 ---
 
 ## Related Pages
 
-- **[Browse Mode](browse-mode.md)** — What happens after the wizard in Browse Mode
-- **[Playlist Mode](playlist-mode.md)** — What happens after the wizard in Playlist Mode
-- **[Settings Reference](settings-reference.md)** — All filter settings explained
+- **[Browse Mode](browse-mode.md)** - What happens after the wizard in Browse Mode
+- **[Playlist Mode](playlist-mode.md)** - What happens after the wizard in Playlist Mode
+- **[Settings Reference](settings-reference.md)** - All filter settings explained

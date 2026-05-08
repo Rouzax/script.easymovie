@@ -25,16 +25,16 @@ EasyMovie presents a quick wizard to filter your movie library, then shows you a
 
 ## Key Features
 
-- **Filter Wizard** — Quick questions for genre, rating, runtime, year, and more
-- **5 Viewing Modes** — Showcase (default), Card List, Posters, Big Screen, Split View
-- **Movie Set Awareness** — Automatically suggests the next unwatched movie in a collection
-- **Set Continuation** — After finishing a set movie, get prompted to watch the next one
-- **Playlist Mode** — Build and play movie marathons automatically
-- **4 Color Themes** — Golden Hour, Ultraviolet, Ember, Nightfall
-- **Re-roll** — Don't like the selection? Get a fresh set of suggestions
-- **Surprise Me** — Pick a random movie from the results
-- **Smart Re-suggestion** — Avoids suggesting the same movies too frequently
-- **Clone Support** — Multiple EasyMovie instances with different filter presets
+- **Filter Wizard** - Quick questions for genre, rating, runtime, year, and more
+- **5 Viewing Modes** - Showcase (default), Card List, Posters, Big Screen, Split View
+- **Movie Set Awareness** - Automatically suggests the next unwatched movie in a collection
+- **Set Continuation** - After finishing a set movie, get prompted to watch the next one
+- **Playlist Mode** - Build and play movie marathons automatically
+- **4 Color Themes** - Golden Hour, Ultraviolet, Ember, Nightfall
+- **Re-roll** - Don't like the selection? Get a fresh set of suggestions
+- **Surprise Me** - Pick a random movie from the results
+- **Smart Re-suggestion** - Avoids suggesting the same movies too frequently
+- **Clone Support** - Multiple EasyMovie instances with different filter presets
 
 ---
 
@@ -89,7 +89,7 @@ See the [Installation page in the docs](https://rouzax.github.io/script.easymovi
 ## Credits & License
 
 ### Author
-**Rouzax** — Created for Kodi 21+ (2026)
+**Rouzax** - Created for Kodi 21+ (2026)
 - Repository: https://github.com/Rouzax/script.easymovie
 
 ### License
@@ -99,4 +99,4 @@ See [LICENSE.txt](LICENSE.txt) for the full license text.
 
 ---
 
-*EasyMovie — Because choosing what to watch shouldn't take longer than watching it.*
+*EasyMovie - Because choosing what to watch shouldn't take longer than watching it.*

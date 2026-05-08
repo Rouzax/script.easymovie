@@ -16,7 +16,7 @@ When enabled, EasyMovie changes how it handles movies that belong to collections
 
 ### What Counts as a Set?
 
-EasyMovie uses Kodi's built-in movie set system. These are the "Collections" you see in your library — typically populated automatically by scrapers like TMDb or manually by you.
+EasyMovie uses Kodi's built-in movie set system. These are the "Collections" you see in your library - typically populated automatically by scrapers like TMDb or manually by you.
 
 If a movie shows as part of a set in Kodi's library, EasyMovie will recognize it.
 
@@ -24,7 +24,7 @@ If a movie shows as part of a set in Kodi's library, EasyMovie will recognize it
 
 ## Set Information
 
-When browsing results, set movies display their collection name and position — for example, "Movie 2 of 3 in The Lord of the Rings Collection".
+When browsing results, set movies display their collection name and position - for example, "Movie 2 of 3 in The Lord of the Rings Collection".
 
 **Enable in:** Settings > Movie Sets > **Show set information**
 
@@ -117,6 +117,6 @@ You can choose to watch the earlier movie or continue with your original selecti
 
 ## Related Pages
 
-- **[Browse Mode](browse-mode.md)** — How sets appear in browse results
-- **[Playlist Mode](playlist-mode.md)** — Set continuation during playlists
-- **[Settings Reference](settings-reference.md)** — All Movie Sets settings
+- **[Browse Mode](browse-mode.md)** - How sets appear in browse results
+- **[Playlist Mode](playlist-mode.md)** - Set continuation during playlists
+- **[Settings Reference](settings-reference.md)** - All Movie Sets settings

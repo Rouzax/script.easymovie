@@ -14,7 +14,7 @@ The wizard finishes but EasyMovie says no movies match.
 
 | Cause | Solution |
 |-------|----------|
-| Filters too restrictive | Try with fewer filters — set most to "Skip" and test |
+| Filters too restrictive | Try with fewer filters - set most to "Skip" and test |
 | Empty library | Ensure you have movies scanned into Kodi's library |
 | Movie pool playlist empty | Disable "Limit to smart playlist" or check playlist rules |
 | All movies recently suggested | Reduce the re-suggestion window or disable it temporarily |
@@ -88,7 +88,7 @@ After updating EasyMovie, a clone still shows old behavior.
 The filter wizard feels sluggish.
 
 **Solutions:**
-1. Disable **Cumulative counts** in Settings > Advanced > Filters — this reduces database queries per wizard step
+1. Disable **Cumulative counts** in Settings > Advanced > Filters - this reduces database queries per wizard step
 2. Disable **Show movie counts in wizard** entirely for the fastest experience
 3. On low-power devices, fewer filter steps (set more to "Skip") helps
 
@@ -252,7 +252,7 @@ Include:
 
 ## Related Pages
 
-- **[Installation](installation.md)** — Initial setup
-- **[Settings Reference](settings-reference.md)** — All settings explained
-- **[Advanced Features](advanced-features.md)** — Debug logging details
-- **[Filter Wizard](filter-wizard.md)** — Filter troubleshooting
+- **[Installation](installation.md)** - Initial setup
+- **[Settings Reference](settings-reference.md)** - All settings explained
+- **[Advanced Features](advanced-features.md)** - Debug logging details
+- **[Filter Wizard](filter-wizard.md)** - Filter troubleshooting
