@@ -38,6 +38,13 @@ CONFIRM_MESSAGE = 2
 CONFIRM_YES = 10
 CONFIRM_NO = 11
 
+RESUME_HEADING = 1
+RESUME_MESSAGE = 2
+RESUME_SUBTITLE = 4
+RESUME_YES = 10
+RESUME_NO = 11
+RESUME_POSTER = 20
+
 # Module-level logger
 log = get_logger('ui')
 
@@ -191,6 +198,54 @@ class ConfirmDialog(xbmcgui.WindowXMLDialog):
             self.close()
 
 
+class ResumeDialog(xbmcgui.WindowXMLDialog):
+    """Resume movie dialog with poster artwork."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
+        self.heading = ""
+        self.title_text = ""
+        self.subtitle = ""
+        self.poster_url = ""
+        self.yes_label = ""
+        self.no_label = ""
+        self.confirmed = False
+        self.cancelled = False
+
+    def onInit(self):
+        """Set up the dialog labels and poster."""
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+
+        cast(xbmcgui.ControlLabel, self.getControl(RESUME_HEADING)).setLabel(self.heading)
+        cast(xbmcgui.ControlLabel, self.getControl(RESUME_MESSAGE)).setLabel(self.title_text)
+        cast(xbmcgui.ControlLabel, self.getControl(RESUME_SUBTITLE)).setLabel(self.subtitle)
+        if self.poster_url:
+            cast(xbmcgui.ControlImage, self.getControl(RESUME_POSTER)).setImage(self.poster_url)
+        if self.yes_label:
+            cast(xbmcgui.ControlButton, self.getControl(RESUME_YES)).setLabel(self.yes_label)
+        if self.no_label:
+            cast(xbmcgui.ControlButton, self.getControl(RESUME_NO)).setLabel(self.no_label)
+        self.setFocus(self.getControl(RESUME_YES))
+
+    def onClick(self, controlId):
+        """Handle button clicks."""
+        if controlId == RESUME_YES:
+            self.confirmed = True
+            self.close()
+        elif controlId == RESUME_NO:
+            self.confirmed = False
+            self.close()
+
+    def onAction(self, action):
+        """Handle back/escape."""
+        action_id = action.getId()
+        if action_id in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            self.cancelled = True
+            self.close()
+
+
 def show_select_dialog(
     heading: str,
     items: List[str],
@@ -280,5 +335,53 @@ def show_confirm_dialog(
                   heading=heading)
         return None
     log.debug("Confirm dialog result", event="ui.dialog_select",
+              heading=heading, confirmed=dialog.confirmed)
+    return dialog.confirmed
+
+
+def show_resume_dialog(
+    heading: str,
+    title: str,
+    remaining_minutes: int,
+    poster_url: str = "",
+    yes_label: str = "",
+    no_label: str = "",
+    addon_id: Optional[str] = None,
+) -> Optional[bool]:
+    """Show a themed resume dialog with movie poster.
+
+    Args:
+        heading: Dialog heading text.
+        title: Movie title.
+        remaining_minutes: Minutes remaining in the movie.
+        poster_url: URL to the movie poster artwork.
+        yes_label: Custom label for the yes button.
+        no_label: Custom label for the no button.
+        addon_id: Optional addon ID (for clone support).
+
+    Returns:
+        True if user confirmed, False if declined, None if cancelled/back.
+    """
+    log.debug("Resume dialog opened", event="ui.dialog_open",
+              heading=heading, title=title)
+    dialog = ResumeDialog(
+        'script-easymovie-resume.xml',
+        _get_addon_path(),
+        'Default', '1080i'
+    )
+    dialog._addon_id = addon_id or ADDON_ID
+    dialog.heading = heading
+    dialog.title_text = f"[B]{title}[/B]"
+    dialog.subtitle = f"{remaining_minutes} minutes remaining"
+    dialog.poster_url = poster_url
+    dialog.yes_label = yes_label
+    dialog.no_label = no_label
+    dialog.doModal()
+
+    if dialog.cancelled:
+        log.debug("Resume dialog cancelled", event="ui.dialog_cancel",
+                  heading=heading)
+        return None
+    log.debug("Resume dialog result", event="ui.dialog_select",
               heading=heading, confirmed=dialog.confirmed)
     return dialog.confirmed
