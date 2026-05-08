@@ -1,3 +1,18 @@
+v1.0.2 (2026-05-08)
+--------------------------
+Bug Fixes:
+  - Fixed: Pressing Back or Escape on the "Resume Movie?" dialog now exits the
+    addon. Previously the cancel action was not distinguished from "New Selection",
+    so the addon fell through to the filter wizard and loaded a new browse selection.
+    _check_in_progress() now checks for None (cancelled) explicitly and returns
+    True to signal main() to stop.
+
+Improvements:
+  - The "Resume Movie?" dialog now shows the movie poster alongside the title and
+    remaining time, matching the visual style of the set warning and continuation
+    dialogs. New ResumeDialog class and script-easymovie-resume.xml skin file.
+
+
 v1.0.1 (2026-04-27)
 --------------------------
 Bug Fixes:
