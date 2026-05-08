@@ -171,13 +171,79 @@ a:hover {
     color: var(--accent-hover);
 }
 
-.hero-screenshot {
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+/* -- Hero flow crossfade ------------------------------------ */
+
+.hero-flow {
     max-width: 960px;
     margin: 0 auto;
 }
+
+.flow-container {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.flow-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    animation: flow8 21s infinite;
+}
+
+.flow-image:first-child {
+    position: relative;
+}
+
+.flow-1 { animation-delay: 0s; }
+.flow-2 { animation-delay: 2.625s; }
+.flow-3 { animation-delay: 5.25s; }
+.flow-4 { animation-delay: 7.875s; }
+.flow-5 { animation-delay: 10.5s; }
+.flow-6 { animation-delay: 13.125s; }
+.flow-7 { animation-delay: 15.75s; }
+.flow-8 { animation-delay: 18.375s; }
+
+@keyframes flow8 {
+    0%      { opacity: 0; }
+    1.5%    { opacity: 1; }
+    12.5%   { opacity: 1; }
+    14%     { opacity: 0; }
+    100%    { opacity: 0; }
+}
+
+.flow-labels {
+    position: relative;
+    height: 2rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.flow-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    opacity: 0;
+    animation: flow8 21s infinite;
+}
+
+.flow-label-1 { animation-delay: 0s; }
+.flow-label-2 { animation-delay: 2.625s; }
+.flow-label-3 { animation-delay: 5.25s; }
+.flow-label-4 { animation-delay: 7.875s; }
+.flow-label-5 { animation-delay: 10.5s; }
+.flow-label-6 { animation-delay: 13.125s; }
+.flow-label-7 { animation-delay: 15.75s; }
+.flow-label-8 { animation-delay: 18.375s; }
 
 /* -- Sections (shared) -------------------------------------- */
 
