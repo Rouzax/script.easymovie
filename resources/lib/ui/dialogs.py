@@ -41,6 +41,9 @@ CONFIRM_NO = 11
 RESUME_HEADING = 1
 RESUME_MESSAGE = 2
 RESUME_SUBTITLE = 4
+RESUME_META = 5
+RESUME_GENRE = 7
+RESUME_PLOT = 6
 RESUME_YES = 10
 RESUME_NO = 11
 RESUME_POSTER = 20
@@ -208,6 +211,9 @@ class ResumeDialog(xbmcgui.WindowXMLDialog):
         self.title_text = ""
         self.subtitle = ""
         self.poster_url = ""
+        self.meta_text = ""
+        self.genre_text = ""
+        self.plot_text = ""
         self.yes_label = ""
         self.no_label = ""
         self.confirmed = False
@@ -223,6 +229,12 @@ class ResumeDialog(xbmcgui.WindowXMLDialog):
         cast(xbmcgui.ControlLabel, self.getControl(RESUME_SUBTITLE)).setLabel(self.subtitle)
         if self.poster_url:
             cast(xbmcgui.ControlImage, self.getControl(RESUME_POSTER)).setImage(self.poster_url)
+        if self.meta_text:
+            cast(xbmcgui.ControlLabel, self.getControl(RESUME_META)).setLabel(self.meta_text)
+        if self.genre_text:
+            cast(xbmcgui.ControlLabel, self.getControl(RESUME_GENRE)).setLabel(self.genre_text)
+        if self.plot_text:
+            cast(xbmcgui.ControlTextBox, self.getControl(RESUME_PLOT)).setText(self.plot_text)
         if self.yes_label:
             cast(xbmcgui.ControlButton, self.getControl(RESUME_YES)).setLabel(self.yes_label)
         if self.no_label:
@@ -339,6 +351,33 @@ def show_confirm_dialog(
     return dialog.confirmed
 
 
+def _build_meta_line(
+    year: int = 0,
+    mpaa: str = "",
+    rating: float = 0.0,
+    runtime: int = 0,
+) -> str:
+    """Build a metadata line from movie properties (excluding genre).
+
+    Joins non-empty parts with `` · `` (middle dot separator),
+    following the browse view formatting conventions.
+    """
+    parts: List[str] = []
+    if year:
+        parts.append(str(year))
+    if mpaa:
+        parts.append(mpaa)
+    if rating and rating > 0:
+        parts.append("★ %.1f" % rating)
+    runtime_min = runtime // 60 if runtime else 0
+    if runtime_min > 0:
+        if runtime_min >= 60:
+            parts.append("%dh %dm" % (runtime_min // 60, runtime_min % 60))
+        else:
+            parts.append("%dm" % runtime_min)
+    return "  ·  ".join(parts)
+
+
 def show_resume_dialog(
     heading: str,
     title: str,
@@ -347,6 +386,12 @@ def show_resume_dialog(
     yes_label: str = "",
     no_label: str = "",
     addon_id: Optional[str] = None,
+    year: int = 0,
+    rating: float = 0.0,
+    mpaa: str = "",
+    runtime: int = 0,
+    genre: Optional[List[str]] = None,
+    plot: str = "",
 ) -> Optional[bool]:
     """Show a themed resume dialog with movie poster.
 
@@ -358,6 +403,12 @@ def show_resume_dialog(
         yes_label: Custom label for the yes button.
         no_label: Custom label for the no button.
         addon_id: Optional addon ID (for clone support).
+        year: Movie release year.
+        rating: Movie rating (0-10).
+        mpaa: MPAA rating string (e.g. "Rated PG-13").
+        runtime: Total runtime in seconds.
+        genre: List of genre names.
+        plot: Plot synopsis text.
 
     Returns:
         True if user confirmed, False if declined, None if cancelled/back.
@@ -374,6 +425,9 @@ def show_resume_dialog(
     dialog.title_text = f"[B]{title}[/B]"
     dialog.subtitle = f"{remaining_minutes} minutes remaining"
     dialog.poster_url = poster_url
+    dialog.meta_text = _build_meta_line(year, mpaa, rating, runtime)
+    dialog.genre_text = ", ".join(genre) if genre else ""
+    dialog.plot_text = plot
     dialog.yes_label = yes_label
     dialog.no_label = no_label
     dialog.doModal()

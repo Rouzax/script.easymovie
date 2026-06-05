@@ -197,6 +197,40 @@ def preview_select_multi() -> None:
     dialog.notification(_notify_title, "Selected: %s" % result)
 
 
+def preview_resume() -> None:
+    """Show the themed ResumeDialog with movie metadata."""
+    movies = _fetch_preview_movies()
+    if not movies:
+        dialog.ok(_notify_title,
+                   "No movies found in the library.\n"
+                   "Resume preview requires a populated movie library.")
+        return
+
+    movie = movies[0]
+    runtime = movie.get("runtime", 7200)
+    fake_remaining = max(1, (runtime // 60) - 30)
+    art = movie.get("art", {})
+    poster = art.get("poster", "") if isinstance(art, dict) else ""
+
+    from resources.lib.ui.dialogs import show_resume_dialog
+    result = show_resume_dialog(
+        addon_name,
+        movie.get("title", "Preview Movie"),
+        fake_remaining,
+        poster_url=poster,
+        yes_label="Resume",
+        no_label="New Selection",
+        addon_id=addon_id,
+        year=movie.get("year", 0),
+        rating=movie.get("rating", 0.0),
+        mpaa=movie.get("mpaa", ""),
+        runtime=runtime,
+        genre=movie.get("genre"),
+        plot=movie.get("plot", ""),
+    )
+    dialog.notification(_notify_title, "Resume result: %s" % result)
+
+
 def preview_browse() -> None:
     """Show the BrowseWindow — lets user pick which view style to preview."""
     movies = _fetch_preview_movies()
@@ -369,11 +403,12 @@ def Main(override_addon_id: Optional[str] = None) -> None:
             "2. Confirm Dialog (OK only)",
             "3. Select Dialog (single)",
             "4. Select Dialog (multi)",
-            "5. Browse Window",
-            "6. Context Menu",
-            "7. Continuation Dialog (countdown)",
-            "8. Set Warning Dialog (no countdown)",
-            "9. All Dialogs (cycle through)",
+            "5. Resume Dialog",
+            "6. Browse Window",
+            "7. Context Menu",
+            "8. Continuation Dialog (countdown)",
+            "9. Set Warning Dialog (no countdown)",
+            "10. All Dialogs (cycle through)",
         ]
 
         menu_title = "%s Dialog Preview [%s]" % (addon_name, addon_id)
@@ -384,6 +419,7 @@ def Main(override_addon_id: Optional[str] = None) -> None:
             preview_confirm_single,
             preview_select_single,
             preview_select_multi,
+            preview_resume,
             preview_browse,
             preview_context_menu,
             preview_continuation,

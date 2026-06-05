@@ -72,6 +72,8 @@ When each movie starts playing, EasyMovie can show a notification with the title
 
 When you launch EasyMovie, it can check if you have a partially watched movie and offer to resume it before starting the wizard.
 
+![Resume dialog](assets/screenshots/dialog-resume.png)
+
 **Enable in:** Settings > Playback > On Launch > **Check for in-progress movie on launch**
 
 ---

@@ -244,9 +244,9 @@
 
             <!-- Button Row: centered grouplist auto-positions visible buttons -->
             <control type="grouplist">
-                <left>115</left>
+                <left>85</left>
                 <top>515</top>
-                <width>370</width>
+                <width>430</width>
                 <height>50</height>
                 <align>center</align>
                 <itemgap>30</itemgap>
@@ -255,7 +255,7 @@
 
                 <!-- Back Button (ID 11) — always visible -->
                 <control type="button" id="11">
-                    <width>170</width>
+                    <width>200</width>
                     <height>50</height>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -271,7 +271,7 @@
 
                 <!-- OK Button (ID 10) — hidden in single-select -->
                 <control type="button" id="10">
-                    <width>170</width>
+                    <width>200</width>
                     <height>50</height>
                     <align>center</align>
                     <aligny>center</aligny>

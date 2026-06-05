@@ -3,14 +3,20 @@
     EasyMovie Context Menu Window
     Resolution: 1080i (1920x1080)
 
+    Two container groups with opposite visibility:
+    - 2-button (170px): shown when movie belongs to a set
+    - 1-button (110px): shown when movie has no set
+
     Control IDs:
-        100 - Button group list
-        110 - Play
+        100 - Button group list (2-button)
+        101 - Button group list (1-button)
+        110 - Play (2-button variant)
         120 - Play Full Set
+        130 - Play (1-button variant)
 -->
 <window>
     <zorder>100000</zorder>
-    <defaultcontrol always="true">100</defaultcontrol>
+    <defaultcontrol>110</defaultcontrol>
 
     <controls>
         <!-- Dim overlay -->
@@ -28,8 +34,11 @@
             </animation>
         </control>
 
-        <!-- Context Menu Container -->
+        <!-- ============================================================ -->
+        <!-- 2-button container (movie belongs to a set)                  -->
+        <!-- ============================================================ -->
         <control type="group">
+            <visible>String.IsEqual(Window.Property(EasyMovie.HasSet),true)</visible>
             <left>720</left>
             <top>455</top>
             <width>480</width>
@@ -105,5 +114,71 @@
 
             </control>
         </control>
+
+        <!-- ============================================================ -->
+        <!-- 1-button container (movie has no set)                        -->
+        <!-- ============================================================ -->
+        <control type="group">
+            <visible>!String.IsEqual(Window.Property(EasyMovie.HasSet),true)</visible>
+            <left>720</left>
+            <top>485</top>
+            <width>480</width>
+            <height>110</height>
+            <animation type="WindowOpen" reversible="false">
+                <effect type="fade" start="0" end="100" time="300" delay="100" />
+                <effect type="slide" start="0,-100" end="0" center="auto" tween="back" easing="out" time="600" delay="100" />
+            </animation>
+            <animation type="WindowClose" reversible="false">
+                <effect type="zoom" start="100" end="95" center="auto" tween="sine" easing="out" time="300" />
+                <effect type="fade" start="100" end="0" tween="cubic" easing="out" time="300" />
+            </animation>
+
+            <!-- Accent border frame -->
+            <control type="image">
+                <left>-2</left>
+                <top>-2</top>
+                <width>484</width>
+                <height>114</height>
+                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+            </control>
+
+            <!-- Menu Background -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>480</width>
+                <height>110</height>
+                <texture border="12">common/menu.png</texture>
+                <colordiffuse>ffffffff</colordiffuse>
+            </control>
+
+            <!-- Single Play Button -->
+            <control type="grouplist" id="101">
+                <left>30</left>
+                <top>30</top>
+                <width>420</width>
+                <height>50</height>
+                <orientation>vertical</orientation>
+                <onleft>101</onleft>
+                <onright>101</onright>
+                <onup>101</onup>
+                <ondown>101</ondown>
+
+                <control type="button" id="130">
+                    <width>420</width>
+                    <height>50</height>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <font>font12</font>
+                    <textoffsetx>25</textoffsetx>
+                    <textcolor>ffFFFFFF</textcolor>
+                    <focusedcolor>$INFO[Window.Property(EasyMovie.Accent)]</focusedcolor>
+                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white_rounded.png</texturefocus>
+                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+                </control>
+
+            </control>
+        </control>
+
     </controls>
 </window>

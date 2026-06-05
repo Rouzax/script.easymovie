@@ -1,3 +1,30 @@
+v1.1.0 (2026-06-05)
+--------------------------
+New Features:
+  - Resume dialog now displays movie metadata (year, MPAA rating, score, runtime),
+    genre, and a plot synopsis with accent line framing. The "minutes remaining"
+    status line is positioned above the buttons as decision context.
+  - Context menu adapts its height based on content: 110px for single-button
+    (no set) and 170px for two-button (set movie) states, controlled by opposite-
+    visibility groups and a HasSet window property.
+  - Resume dialog added to the dialog preview menu (option 5) for theme testing.
+
+Improvements:
+  - Updated dialog screenshots: new resume dialog screenshot, retaken continuation
+    and set warning screenshots.
+
+Internal:
+  - Continuation dialog vertical centering corrected (top 300 to 295).
+  - Button rows in resume, continuation, and set warning dialogs converted from
+    manual group to grouplist for automatic centering.
+  - Select dialog button width standardized from 170px to 200px, matching all
+    other dialogs.
+  - In-progress movies query expanded with genre, year, rating, plot, and mpaa
+    properties.
+  - Skin guidelines updated with dialog dimension catalog, button row conventions,
+    poster-dialog layout, and context menu conventions.
+
+
 v1.0.2 (2026-05-08)
 --------------------------
 Bug Fixes:

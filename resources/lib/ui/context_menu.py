@@ -28,6 +28,7 @@ CONTEXT_PLAY_SET = "play_set"
 # Control IDs matching the XML
 _BUTTON_PLAY = 110
 _BUTTON_PLAY_SET = 120
+_BUTTON_PLAY_SINGLE = 130
 
 # Module-level logger
 log = get_logger('ui')
@@ -56,22 +57,21 @@ class ContextMenuWindow(xbmcgui.WindowXMLDialog):
         log.debug("Context menu opened", event="ui.context_open",
                   has_set=self._has_set)
 
-        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY)).setLabel(
-            lang(32312))  # "Play"
-
-        set_label = lang(32313)  # "Play Full Set"
-        cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SET)).setLabel(
-            set_label)
-
-        # Hide "Play Full Set" if movie is not in a set
-        if not self._has_set:
-            self.getControl(_BUTTON_PLAY_SET).setVisible(False)
-
-        self.setFocus(self.getControl(_BUTTON_PLAY))
+        if self._has_set:
+            self.setProperty('EasyMovie.HasSet', 'true')
+            cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY)).setLabel(
+                lang(32312))
+            cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SET)).setLabel(
+                lang(32313))
+            self.setFocus(self.getControl(_BUTTON_PLAY))
+        else:
+            cast(xbmcgui.ControlButton, self.getControl(_BUTTON_PLAY_SINGLE)).setLabel(
+                lang(32312))
+            self.setFocus(self.getControl(_BUTTON_PLAY_SINGLE))
 
     def onClick(self, controlId):
         """Handle button clicks."""
-        if controlId == _BUTTON_PLAY:
+        if controlId in (_BUTTON_PLAY, _BUTTON_PLAY_SINGLE):
             self._result = CONTEXT_PLAY
         elif controlId == _BUTTON_PLAY_SET:
             self._result = CONTEXT_PLAY_SET

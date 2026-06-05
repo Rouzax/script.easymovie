@@ -423,6 +423,12 @@ def _check_in_progress(
         yes_label="Resume",
         no_label="New Selection",
         addon_id=addon_id,
+        year=movie.get("year", 0),
+        rating=movie.get("rating", 0.0),
+        mpaa=movie.get("mpaa", ""),
+        runtime=movie.get("runtime", 0),
+        genre=movie.get("genre"),
+        plot=movie.get("plot", ""),
     )
 
     if confirmed is None:

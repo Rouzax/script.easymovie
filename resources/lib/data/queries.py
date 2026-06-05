@@ -195,6 +195,7 @@ def get_in_progress_movies_query() -> Dict[str, Any]:
             "properties": [
                 "title", "runtime", "resume", "lastplayed",
                 "art", "set", "setid",
+                "genre", "year", "rating", "plot", "mpaa",
             ],
             "filter": {
                 "field": "inprogress",
