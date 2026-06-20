@@ -34,11 +34,6 @@ docs/forum-post.txt
 docs/*.png
 docs/*.svg
 
-# Tests
-tests/
-conftest.py
-pytest.ini
-
 # Dev tooling config
 .pyflakes
 
