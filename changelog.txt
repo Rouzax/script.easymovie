@@ -1,3 +1,30 @@
+v1.2.0 (2026-06-20)
+--------------------------
+New Features:
+  - Movie Info pane in Browse Mode: pressing Info (the I key or the remote
+    Info button) on a focused movie opens Kodi's native movie information
+    screen, fully populated with plot, full cast with photos, director,
+    writer, studio, country, ratings, and artwork. Works in all five view
+    styles. Back out to keep browsing, or play directly from the pane.
+  - Playing from the info pane is recorded as a started movie for the running
+    instance (base addon or clone, each into its own data), so resume and
+    in-progress tracking keep working, then the results window closes to match
+    a normal pick. A solid black backdrop renders behind the pane so the
+    EasyMovie layout does not show through.
+
+Internal:
+  - Added get_movie_full_details_query() (cast, crew, art, file path) feeding
+    the native pane. browse_window._show_native_info() builds a complete
+    ListItem and opens it via xbmcgui.Dialog().info();
+    _record_native_play_if_playing() detects post-pane playback;
+    RESULT_ALREADY_PLAYING tells main.py to exit without replaying.
+  - ACTION_SHOW_INFO (11) added; Info dispatched from BrowseWindow.onAction.
+    Black backdrop added to all five browse-view skins, gated on
+    Window.IsVisible(movieinformation).
+  - The pytest suite (151 tests) is now tracked in version control and excluded
+    from the packaged addon zip. pyright excludes the _temp scratch dir.
+
+
 v1.1.0 (2026-06-05)
 --------------------------
 New Features:
