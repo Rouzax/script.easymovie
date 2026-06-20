@@ -42,6 +42,7 @@ CLAUDE.md
 .claude/
 .claudeignore
 .mcp.json
+.superpowers/
 
 # Worktrees
 .worktrees/
