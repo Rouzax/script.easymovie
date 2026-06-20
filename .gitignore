@@ -30,6 +30,7 @@ build/
 # Development docs (plans, source artwork, drafts)
 IMPLEMENTATION.md
 docs/plans/
+docs/superpowers/
 docs/forum-post.txt
 docs/*.png
 docs/*.svg
