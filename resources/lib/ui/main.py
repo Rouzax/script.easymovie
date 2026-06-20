@@ -42,7 +42,7 @@ from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
 from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog, show_resume_dialog
 from resources.lib.ui.browse_window import (
-    show_browse_window, RESULT_REROLL, RESULT_SURPRISE,
+    show_browse_window, RESULT_REROLL, RESULT_SURPRISE, RESULT_ALREADY_PLAYING,
 )
 from resources.lib.data.queries import (
     get_all_movies_query,
@@ -894,13 +894,19 @@ def _run_browse_mode(
         titles = [m.get("title", "") for m in results]
         log.debug("Presenting movies", event="browse.present",
                   count=len(results), pool=len(available), titles=titles)
-        result = show_browse_window(results, browse_settings.view_style, addon_id)
+        result = show_browse_window(
+            results, browse_settings.view_style, addon_id, storage=storage)
 
         if result == RESULT_REROLL:
             log.info("Re-rolling", event="ui.reroll")
             if playback_settings.show_processing_notifications:
                 notify(lang(32350))
             continue
+        elif result == RESULT_ALREADY_PLAYING:
+            # User pressed Play in the native info pane; movie is already
+            # playing and was recorded. Exit without starting playback again.
+            log.info("Native play from info pane", event="ui.info.native_play")
+            break
         elif result == RESULT_SURPRISE:
             if not results:
                 continue
