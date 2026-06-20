@@ -87,6 +87,14 @@ All views and dialogs use your selected accent color theme. Change via **Setting
 
 Select a movie and press Enter to start playback. If the movie is part of a collection and set awareness is enabled, EasyMovie may suggest an earlier unwatched movie instead (see [Movie Sets](movie-sets.md)).
 
+### Movie Info
+
+With a movie focused, press **I** (keyboard) or the **Info** button (remote) to open Kodi's standard movie information screen - the same details view used throughout Kodi. It shows the full library entry: plot, cast with photos, director, writer, studio, ratings, and artwork. Works in all five view styles.
+
+From the info screen you can back out to return to your results with your place kept, or press **Play** to start the movie directly. Playing from there works the same as selecting a movie normally - EasyMovie records the playback so resume and in-progress tracking still work, and the results window closes.
+
+No setting is required; the Info action is always available.
+
 ### Surprise Me
 
 Can't decide? **Surprise Me** picks a random movie from the current results and starts playing immediately.

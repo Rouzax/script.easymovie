@@ -42,6 +42,29 @@ def get_movie_details_with_art_query(movie_id: int) -> Dict[str, Any]:
     }
 
 
+def get_movie_full_details_query(movie_id: int) -> Dict[str, Any]:
+    """Get a single movie with the full metadata the native info pane shows.
+
+    Used to populate Kodi's DialogVideoInfo, which renders only what the
+    supplied ListItem carries (it does not re-query the library by dbid),
+    so this requests cast and crew on top of the display fields.
+    """
+    return {
+        "jsonrpc": "2.0",
+        "method": "VideoLibrary.GetMovieDetails",
+        "params": {
+            "movieid": movie_id,
+            "properties": [
+                "title", "originaltitle", "genre", "year", "rating", "votes",
+                "runtime", "mpaa", "plot", "plotoutline", "tagline",
+                "director", "writer", "studio", "country", "premiered",
+                "art", "cast", "playcount", "trailer", "set", "file",
+            ],
+        },
+        "id": 1,
+    }
+
+
 def get_all_movie_sets_query() -> Dict[str, Any]:
     """Get all movie sets."""
     return {
