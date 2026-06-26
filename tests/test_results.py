@@ -1,10 +1,15 @@
 """Tests for result selection and sorting."""
-from resources.lib.data.results import select_and_sort_results
 from resources.lib.constants import (
-    SORT_RANDOM, SORT_TITLE, SORT_YEAR, SORT_RATING,
-    SORT_RUNTIME, SORT_DATE_ADDED, SORT_ASC, SORT_DESC,
+    SORT_ASC,
+    SORT_DATE_ADDED,
+    SORT_DESC,
+    SORT_RANDOM,
+    SORT_RATING,
+    SORT_RUNTIME,
+    SORT_TITLE,
+    SORT_YEAR,
 )
-
+from resources.lib.data.results import select_and_sort_results
 
 SAMPLE_MOVIES = [
     {"movieid": 1, "title": "Zebra", "year": 2020, "rating": 7.0, "runtime": 5400, "dateadded": "2024-01-01", "setid": 0, "set": ""},

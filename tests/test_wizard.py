@@ -1,6 +1,6 @@
 """Tests for the filter wizard flow logic."""
-from resources.lib.ui.wizard import WizardFlow
 from resources.lib.constants import FILTER_ASK, FILTER_PRESET, FILTER_SKIP
+from resources.lib.ui.wizard import WizardFlow
 
 
 def test_all_filters_ask():

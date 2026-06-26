@@ -11,11 +11,16 @@ Logging:
     See LOGGING.md for full guidelines.
 """
 import random
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from resources.lib.constants import (
-    SORT_RANDOM, SORT_TITLE, SORT_YEAR, SORT_RATING,
-    SORT_RUNTIME, SORT_DATE_ADDED, SORT_DESC,
+    SORT_DATE_ADDED,
+    SORT_DESC,
+    SORT_RANDOM,
+    SORT_RATING,
+    SORT_RUNTIME,
+    SORT_TITLE,
+    SORT_YEAR,
 )
 from resources.lib.utils import get_logger
 

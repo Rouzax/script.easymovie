@@ -25,41 +25,59 @@ from __future__ import annotations
 import os
 import random
 import sys
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING, Tuple, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, cast
 
 import xbmcvfs
 
 from resources.lib.constants import (
     ADDON_ID,
-    MODE_BROWSE, MODE_PLAYLIST, MODE_ASK,
+    MODE_ASK,
+    MODE_BROWSE,
+    MODE_PLAYLIST,
     PROP_PLAYLIST_RUNNING,
     RESURFACE_WINDOWS,
 )
-from resources.lib.utils import (
-    get_logger, invalidate_icon_cache, json_query, notify, log_timing, lang,
+from resources.lib.data.filters import apply_filters, filter_by_playlist_ids
+from resources.lib.data.movie_sets import apply_set_substitutions
+from resources.lib.data.queries import (
+    get_all_movies_query,
+    get_in_progress_movies_query,
+    get_movie_details_with_art_query,
+    get_movie_set_details_query,
+)
+from resources.lib.data.results import select_and_sort_results
+from resources.lib.data.smart_playlists import extract_movie_ids_from_playlist
+from resources.lib.data.storage import StorageManager
+from resources.lib.ui.browse_window import (
+    RESULT_ALREADY_PLAYING,
+    RESULT_REROLL,
+    RESULT_SURPRISE,
+    show_browse_window,
+)
+from resources.lib.ui.dialogs import (
+    show_confirm_dialog,
+    show_resume_dialog,
+    show_select_dialog,
 )
 from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
-from resources.lib.ui.dialogs import show_confirm_dialog, show_select_dialog, show_resume_dialog
-from resources.lib.ui.browse_window import (
-    show_browse_window, RESULT_REROLL, RESULT_SURPRISE, RESULT_ALREADY_PLAYING,
+from resources.lib.utils import (
+    get_logger,
+    invalidate_icon_cache,
+    json_query,
+    lang,
+    log_timing,
+    notify,
 )
-from resources.lib.data.queries import (
-    get_all_movies_query,
-    get_movie_details_with_art_query,
-    get_movie_set_details_query,
-    get_in_progress_movies_query,
-)
-from resources.lib.data.filters import apply_filters, filter_by_playlist_ids
-from resources.lib.data.smart_playlists import extract_movie_ids_from_playlist
-from resources.lib.data.movie_sets import apply_set_substitutions
-from resources.lib.data.results import select_and_sort_results
-from resources.lib.data.storage import StorageManager
 
 if TYPE_CHECKING:
     from resources.lib.ui.settings import (
-        FilterSettings, BrowseSettings, PlaylistSettings,
-        SetSettings, PlaybackSettings, AdvancedSettings,
+        AdvancedSettings,
+        BrowseSettings,
+        FilterSettings,
+        PlaybackSettings,
+        PlaylistSettings,
+        SetSettings,
     )
 
 _active_monitors = []  # Keep references to prevent GC
@@ -382,7 +400,7 @@ def _check_in_progress(
     storage: Optional['StorageManager'] = None,
 ) -> bool:
     """Check for in-progress movies started by EasyMovie and offer to resume."""
-    from resources.lib.playback.player import play_movie, get_resume_info
+    from resources.lib.playback.player import get_resume_info, play_movie
     result = json_query(get_in_progress_movies_query())
     movies = result.get("movies", [])
     if not movies:
@@ -568,12 +586,12 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
                 cumulative_counts: bool = False,
                 exclude_ids: Optional[set] = None) -> Optional[Any]:
     """Run the wizard flow, returning a FilterConfig or None if cancelled."""
-    from resources.lib.data.filters import (
-        extract_unique_genres, extract_unique_mpaa,
-    )
     from resources.lib.constants import RUNTIME_RANGES, SCORE_RANGES
-
     from resources.lib.data.filters import apply_filters as _apply_filters
+    from resources.lib.data.filters import (
+        extract_unique_genres,
+        extract_unique_mpaa,
+    )
 
     def _count_pool() -> list:
         """Get the movie pool for counting — full or cumulative."""
@@ -687,9 +705,10 @@ def _run_wizard(log, wizard: WizardFlow, all_movies: list,
 
         elif filter_type == "year":
             # Combined recency + decade picker
-            from resources.lib.data.filters import extract_decade_buckets
-            from resources.lib.constants import RECENCY_RANGES
             import datetime
+
+            from resources.lib.constants import RECENCY_RANGES
+            from resources.lib.data.filters import extract_decade_buckets
 
             current_year = datetime.datetime.now().year
             pool = _count_pool()
@@ -950,8 +969,8 @@ def _run_playlist_mode(
     addon_id: str,
 ) -> None:
     """Run playlist mode."""
-    from resources.lib.playback.playlist_builder import build_and_play_playlist
     from resources.lib.playback.playback_monitor import PlaybackMonitor
+    from resources.lib.playback.playlist_builder import build_and_play_playlist
     # Select and sort
     results = select_and_sort_results(
         filtered, playlist_settings.movie_count,
@@ -1041,9 +1060,10 @@ def _handle_entry_args(addon_id: str) -> bool:
         dialog_preview.Main(override)
         return True
     elif action == 'set_icon':
-        from resources.lib.utils import get_addon
-        import xbmcvfs as _xbmcvfs
         import xbmcgui
+        import xbmcvfs as _xbmcvfs
+
+        from resources.lib.utils import get_addon
         log = get_logger('default')
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
@@ -1091,9 +1111,10 @@ def _handle_entry_args(addon_id: str) -> bool:
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':
-        from resources.lib.utils import get_addon
-        from resources.lib.constants import CUSTOM_ICON_BACKUP
         import xbmcvfs as _xbmcvfs
+
+        from resources.lib.constants import CUSTOM_ICON_BACKUP
+        from resources.lib.utils import get_addon
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
         default_icon = os.path.join(addon_path, 'icon_default.png')

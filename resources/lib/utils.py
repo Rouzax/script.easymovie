@@ -28,16 +28,15 @@ import xbmcvfs
 
 from resources.lib.constants import (
     ADDON_ID,
+    LOG_BACKUP_COUNT,
     LOG_DIR,
     LOG_FILENAME,
     LOG_MAX_BYTES,
-    LOG_BACKUP_COUNT,
     LOG_MAX_VALUE_LENGTH,
     LOG_TIMESTAMP_FORMAT,
     LOG_TIMESTAMP_TRIM,
     NOTIFICATION_DURATION_MS,
 )
-
 
 # Singleton addon instance
 _addon: Optional[xbmcaddon.Addon] = None

@@ -16,7 +16,9 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from resources.lib.constants import (
-    FILTER_ASK, FILTER_PRESET, FILTER_SKIP,
+    FILTER_ASK,
+    FILTER_PRESET,
+    FILTER_SKIP,
     WATCHED_BOTH,
     YEAR_FILTER_RECENCY,
 )

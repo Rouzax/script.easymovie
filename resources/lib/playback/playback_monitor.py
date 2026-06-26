@@ -20,8 +20,8 @@ import threading
 from typing import Any, Dict, Optional, cast
 
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 from resources.lib.constants import (
     ACTION_NAV_BACK,
@@ -29,9 +29,9 @@ from resources.lib.constants import (
     ADDON_ID,
     CONTINUATION_DEFAULT_CONTINUE_SET,
 )
-from resources.lib.utils import get_logger, json_query, lang
-from resources.lib.data.queries import build_add_movie_query
 from resources.lib.data.movie_sets import get_next_in_set
+from resources.lib.data.queries import build_add_movie_query
+from resources.lib.utils import get_logger, json_query, lang
 
 # Control IDs for the continuation dialog
 CONT_HEADING = 1

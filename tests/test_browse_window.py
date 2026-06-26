@@ -3,12 +3,11 @@ import xbmc
 import xbmcgui
 
 import resources.lib.ui.context_menu as cm
-
 from resources.lib.constants import ACTION_CONTEXT_MENU, ACTION_SHOW_INFO
 from resources.lib.ui import browse_window as bw
 from resources.lib.ui.browse_window import (
-    BrowseWindow,
     RESULT_ALREADY_PLAYING,
+    BrowseWindow,
     show_browse_window,
 )
 

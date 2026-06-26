@@ -1,17 +1,17 @@
 """Tests for JSON-RPC query builders."""
 from resources.lib.data.queries import (
+    build_add_movie_query,
+    build_play_movie_query,
+    build_play_playlist_query,
+    build_playlist_get_movies_query,
+    get_all_movie_sets_query,
     get_all_movies_query,
+    get_clear_video_playlist_query,
+    get_in_progress_movies_query,
     get_movie_details_with_art_query,
     get_movie_full_details_query,
-    get_all_movie_sets_query,
     get_movie_set_details_query,
-    get_clear_video_playlist_query,
-    build_add_movie_query,
-    build_play_playlist_query,
-    build_play_movie_query,
-    get_in_progress_movies_query,
     get_playing_item_query,
-    build_playlist_get_movies_query,
 )
 
 

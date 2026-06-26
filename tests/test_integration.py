@@ -66,9 +66,9 @@ class TestFilterIntegration:
 
     def test_filter_then_sort_pipeline(self):
         """Filtering + sorting produces valid results."""
+        from resources.lib.constants import SORT_ASC, SORT_TITLE
         from resources.lib.data.filters import FilterConfig, apply_filters
         from resources.lib.data.results import select_and_sort_results
-        from resources.lib.constants import SORT_TITLE, SORT_ASC
 
         config = FilterConfig(
             genres=["Action", "Drama"],
@@ -141,11 +141,15 @@ class TestWizardFilterConfigIntegration:
 
     def test_wizard_answers_to_filter_to_results(self):
         """Full pipeline: wizard answers → FilterConfig → apply → results."""
-        from resources.lib.constants import FILTER_ASK, FILTER_SKIP
-        from resources.lib.ui.wizard import WizardFlow
+        from resources.lib.constants import (
+            FILTER_ASK,
+            FILTER_SKIP,
+            SORT_DESC,
+            SORT_RATING,
+        )
         from resources.lib.data.filters import apply_filters
         from resources.lib.data.results import select_and_sort_results
-        from resources.lib.constants import SORT_RATING, SORT_DESC
+        from resources.lib.ui.wizard import WizardFlow
 
         settings = {
             "genre_mode": FILTER_ASK,
@@ -174,8 +178,8 @@ class TestPlaylistIntegration:
 
     def test_playlist_mode_selects_correct_count(self):
         """Playlist mode respects movie count setting."""
+        from resources.lib.constants import SORT_ASC, SORT_RANDOM
         from resources.lib.data.results import select_and_sort_results
-        from resources.lib.constants import SORT_RANDOM, SORT_ASC
 
         results = select_and_sort_results(
             SAMPLE_MOVIES, count=2,
@@ -185,8 +189,8 @@ class TestPlaylistIntegration:
 
     def test_reroll_produces_different_order(self):
         """Re-roll can produce different results (probabilistic)."""
+        from resources.lib.constants import SORT_ASC, SORT_RANDOM
         from resources.lib.data.results import select_and_sort_results
-        from resources.lib.constants import SORT_RANDOM, SORT_ASC
 
         # With 3 movies and count=3, order may differ
         large_pool = SAMPLE_MOVIES * 10  # 30 movies

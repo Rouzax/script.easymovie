@@ -18,8 +18,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union, cast
 
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 dialog = xbmcgui.Dialog()
 
@@ -98,11 +98,11 @@ def _fetch_set_pair() -> Dict[str, Any]:
     if _cached_set_pair is not None:
         return _cached_set_pair
 
-    from resources.lib.utils import json_query
     from resources.lib.data.queries import (
         get_all_movie_sets_query,
         get_movie_set_details_query,
     )
+    from resources.lib.utils import json_query
 
     # Find a set with at least 2 movies
     sets_result = json_query(get_all_movie_sets_query())
@@ -240,11 +240,14 @@ def preview_browse() -> None:
                    "Browse preview requires a populated movie library.")
         return
 
-    from resources.lib.ui.browse_window import BrowseWindow, VIEW_XML_MAP
     from resources.lib.constants import (
-        VIEW_SHOWCASE, VIEW_CARD_LIST, VIEW_POSTERS,
-        VIEW_BIG_SCREEN, VIEW_SPLIT_VIEW,
+        VIEW_BIG_SCREEN,
+        VIEW_CARD_LIST,
+        VIEW_POSTERS,
+        VIEW_SHOWCASE,
+        VIEW_SPLIT_VIEW,
     )
+    from resources.lib.ui.browse_window import VIEW_XML_MAP, BrowseWindow
 
     view_names = [
         "Showcase",

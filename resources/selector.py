@@ -27,10 +27,10 @@ from typing import Optional
 import xbmcaddon
 import xbmcvfs
 
-from resources.lib.utils import get_logger, json_query, lang
-from resources.lib.data.queries import get_all_movies_query, get_playlist_files_query
 from resources.lib.data.filters import extract_unique_genres, extract_unique_mpaa
+from resources.lib.data.queries import get_all_movies_query, get_playlist_files_query
 from resources.lib.ui.dialogs import show_select_dialog
+from resources.lib.utils import get_logger, json_query, lang
 
 log = get_logger('selector')
 

@@ -1,5 +1,11 @@
 """Tests for the movie filter engine."""
-from resources.lib.data.filters import FilterConfig, apply_filters, extract_unique_genres, extract_unique_mpaa, filter_by_playlist_ids
+from resources.lib.data.filters import (
+    FilterConfig,
+    apply_filters,
+    extract_unique_genres,
+    extract_unique_mpaa,
+    filter_by_playlist_ids,
+)
 
 # Sample movie data matching Kodi JSON-RPC response format
 SAMPLE_MOVIES = [

@@ -16,11 +16,11 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 from resources.lib.constants import (
     ACTION_CONTEXT_MENU,
@@ -31,10 +31,10 @@ from resources.lib.constants import (
     ADDON_ID,
     THEME_COLORS,
     THEME_NAMES,
-    VIEW_SHOWCASE,
+    VIEW_BIG_SCREEN,
     VIEW_CARD_LIST,
     VIEW_POSTERS,
-    VIEW_BIG_SCREEN,
+    VIEW_SHOWCASE,
     VIEW_SPLIT_VIEW,
 )
 from resources.lib.data.queries import get_movie_full_details_query
@@ -316,7 +316,9 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             movie = self._get_focused_movie()
             if movie:
                 from resources.lib.ui.context_menu import (
-                    show_context_menu, CONTEXT_PLAY, CONTEXT_PLAY_SET,
+                    CONTEXT_PLAY,
+                    CONTEXT_PLAY_SET,
+                    show_context_menu,
                 )
                 result = show_context_menu(movie, self._addon_id)
                 if result == CONTEXT_PLAY:

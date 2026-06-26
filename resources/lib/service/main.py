@@ -21,8 +21,8 @@ import xbmcaddon
 import xbmcvfs
 
 from resources.lib.constants import CUSTOM_ICON_BACKUP
-from resources.lib.utils import get_logger, invalidate_icon_cache
 from resources.lib.service.playback_monitor import MoviePlaybackMonitor
+from resources.lib.utils import get_logger, invalidate_icon_cache
 
 
 def _get_device_name() -> str:

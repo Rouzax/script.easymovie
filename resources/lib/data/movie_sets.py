@@ -12,7 +12,7 @@ Logging:
         - continuation.next_found (DEBUG): Next movie in set identified
     See LOGGING.md for full guidelines.
 """
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from resources.lib.utils import get_logger
 

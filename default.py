@@ -10,7 +10,7 @@ Logging:
         - launch.crash (ERROR): Unhandled error caught at top level
     See LOGGING.md for full guidelines.
 """
-from resources.lib.ui.main import main, _handle_entry_args
+from resources.lib.ui.main import _handle_entry_args, main
 
 try:
     if not _handle_entry_args("script.easymovie"):
@@ -24,6 +24,7 @@ except Exception:
         log.exception("Unhandled error in EasyMovie", event="launch.crash")
     except Exception:
         import traceback
+
         import xbmc
         xbmc.log(
             f"[EasyMovie] Unhandled error: {traceback.format_exc()}",

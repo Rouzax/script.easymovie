@@ -15,16 +15,23 @@ import json
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from resources.lib.utils import get_bool_setting, get_int_setting, get_string_setting, get_logger
 from resources.lib.constants import (
-    FILTER_ASK, FILTER_SKIP,
+    CONTINUATION_DEFAULT_CONTINUE_SET,
+    FILTER_ASK,
+    FILTER_SKIP,
+    MODE_ASK,
+    SORT_DESC,
+    SORT_RANDOM,
+    THEME_GOLDEN_HOUR,
+    VIEW_SHOWCASE,
     WATCHED_UNWATCHED,
     YEAR_FILTER_AFTER,
-    VIEW_SHOWCASE,
-    SORT_RANDOM, SORT_DESC,
-    CONTINUATION_DEFAULT_CONTINUE_SET,
-    MODE_ASK,
-    THEME_GOLDEN_HOUR,
+)
+from resources.lib.utils import (
+    get_bool_setting,
+    get_int_setting,
+    get_logger,
+    get_string_setting,
 )
 
 log = get_logger('ui')

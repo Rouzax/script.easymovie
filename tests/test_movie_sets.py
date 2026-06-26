@@ -1,11 +1,10 @@
 """Tests for movie set awareness logic."""
 from resources.lib.data.movie_sets import (
+    apply_set_substitutions,
     find_first_unwatched_before,
     find_first_unwatched_in_set,
-    apply_set_substitutions,
     get_next_in_set,
 )
-
 
 # Simulated set data (sorted by year, as Kodi returns)
 HP_SET = {

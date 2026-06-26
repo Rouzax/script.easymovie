@@ -1,5 +1,6 @@
 """Tests for persistent storage manager."""
 import pytest
+
 from resources.lib.data.storage import StorageManager
 
 

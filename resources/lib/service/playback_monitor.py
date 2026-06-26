@@ -31,13 +31,13 @@ from resources.lib.constants import (
     PLAYER_STOP_DELAY_MS,
     PROP_PLAYLIST_RUNNING,
 )
-from resources.lib.utils import get_bool_setting, get_logger, json_query, lang
+from resources.lib.data.movie_sets import find_first_unwatched_before
 from resources.lib.data.queries import (
     get_movie_details_with_art_query,
     get_movie_set_details_query,
 )
-from resources.lib.data.movie_sets import find_first_unwatched_before
 from resources.lib.playback.playback_monitor import ContinuationDialog
+from resources.lib.utils import get_bool_setting, get_logger, json_query, lang
 
 log = get_logger('service')
 

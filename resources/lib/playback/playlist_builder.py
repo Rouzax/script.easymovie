@@ -13,7 +13,7 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import xbmc
 
@@ -21,12 +21,12 @@ if TYPE_CHECKING:
     from resources.lib.data.storage import StorageManager
 
 from resources.lib.constants import PLAYLIST_ADD_DELAY_MS
-from resources.lib.utils import get_logger, json_query, notify
 from resources.lib.data.queries import (
-    get_clear_video_playlist_query,
     build_add_movie_query,
     build_play_playlist_query,
+    get_clear_video_playlist_query,
 )
+from resources.lib.utils import get_logger, json_query, notify
 
 # Module-level logger
 log = get_logger('playback')

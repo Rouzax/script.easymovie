@@ -13,14 +13,14 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 if TYPE_CHECKING:
     from resources.lib.data.storage import StorageManager
 
 from resources.lib.constants import RESUME_REWIND_SECONDS
-from resources.lib.utils import get_logger, json_query
 from resources.lib.data.queries import build_play_movie_query
+from resources.lib.utils import get_logger, json_query
 
 # Module-level logger
 log = get_logger('playback')

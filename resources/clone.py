@@ -44,8 +44,8 @@ import xbmcgui
 import xbmcvfs
 
 from resources.lib.constants import ADDON_ID, ADDON_NAME
-from resources.lib.utils import get_logger, lang
 from resources.lib.ui.dialogs import show_confirm_dialog
+from resources.lib.utils import get_logger, lang
 
 log = get_logger('clone')
 
