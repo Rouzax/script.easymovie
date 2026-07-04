@@ -15,7 +15,12 @@ Logging:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
+
+import xbmcgui
+
+from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
+from resources.lib.utils import get_logger, lang
 
 # Language string ids (see strings.po)
 STR_GENRE = 32012
@@ -24,6 +29,9 @@ STR_YEAR = 32516
 STR_RATING = 32517
 STR_RUNTIME = 32518
 STR_RATED = 32717
+
+# Module-level logger
+log = get_logger('ui')
 
 
 def format_runtime(seconds: int) -> str:
@@ -89,3 +97,94 @@ def build_cast_items(cast: List[Dict[str, Any]],
         items.append((member.get("name", ""), member.get("role", ""),
                       member.get("thumbnail", "")))
     return items
+
+
+# Control ids (match script-easymovie-info.xml)
+INFO_TITLE = 2
+INFO_TAGLINE = 5
+INFO_PLOT = 6
+INFO_PLAY = 10
+INFO_POSTER = 20
+INFO_FANART = 40
+INFO_CAST_LIST = 100
+INFO_META_LIST = 500
+
+INFO_RESULT_PLAY = "__info_play__"
+
+
+class InfoDialog(xbmcgui.WindowXMLDialog):
+    """Fullscreen movie info dialog rendered from full movie details."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._addon_id: str = ADDON_ID
+        self.movie: Dict[str, Any] = {}
+        self.details: Dict[str, Any] = {}
+        self.result: Optional[str] = None
+
+    def onInit(self) -> None:
+        from resources.lib.ui import apply_theme
+        apply_theme(self, self._addon_id)
+        d = self.details
+        art = d.get("art", {}) or {}
+
+        fanart = art.get("fanart", "")
+        if fanart:
+            cast(xbmcgui.ControlImage, self.getControl(INFO_FANART)).setImage(fanart)
+        poster = art.get("poster", "") or art.get("thumb", "")
+        if poster:
+            cast(xbmcgui.ControlImage, self.getControl(INFO_POSTER)).setImage(poster)
+        cast(xbmcgui.ControlLabel, self.getControl(INFO_TITLE)).setLabel(
+            d.get("title", ""))
+        cast(xbmcgui.ControlLabel, self.getControl(INFO_TAGLINE)).setLabel(
+            d.get("tagline", ""))
+        cast(xbmcgui.ControlTextBox, self.getControl(INFO_PLOT)).setText(
+            d.get("plot", ""))
+
+        meta = cast(xbmcgui.ControlList, self.getControl(INFO_META_LIST))
+        meta.reset()
+        for string_id, value in build_metadata_rows(d):
+            li = xbmcgui.ListItem(lang(string_id, self._addon_id))
+            li.setLabel2(value)
+            meta.addItem(li)
+
+        cast_list = cast(xbmcgui.ControlList, self.getControl(INFO_CAST_LIST))
+        cast_list.reset()
+        for name, role, thumb in build_cast_items(d.get("cast", [])):
+            li = xbmcgui.ListItem(name)
+            li.setLabel2(role)
+            if thumb:
+                li.setArt({"thumb": thumb})
+            cast_list.addItem(li)
+
+        cast(xbmcgui.ControlButton, self.getControl(INFO_PLAY)).setLabel(
+            lang(STR_PLAY, self._addon_id))
+
+        log.info("Info dialog opened", event="ui.info.open",
+                 title=d.get("title", ""), movieid=self.movie.get("movieid", 0))
+        self.setFocus(self.getControl(INFO_PLAY))
+
+    def onClick(self, controlId: int) -> None:
+        if controlId == INFO_PLAY:
+            self.result = INFO_RESULT_PLAY
+            log.info("Play from info dialog", event="ui.info.play",
+                     movieid=self.movie.get("movieid", 0))
+            self.close()
+
+    def onAction(self, action) -> None:
+        if action.getId() in (ACTION_NAV_BACK, ACTION_PREVIOUS_MENU):
+            self.result = None
+            self.close()
+
+
+def show_info_dialog(movie: Dict[str, Any], details: Dict[str, Any],
+                     addon_id: str = ADDON_ID) -> Optional[str]:
+    """Show the info dialog. Returns INFO_RESULT_PLAY if Play was pressed."""
+    import xbmcaddon
+    path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
+    dialog = InfoDialog('script-easymovie-info.xml', path, 'Default', '1080i')
+    dialog._addon_id = addon_id
+    dialog.movie = movie
+    dialog.details = details
+    dialog.doModal()
+    return dialog.result

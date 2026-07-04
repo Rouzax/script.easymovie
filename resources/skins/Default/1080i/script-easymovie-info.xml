@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    EasyMovie Info Dialog (fullscreen)
+    Resolution: 1080i (1920x1080)
+
+    Control IDs:
+        2   - Title label
+        5   - Tagline label
+        6   - Plot textbox
+        10  - Play button
+        20  - Poster image
+        40  - Fanart background image
+        100 - Cast strip list (display-only)
+        500 - Metadata list (display-only, label:value)
+-->
+<window>
+    <zorder>1</zorder>
+    <defaultcontrol always="true">10</defaultcontrol>
+    <controls>
+        <!-- Opaque black base: browse window never shows through (fanart may be empty) -->
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <texture colordiffuse="FF000000">common/white.png</texture>
+        </control>
+        <!-- Fanart background, above the black base -->
+        <control type="image" id="40">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <aspectratio>scale</aspectratio>
+            <texture background="true">-</texture>
+            <animation type="WindowOpen" reversible="false">
+                <effect type="fade" start="0" end="100" time="300" />
+            </animation>
+        </control>
+        <!-- Dim over fanart for readability (70%, fanart still reads through) -->
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <texture colordiffuse="B3000000">common/white.png</texture>
+        </control>
+
+        <!-- Poster with accent border -->
+        <control type="group">
+            <left>80</left><top>200</top>
+            <control type="image">
+                <left>-3</left><top>-3</top><width>406</width><height>606</height>
+                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+            </control>
+            <control type="image" id="20">
+                <left>0</left><top>0</top><width>400</width><height>600</height>
+                <aspectratio>keep</aspectratio>
+                <texture background="true">-</texture>
+            </control>
+        </control>
+
+        <!-- Title -->
+        <control type="label" id="2">
+            <left>560</left><top>120</top><width>1120</width><height>50</height>
+            <font>font14_title</font>
+            <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+            <label>-</label>
+        </control>
+        <!-- Tagline -->
+        <control type="label" id="5">
+            <left>560</left><top>178</top><width>1120</width><height>28</height>
+            <font>font10</font>
+            <textcolor>FFAAAAAA</textcolor>
+            <label></label>
+        </control>
+        <!-- Accent separator under title -->
+        <control type="image">
+            <left>560</left><top>212</top><width>1120</width><height>2</height>
+            <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+        </control>
+
+        <!-- Cast strip (display-only list) -->
+        <control type="list" id="100">
+            <left>560</left><top>236</top><width>1120</width><height>210</height>
+            <orientation>horizontal</orientation>
+            <itemgap>16</itemgap>
+            <!-- display-only: enable=false removes it from focus navigation (CanFocus); it still renders -->
+            <enable>false</enable>
+            <itemlayout width="150" height="210">
+                <control type="image">
+                    <left>0</left><top>0</top><width>150</width><height>150</height>
+                    <texture border="8" colordiffuse="1fFFFFFF">common/white_rounded.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left><top>0</top><width>150</width><height>150</height>
+                    <aspectratio>scale</aspectratio>
+                    <texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+                </control>
+                <control type="label">
+                    <left>0</left><top>152</top><width>150</width><height>26</height>
+                    <font>font10</font><align>center</align>
+                    <textcolor>FFCCCCCC</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>0</left><top>178</top><width>150</width><height>24</height>
+                    <font>font10</font><align>center</align>
+                    <textcolor>FF888888</textcolor>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="150" height="210" />
+        </control>
+
+        <!-- Plot -->
+        <control type="textbox" id="6">
+            <left>560</left><top>470</top><width>760</width><height>400</height>
+            <font>font12</font>
+            <textcolor>FFCCCCCC</textcolor>
+            <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
+        </control>
+
+        <!-- Metadata column (display-only label:value list) -->
+        <control type="list" id="500">
+            <left>1360</left><top>470</top><width>480</width><height>400</height>
+            <orientation>vertical</orientation>
+            <itemgap>6</itemgap>
+            <!-- display-only: enable=false removes it from focus navigation (CanFocus); it still renders -->
+            <enable>false</enable>
+            <itemlayout width="480" height="40">
+                <control type="label">
+                    <left>0</left><top>0</top><width>170</width><height>40</height>
+                    <font>font10</font><aligny>center</aligny>
+                    <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>180</left><top>0</top><width>300</width><height>40</height>
+                    <font>font10</font><aligny>center</aligny>
+                    <textcolor>FFAAAAAA</textcolor>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="480" height="40" />
+        </control>
+
+        <!-- Button row (Play only, centered on screen) -->
+        <control type="grouplist">
+            <left>80</left><top>980</top><width>1760</width><height>50</height>
+            <itemgap>30</itemgap>
+            <align>center</align>
+            <orientation>horizontal</orientation>
+            <control type="button" id="10">
+                <width>200</width><height>50</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font12</font><textoffsetx>10</textoffsetx>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
+                <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
+                <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+            </control>
+        </control>
+    </controls>
+</window>

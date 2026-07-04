@@ -1,10 +1,13 @@
 """Tests for the custom movie info dialog."""
 from resources.lib.ui.info_dialog import (
+    INFO_PLAY,
+    INFO_RESULT_PLAY,
     STR_GENRE,
     STR_RATED,
     STR_RATING,
     STR_RUNTIME,
     STR_YEAR,
+    InfoDialog,
     build_cast_items,
     build_metadata_rows,
     format_certification,
@@ -79,3 +82,36 @@ def test_build_cast_items_limits_and_maps():
     assert build_cast_items(cast, limit=1) == [("A", "Hero", "img://a")]
     assert build_cast_items(cast, limit=10) == [
         ("A", "Hero", "img://a"), ("B", "", "")]
+
+
+def _make_dialog():
+    """Construct an InfoDialog without doModal (Kodistubs allow this)."""
+    d = InfoDialog("script-easymovie-info.xml", "/tmp", "Default", "1080i")
+    d._addon_id = "script.easymovie"
+    d.movie = {"movieid": 1, "title": "T"}
+    d.details = {"title": "T", "year": 2024, "rating": 7.5, "votes": "10",
+                 "runtime": 6000, "mpaa": "Rated R", "genre": ["Action"],
+                 "plot": "P", "tagline": "tag", "trailer": "", "art": {},
+                 "cast": []}
+    return d
+
+
+def test_play_button_sets_play_result(monkeypatch):
+    d = _make_dialog()
+    closed = {"v": False}
+    monkeypatch.setattr(d, "close", lambda: closed.__setitem__("v", True))
+    d.onClick(INFO_PLAY)
+    assert d.result == INFO_RESULT_PLAY
+    assert closed["v"] is True
+
+
+def test_back_leaves_no_play_result(monkeypatch):
+    d = _make_dialog()
+    monkeypatch.setattr(d, "close", lambda: None)
+
+    class _A:
+        def getId(self):
+            return 92  # ACTION_NAV_BACK
+
+    d.onAction(_A())
+    assert d.result is None
