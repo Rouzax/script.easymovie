@@ -25,6 +25,7 @@ from resources.lib.constants import (
     ACTION_PREVIOUS_MENU,
     ADDON_ID,
 )
+from resources.lib.ui.skin_fonts import ensure_generated
 from resources.lib.utils import get_logger
 
 # Control IDs matching the XML files
@@ -52,10 +53,11 @@ RESUME_POSTER = 20
 log = get_logger('ui')
 
 
-def _get_addon_path() -> str:
-    """Get the addon root path (Kodi resolves the skin subdirectory)."""
-    import xbmcaddon
-    return xbmcaddon.Addon(ADDON_ID).getAddonInfo('path')
+def _get_addon_path(addon_id: Optional[str] = None) -> str:
+    """Get the (skin-adapted) addon root path (Kodi resolves the skin
+    subdirectory). Threads `addon_id` so clones generate into and read
+    from their own addon_data cache instead of the base addon's."""
+    return ensure_generated(addon_id or ADDON_ID)
 
 
 class SelectDialog(xbmcgui.WindowXMLDialog):
@@ -284,7 +286,7 @@ def show_select_dialog(
               multi_select=multi_select)
     dialog = SelectDialog(
         'script-easymovie-select.xml',
-        _get_addon_path(),
+        _get_addon_path(addon_id),
         'Default', '1080i'
     )
     dialog._addon_id = addon_id or ADDON_ID
@@ -332,7 +334,7 @@ def show_confirm_dialog(
               heading=heading)
     dialog = ConfirmDialog(
         'script-easymovie-confirm.xml',
-        _get_addon_path(),
+        _get_addon_path(addon_id),
         'Default', '1080i'
     )
     dialog._addon_id = addon_id or ADDON_ID
@@ -417,7 +419,7 @@ def show_resume_dialog(
               heading=heading, title=title)
     dialog = ResumeDialog(
         'script-easymovie-resume.xml',
-        _get_addon_path(),
+        _get_addon_path(addon_id),
         'Default', '1080i'
     )
     dialog._addon_id = addon_id or ADDON_ID

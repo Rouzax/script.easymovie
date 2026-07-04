@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import xbmcgui
 
 from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
+from resources.lib.ui.skin_fonts import ensure_generated
 from resources.lib.utils import get_logger, lang
 
 # Language string ids (see strings.po)
@@ -184,8 +185,7 @@ class InfoDialog(xbmcgui.WindowXMLDialog):
 def show_info_dialog(movie: Dict[str, Any], details: Dict[str, Any],
                      addon_id: str = ADDON_ID) -> Optional[str]:
     """Show the info dialog. Returns INFO_RESULT_PLAY if Play was pressed."""
-    import xbmcaddon
-    path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
+    path = ensure_generated(addon_id)
     dialog = InfoDialog('script-easymovie-info.xml', path, 'Default', '1080i')
     dialog._addon_id = addon_id
     dialog.movie = movie

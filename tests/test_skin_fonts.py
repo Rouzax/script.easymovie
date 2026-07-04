@@ -1,4 +1,5 @@
 """Tests for skin-adaptive font mapping."""
+import resources.lib.ui.info_dialog as idlg
 import resources.lib.ui.skin_fonts as sf
 from resources.lib.ui.skin_fonts import (
     ANCHOR_SIZES,
@@ -173,3 +174,21 @@ def test_ensure_generated_fallback_never_raises(monkeypatch):
 def test_ensure_generated_rejects_bad_addon_id(monkeypatch):
     monkeypatch.setattr(sf, "_safe_shipped", lambda a: "/ship")
     assert sf.ensure_generated("../evil") == "/ship"
+
+
+def test_show_info_dialog_uses_generated_scriptpath(monkeypatch):
+    captured = {}
+
+    class _FakeDialog:
+        def __init__(self, xml, path, skin, res):
+            captured["path"] = path
+        def __setattr__(self, k, v):
+            object.__setattr__(self, k, v)
+        def doModal(self):
+            pass
+        result = None
+
+    monkeypatch.setattr(idlg, "InfoDialog", _FakeDialog)
+    monkeypatch.setattr(idlg, "ensure_generated", lambda addon_id: "/gen/base")
+    idlg.show_info_dialog({"movieid": 1}, {"title": "T"}, "script.easymovie")
+    assert captured["path"] == "/gen/base"

@@ -155,7 +155,8 @@ class MoviePlaybackMonitor(xbmc.Player):
             return
 
         # Build dialog
-        addon_path = xbmcaddon.Addon(ADDON_ID).getAddonInfo('path')
+        from resources.lib.ui.skin_fonts import ensure_generated
+        addon_path = ensure_generated(ADDON_ID)
 
         # Get poster art
         art = earlier_movie.get("art", {})

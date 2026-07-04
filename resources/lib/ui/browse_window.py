@@ -263,7 +263,8 @@ def show_browse_window(
         Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
     """
     xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_SHOWCASE])
-    addon_path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
+    from resources.lib.ui.skin_fonts import ensure_generated
+    addon_path = ensure_generated(addon_id)
 
     window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
     window.set_movies(movies)

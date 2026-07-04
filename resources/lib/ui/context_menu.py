@@ -100,8 +100,8 @@ def show_context_menu(
     Returns:
         CONTEXT_PLAY, CONTEXT_PLAY_SET, or None.
     """
-    import xbmcaddon
-    addon_path = xbmcaddon.Addon(addon_id or ADDON_ID).getAddonInfo('path')
+    from resources.lib.ui.skin_fonts import ensure_generated
+    addon_path = ensure_generated(addon_id or ADDON_ID)
 
     dialog = ContextMenuWindow(
         'script-easymovie-contextwindow.xml',

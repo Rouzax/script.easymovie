@@ -253,7 +253,8 @@ class PlaybackMonitor(xbmc.Player):
                  set_name=set_details.get("title", ""))
 
         # Show continuation dialog
-        addon_path = xbmcaddon.Addon(self._addon_id).getAddonInfo('path')
+        from resources.lib.ui.skin_fonts import ensure_generated
+        addon_path = ensure_generated(self._addon_id)
 
         finished_title = movie.get("title", "")
         next_title = next_movie.get("title", "")
