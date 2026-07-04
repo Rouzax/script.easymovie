@@ -47,5 +47,8 @@ CLAUDE.md
 .mcp.json
 .superpowers/
 
+# Local working notes
+todo.md
+
 # Worktrees
 .worktrees/
