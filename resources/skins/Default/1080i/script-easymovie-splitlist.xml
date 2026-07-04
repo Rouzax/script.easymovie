@@ -80,7 +80,7 @@
                         <top>0</top>
                         <width>730</width>
                         <height>40</height>
-                        <font>font14_title</font>
+                        <font>font36_title</font>
                         <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                         <label>$INFO[Window.Property(EasyMovie.AddonName)]</label>
                     </control>
