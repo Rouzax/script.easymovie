@@ -50,74 +50,97 @@
 
         <!-- Poster with accent border -->
         <control type="group">
-            <left>80</left><top>200</top>
+            <left>80</left><top>165</top>
             <control type="image">
                 <left>-3</left><top>-3</top><width>406</width><height>606</height>
                 <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
             </control>
             <control type="image" id="20">
                 <left>0</left><top>0</top><width>400</width><height>600</height>
-                <aspectratio>keep</aspectratio>
+                <aspectratio>scale</aspectratio>
                 <texture background="true">-</texture>
             </control>
         </control>
 
-        <!-- Title -->
+        <!-- Title (full-width header, aligned to the poster's left edge) -->
         <control type="label" id="2">
-            <left>560</left><top>120</top><width>1120</width><height>50</height>
+            <left>80</left><top>40</top><width>1760</width><height>50</height>
             <font>font14_title</font>
             <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
             <label>-</label>
         </control>
         <!-- Tagline -->
         <control type="label" id="5">
-            <left>560</left><top>178</top><width>1120</width><height>28</height>
+            <left>80</left><top>96</top><width>1760</width><height>28</height>
             <font>font10</font>
             <textcolor>FFAAAAAA</textcolor>
             <label></label>
         </control>
-        <!-- Accent separator under title -->
+        <!-- Accent separator under the header (full width) -->
         <control type="image">
-            <left>560</left><top>212</top><width>1120</width><height>2</height>
+            <left>80</left><top>130</top><width>1760</width><height>2</height>
             <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
         </control>
 
-        <!-- Cast strip (display-only list) -->
+        <!-- Cast strip: wider portrait tiles, scrollable (Up from Play focuses it) -->
         <control type="list" id="100">
-            <left>560</left><top>236</top><width>1120</width><height>210</height>
+            <left>560</left><top>165</top><width>1120</width><height>285</height>
             <orientation>horizontal</orientation>
             <itemgap>16</itemgap>
-            <!-- display-only: enable=false removes it from focus navigation (CanFocus); it still renders -->
-            <enable>false</enable>
-            <itemlayout width="150" height="210">
+            <onup>10</onup>
+            <ondown>10</ondown>
+            <itemlayout width="200" height="285">
+                <!-- placeholder box (shows when a cast member has no thumbnail) -->
                 <control type="image">
-                    <left>0</left><top>0</top><width>150</width><height>150</height>
+                    <left>30</left><top>0</top><width>140</width><height>210</height>
                     <texture border="8" colordiffuse="1fFFFFFF">common/white_rounded.png</texture>
                 </control>
                 <control type="image">
-                    <left>0</left><top>0</top><width>150</width><height>150</height>
-                    <aspectratio>scale</aspectratio>
+                    <left>30</left><top>0</top><width>140</width><height>210</height>
+                    <aspectratio>keep</aspectratio>
                     <texture background="true">$INFO[ListItem.Art(thumb)]</texture>
                 </control>
                 <control type="label">
-                    <left>0</left><top>152</top><width>150</width><height>26</height>
+                    <left>0</left><top>214</top><width>200</width><height>36</height>
                     <font>font10</font><align>center</align>
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[ListItem.Label]</label>
                 </control>
                 <control type="label">
-                    <left>0</left><top>178</top><width>150</width><height>24</height>
+                    <left>0</left><top>250</top><width>200</width><height>32</height>
                     <font>font10</font><align>center</align>
                     <textcolor>FF888888</textcolor>
                     <label>$INFO[ListItem.Label2]</label>
                 </control>
             </itemlayout>
-            <focusedlayout width="150" height="210" />
+            <focusedlayout width="200" height="285">
+                <control type="image">
+                    <left>27</left><top>-3</top><width>146</width><height>216</height>
+                    <texture border="10" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                </control>
+                <control type="image">
+                    <left>30</left><top>0</top><width>140</width><height>210</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+                </control>
+                <control type="label">
+                    <left>0</left><top>214</top><width>200</width><height>36</height>
+                    <font>font10</font><align>center</align>
+                    <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>0</left><top>250</top><width>200</width><height>32</height>
+                    <font>font10</font><align>center</align>
+                    <textcolor>FFCCCCCC</textcolor>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+            </focusedlayout>
         </control>
 
         <!-- Plot -->
         <control type="textbox" id="6">
-            <left>560</left><top>470</top><width>760</width><height>400</height>
+            <left>560</left><top>470</top><width>760</width><height>390</height>
             <font>font12</font>
             <textcolor>FFCCCCCC</textcolor>
             <autoscroll delay="6000" time="3000" repeat="10000">true</autoscroll>
@@ -125,20 +148,20 @@
 
         <!-- Metadata column (display-only label:value list) -->
         <control type="list" id="500">
-            <left>1360</left><top>470</top><width>480</width><height>400</height>
+            <left>1360</left><top>470</top><width>480</width><height>390</height>
             <orientation>vertical</orientation>
             <itemgap>6</itemgap>
             <!-- display-only: enable=false removes it from focus navigation (CanFocus); it still renders -->
             <enable>false</enable>
             <itemlayout width="480" height="40">
                 <control type="label">
-                    <left>0</left><top>0</top><width>170</width><height>40</height>
+                    <left>0</left><top>0</top><width>115</width><height>40</height>
                     <font>font10</font><aligny>center</aligny>
                     <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                     <label>$INFO[ListItem.Label]</label>
                 </control>
                 <control type="label">
-                    <left>180</left><top>0</top><width>300</width><height>40</height>
+                    <left>120</left><top>0</top><width>360</width><height>40</height>
                     <font>font10</font><aligny>center</aligny>
                     <textcolor>FFAAAAAA</textcolor>
                     <label>$INFO[ListItem.Label2]</label>
@@ -154,6 +177,7 @@
             <align>center</align>
             <orientation>horizontal</orientation>
             <control type="button" id="10">
+                <onup>100</onup>
                 <width>200</width><height>50</height>
                 <align>center</align><aligny>center</aligny>
                 <font>font12</font><textoffsetx>10</textoffsetx>
