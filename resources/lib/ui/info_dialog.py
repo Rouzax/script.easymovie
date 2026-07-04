@@ -45,10 +45,14 @@ def format_runtime(seconds: int) -> str:
 
 
 def format_rating(rating: float, votes: str = "") -> str:
-    """Format rating as '★ 7.5 (2,558 votes)' ('' when no rating)."""
+    """Format rating as '7.5 (2,558 votes)' ('' when no rating).
+
+    No star glyph: the info dialog shows a "Rating" label beside this value,
+    so the star is redundant (and it avoids the Unicode-font dependency).
+    """
     if not rating or rating <= 0:
         return ""
-    text = "★ %.1f" % rating
+    text = "%.1f" % rating
     digits = "".join(ch for ch in str(votes) if ch.isdigit())
     if digits:
         text += " (%s votes)" % format(int(digits), ",")
@@ -89,11 +93,11 @@ def build_metadata_rows(details: Dict[str, Any]) -> List[Tuple[int, str]]:
     return rows
 
 
-def build_cast_items(cast: List[Dict[str, Any]],
+def build_cast_items(cast_members: List[Dict[str, Any]],
                      limit: int = 10) -> List[Tuple[str, str, str]]:
     """Map cast dicts to (name, role, thumbnail), capped at `limit`."""
     items: List[Tuple[str, str, str]] = []
-    for member in cast[:limit]:
+    for member in cast_members[:limit]:
         items.append((member.get("name", ""), member.get("role", ""),
                       member.get("thumbnail", "")))
     return items

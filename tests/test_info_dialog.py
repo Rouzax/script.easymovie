@@ -25,16 +25,20 @@ def test_format_runtime_under_an_hour():
     assert format_runtime(45 * 60) == "45m"
 
 
+def test_format_runtime_exact_hour():
+    assert format_runtime(3600) == "1h 0m"
+
+
 def test_format_runtime_zero_is_empty():
     assert format_runtime(0) == ""
 
 
 def test_format_rating_with_votes():
-    assert format_rating(7.5, "2558") == "★ 7.5 (2,558 votes)"
+    assert format_rating(7.5, "2558") == "7.5 (2,558 votes)"
 
 
 def test_format_rating_without_votes():
-    assert format_rating(7.5, "") == "★ 7.5"
+    assert format_rating(7.5, "") == "7.5"
 
 
 def test_format_rating_zero_is_empty():
@@ -64,7 +68,7 @@ def test_build_metadata_rows_collapses_empty():
     rows = build_metadata_rows(details)
     assert rows == [
         (STR_YEAR, "2024"),
-        (STR_RATING, "★ 7.5 (2,558 votes)"),
+        (STR_RATING, "7.5 (2,558 votes)"),
         (STR_RUNTIME, "1h 36m"),
         (STR_RATED, "R"),
         (STR_GENRE, "Action / Thriller"),
