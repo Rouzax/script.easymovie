@@ -103,25 +103,46 @@ def parse_fontset(font_xml_text: str, fontset_id: str = "Default") -> Dict[str, 
     return result
 
 
+# Skin fonts whose NAME signals a special-purpose glyph/symbol/decorative font
+# rather than general body text. Nearest-size matching MUST skip these, or
+# captions and labels render as icons/wrong glyphs (observed live: Arctic's
+# "SymbolList" was nearest to font10 by size and rendered "Runtime" with a clock
+# glyph and cast names in a symbol face).
+_SPECIAL_FONT_HINTS = (
+    "symbol", "icon", "glyph", "flag", "weather", "clock", "lyric", "mono",
+    "arrow", "timeline", "selector", "watched", "wingding", "awesome",
+    "material", "dingbat", "emoji",
+)
+
+
+def _is_text_font(name: str) -> bool:
+    """True unless the font name signals a special-purpose (non-text) face."""
+    low = name.lower()
+    return not any(hint in low for hint in _SPECIAL_FONT_HINTS)
+
+
 def build_font_map(skin_fonts: Dict[str, int],
                    anchors: Dict[str, int] = ANCHOR_SIZES) -> Dict[str, str]:
-    """Map each anchor font name to the skin font whose size is nearest.
+    """Map each anchor font name to the skin's nearest-size TEXT font.
 
-    If the skin defines the anchor name itself, it maps to itself. If the skin
-    provides no usable fonts, every anchor maps to itself (identity), so the
-    shipped names are kept and Kodi's own fallback applies.
+    If the skin defines the anchor name itself, it maps to itself. Special-
+    purpose fonts (symbol/icon/flag/weather/etc., by name) are excluded from the
+    candidate pool so text never gets mapped onto a glyph face. If the skin
+    provides no usable text font, an anchor maps to itself (identity), so the
+    shipped name is kept and Kodi's own font13 fallback applies.
     """
     font_map: Dict[str, str] = {}
+    candidates = {n: s for n, s in skin_fonts.items() if _is_text_font(n)}
     for anchor, target in anchors.items():
         if anchor in skin_fonts:
             font_map[anchor] = anchor
             continue
-        if not skin_fonts:
+        if not candidates:
             font_map[anchor] = anchor
             continue
         # Nearest by absolute size difference; ties break to the smaller size
         # then the name, for determinism.
-        best = min(skin_fonts.items(),
+        best = min(candidates.items(),
                    key=lambda kv: (abs(kv[1] - target), kv[1], kv[0]))
         font_map[anchor] = best[0]
     return font_map

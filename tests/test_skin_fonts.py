@@ -109,6 +109,14 @@ def test_build_font_map_nearest_size():
     assert m["font10"] == "Mini"            # 23 -> 24 (nearest, beats 17)
 
 
+def test_build_font_map_skips_special_fonts():
+    # A symbol/icon font that is nearest by SIZE must not be chosen for text.
+    skin = {"font13": 30, "SymbolList": 22, "Mini": 24}
+    m = build_font_map(skin)
+    assert m["font10"] == "Mini"  # 23 -> Mini(24), not SymbolList(22) despite closer size
+    assert "SymbolList" not in m.values()
+
+
 def test_build_font_map_empty_skin_is_identity():
     assert build_font_map({}) == {
         "font36_title": "font36_title", "font13": "font13",
