@@ -94,3 +94,48 @@ def parse_fontset(font_xml_text: str, fontset_id: str = "Default") -> Dict[str, 
         if name and size > 0 and _VALID_FONT_NAME.match(name):
             result[name] = size
     return result
+
+
+def build_font_map(skin_fonts: Dict[str, int],
+                   anchors: Dict[str, int] = ANCHOR_SIZES) -> Dict[str, str]:
+    """Map each anchor font name to the skin font whose size is nearest.
+
+    If the skin defines the anchor name itself, it maps to itself. If the skin
+    provides no usable fonts, every anchor maps to itself (identity), so the
+    shipped names are kept and Kodi's own fallback applies.
+    """
+    font_map: Dict[str, str] = {}
+    for anchor, target in anchors.items():
+        if anchor in skin_fonts:
+            font_map[anchor] = anchor
+            continue
+        if not skin_fonts:
+            font_map[anchor] = anchor
+            continue
+        # Nearest by absolute size difference; ties break to the smaller size
+        # then the name, for determinism.
+        best = min(skin_fonts.items(),
+                   key=lambda kv: (abs(kv[1] - target), kv[1], kv[0]))
+        font_map[anchor] = best[0]
+    return font_map
+
+
+def substitute_fonts(xml_text: str, font_map: Dict[str, str]) -> str:
+    """Replace <font>ANCHOR</font> with <font>MAPPED</font> for each anchor."""
+    out = xml_text
+    for anchor, mapped in font_map.items():
+        if anchor != mapped:
+            out = out.replace("<font>%s</font>" % anchor,
+                              "<font>%s</font>" % mapped)
+    return out
+
+
+def cache_key(skin_id: str, skin_version: str, fontset: str,
+              addon_version: str, font_mtime: int) -> str:
+    """Stable identity for a generated set (invalidates on any component change).
+
+    Includes the skin Font.xml mtime so a hand-edited or forked skin font file
+    invalidates the cache without a per-open full content hash (TRADEOFF-1).
+    """
+    return "%s@%s|%s|addon@%s|font@%d" % (
+        skin_id, skin_version, fontset, addon_version, font_mtime)

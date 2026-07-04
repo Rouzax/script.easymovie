@@ -1,5 +1,11 @@
 """Tests for skin-adaptive font mapping."""
-from resources.lib.ui.skin_fonts import ANCHOR_SIZES, parse_fontset
+from resources.lib.ui.skin_fonts import (
+    ANCHOR_SIZES,
+    build_font_map,
+    cache_key,
+    parse_fontset,
+    substitute_fonts,
+)
 
 _SAMPLE = """<?xml version="1.0"?>
 <fonts>
@@ -81,3 +87,46 @@ def test_shipped_templates_only_use_anchor_fonts():
             used |= set(_re.findall(r"<font>([^<]+)</font>", fh.read()))
     assert used <= set(ANCHOR_SIZES), (
         "templates use non-anchor fonts: %s" % (used - set(ANCHOR_SIZES)))
+
+
+def test_build_font_map_identity_when_anchor_present():
+    # A skin that defines our anchor names maps each to itself.
+    skin = {"font36_title": 36, "font13": 30, "font12": 25, "font10": 23}
+    assert build_font_map(skin) == {
+        "font36_title": "font36_title", "font13": "font13",
+        "font12": "font12", "font10": "font10"}
+
+
+def test_build_font_map_nearest_size():
+    # Arctic-like: only font13 numbered, plus its own named fonts.
+    skin = {"font13": 30, "Mini": 24, "Small20": 17, "LargeNew": 44, "Large": 38}
+    m = build_font_map(skin)
+    assert m["font36_title"] == "Large"    # 36 -> 38 (nearest, beats 44)
+    assert m["font13"] == "font13"          # 30 -> 30 exact
+    assert m["font12"] == "Mini"            # 25 -> 24 (nearest, beats 30)
+    assert m["font10"] == "Mini"            # 23 -> 24 (nearest, beats 17)
+
+
+def test_build_font_map_empty_skin_is_identity():
+    assert build_font_map({}) == {
+        "font36_title": "font36_title", "font13": "font13",
+        "font12": "font12", "font10": "font10"}
+
+
+def test_substitute_fonts_replaces_anchor_tags():
+    xml = "<font>font36_title</font> x <font>font10</font> <font>font10</font>"
+    out = substitute_fonts(xml, {"font36_title": "Large", "font10": "Mini"})
+    assert out == "<font>Large</font> x <font>Mini</font> <font>Mini</font>"
+
+
+def test_substitute_fonts_identity_leaves_text_unchanged():
+    xml = "<font>font10</font>"
+    assert substitute_fonts(xml, {"font10": "font10"}) == xml
+
+
+def test_cache_key_stable_and_sensitive():
+    a = cache_key("skin.x", "1.0", "Default", "2.0", 1000)
+    assert a == cache_key("skin.x", "1.0", "Default", "2.0", 1000)
+    assert a != cache_key("skin.x", "1.1", "Default", "2.0", 1000)
+    assert a != cache_key("skin.y", "1.0", "Default", "2.0", 1000)
+    assert a != cache_key("skin.x", "1.0", "Default", "2.0", 1001)  # Font.xml edited
