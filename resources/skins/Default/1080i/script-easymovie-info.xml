@@ -53,7 +53,7 @@
             <left>80</left><top>165</top>
             <control type="image">
                 <left>-3</left><top>-3</top><width>406</width><height>606</height>
-                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
             </control>
             <control type="image" id="20">
                 <left>0</left><top>0</top><width>400</width><height>600</height>
@@ -64,8 +64,8 @@
 
         <!-- Title (full-width header, aligned to the poster's left edge) -->
         <control type="label" id="2">
-            <left>80</left><top>40</top><width>1760</width><height>50</height>
-            <font>font14_title</font>
+            <left>80</left><top>36</top><width>1760</width><height>56</height>
+            <font>font36_title</font>
             <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
             <label>-</label>
         </control>
@@ -84,7 +84,7 @@
 
         <!-- Cast strip: wider portrait tiles, scrollable (Up from Play focuses it) -->
         <control type="list" id="100">
-            <left>560</left><top>165</top><width>1120</width><height>285</height>
+            <left>560</left><top>165</top><width>1280</width><height>285</height>
             <orientation>horizontal</orientation>
             <itemgap>16</itemgap>
             <onup>10</onup>
