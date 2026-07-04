@@ -1,4 +1,5 @@
 """Tests for skin-adaptive font mapping."""
+import resources.lib.ui.skin_fonts as sf
 from resources.lib.ui.skin_fonts import (
     ANCHOR_SIZES,
     build_font_map,
@@ -130,3 +131,45 @@ def test_cache_key_stable_and_sensitive():
     assert a != cache_key("skin.x", "1.1", "Default", "2.0", 1000)
     assert a != cache_key("skin.y", "1.0", "Default", "2.0", 1000)
     assert a != cache_key("skin.x", "1.0", "Default", "2.0", 1001)  # Font.xml edited
+
+
+def test_generate_into_writes_substituted_xml(tmp_path):
+    # Arrange a fake shipped addon tree.
+    ship = tmp_path / "addon"
+    res = ship / "resources" / "skins" / "Default"
+    (res / "1080i").mkdir(parents=True)
+    (res / "media" / "common").mkdir(parents=True)
+    (res / "1080i" / "script-easymovie-info.xml").write_text(
+        "<window><control><font>font36_title</font></control></window>")
+    (res / "media" / "common" / "white.png").write_text("PNG")
+
+    out = tmp_path / "gen"
+    font_map = {"font36_title": "LargeNew"}
+    sf._generate_into(str(ship), str(out), font_map)
+
+    gen_xml = out / "resources" / "skins" / "Default" / "1080i" / "script-easymovie-info.xml"
+    assert "<font>LargeNew</font>" in gen_xml.read_text()
+    # media copied
+    assert (out / "resources" / "skins" / "Default" / "media" / "common" / "white.png").exists()
+
+
+def test_ensure_generated_falls_back_on_error(monkeypatch):
+    # A failure mid-generation returns the shipped path, never raises.
+    monkeypatch.setattr(sf, "_safe_shipped", lambda addon_id: "/ship/path")
+    monkeypatch.setattr(sf, "_active_skin", lambda: (_ for _ in ()).throw(OSError("no skin")))
+    assert sf.ensure_generated("script.easymovie") == "/ship/path"
+
+
+def test_ensure_generated_fallback_never_raises(monkeypatch):
+    # Even if xbmcaddon.Addon() itself raises (malformed/unregistered id), the
+    # caller gets a string, never an exception (the "never break a dialog"
+    # invariant, which the fallback path must not itself violate).
+    monkeypatch.setattr(sf.xbmcaddon, "Addon",
+                        lambda addon_id: (_ for _ in ()).throw(RuntimeError("no addon")))
+    monkeypatch.setattr(sf.xbmcvfs, "translatePath", lambda p: "/home/addons/x")
+    assert sf.ensure_generated("script.easymovie") == "/home/addons/x"
+
+
+def test_ensure_generated_rejects_bad_addon_id(monkeypatch):
+    monkeypatch.setattr(sf, "_safe_shipped", lambda a: "/ship")
+    assert sf.ensure_generated("../evil") == "/ship"
