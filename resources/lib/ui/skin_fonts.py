@@ -23,7 +23,7 @@ import re
 import shutil
 import time
 import xml.etree.ElementTree as ET
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 import xbmc
 import xbmcaddon
@@ -156,10 +156,6 @@ _VALID_ID = re.compile(r"^[A-Za-z0-9_.]+$")
 _LOCK_STALE_SECS = 30
 
 
-def _shipped_path(addon_id: str) -> str:
-    return xbmcaddon.Addon(addon_id).getAddonInfo('path')
-
-
 def _safe_shipped(addon_id: str) -> str:
     """The shipped scriptPath, but NEVER raising: the fallback must not itself
     break a dialog. If Addon() fails (malformed/unregistered id), derive the
@@ -170,7 +166,7 @@ def _safe_shipped(addon_id: str) -> str:
         return xbmcvfs.translatePath("special://home/addons/%s" % addon_id)
 
 
-def _active_skin():
+def _active_skin() -> Tuple[str, str]:
     """Return (skin_id, skin_version). Raises if the skin addon is unavailable."""
     skin_id = xbmc.getSkinDir()
     version = xbmcaddon.Addon(skin_id).getAddonInfo('version')
@@ -188,7 +184,7 @@ def _active_fontset() -> str:
         return "Default"
 
 
-def _find_skin_font_xml(skin_id: str) -> Optional[str]:
+def _find_skin_font_xml() -> Optional[str]:
     """Locate the active skin's Font.xml (varies by skin: 1080i/, xml/, etc.)."""
     base = xbmcvfs.translatePath("special://skin/")
     candidates = ["1080i", "16x9", "720p", "xml", "1080p", ""]
@@ -281,12 +277,14 @@ def ensure_generated(addon_id: str) -> str:
     """
     try:
         if not _VALID_ID.match(addon_id or ""):
+            log.warning("Rejected invalid addon_id", event="skinfont.bad_id",
+                       addon=addon_id)
             return _safe_shipped(addon_id)
         addon = xbmcaddon.Addon(addon_id)          # inside try: a bad id -> fallback
         shipped = addon.getAddonInfo('path')
         skin_id, skin_version = _active_skin()
         fontset = _active_fontset()
-        font_xml_path = _find_skin_font_xml(skin_id)
+        font_xml_path = _find_skin_font_xml()
         if not font_xml_path:
             return shipped                          # cannot adapt; shipped is valid
         font_mtime = int(os.path.getmtime(font_xml_path))
@@ -320,7 +318,12 @@ def ensure_generated(addon_id: str) -> str:
         try:
             if _fresh():                            # built while we waited for the lock
                 return out_base
-            tmp = out_base + ".new"
+            # The lock above is best-effort (see _try_lock's stale-reclaim). A
+            # PID-unique temp dir makes a lock race benign: each builder writes
+            # its own temp, output is identical for the same skin+fonts, and the
+            # atomic rename-swap means a racing loser at worst falls back to the
+            # shipped path for that one open.
+            tmp = out_base + ".new." + str(os.getpid())
             if os.path.isdir(tmp):
                 shutil.rmtree(tmp, ignore_errors=True)
             try:
