@@ -43,11 +43,10 @@ def get_movie_details_with_art_query(movie_id: int) -> Dict[str, Any]:
 
 
 def get_movie_full_details_query(movie_id: int) -> Dict[str, Any]:
-    """Get a single movie with the full metadata the native info pane shows.
+    """Get a single movie with the full metadata the info dialog shows.
 
-    Used to populate Kodi's DialogVideoInfo, which renders only what the
-    supplied ListItem carries (it does not re-query the library by dbid),
-    so this requests cast and crew on top of the display fields.
+    Requests cast and crew on top of the display fields so the addon-owned
+    info dialog can render plot, cast, art, and ratings without a second query.
     """
     return {
         "jsonrpc": "2.0",

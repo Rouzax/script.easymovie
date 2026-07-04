@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, cast
 
-import xbmc
 import xbmcaddon
 import xbmcgui
 
@@ -38,6 +37,7 @@ from resources.lib.constants import (
     VIEW_SPLIT_VIEW,
 )
 from resources.lib.data.queries import get_movie_full_details_query
+from resources.lib.ui.info_dialog import INFO_RESULT_PLAY, show_info_dialog
 from resources.lib.utils import get_logger, json_query
 
 # Control IDs (shared across all view XMLs)
@@ -48,13 +48,7 @@ REROLL_BUTTON_ID = 11
 # Result signals
 RESULT_REROLL = "__reroll__"
 RESULT_SURPRISE = "__surprise__"
-# Movie already started playing natively (from the info pane's Play button);
-# main.py should exit without starting playback again.
-RESULT_ALREADY_PLAYING = "__already_playing__"
 
-# Bounded wait for native playback to begin after the info pane closes.
-NATIVE_PLAY_POLL_COUNT = 10
-NATIVE_PLAY_POLL_MS = 100
 # View style to XML filename mapping
 VIEW_XML_MAP = {
     VIEW_SHOWCASE: "script-easymovie-postergrid.xml",
@@ -82,7 +76,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         self._addon_id: str = ADDON_ID
         self._preview_mode: bool = False
         self._theme_index: int = 0
-        self._storage: Optional[Any] = None
 
     def set_movies(self, movies: List[Dict[str, Any]]) -> None:
         """Set the movies to display."""
@@ -91,10 +84,6 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
     def set_addon_id(self, addon_id: str) -> None:
         """Set the addon ID (for clone support)."""
         self._addon_id = addon_id
-
-    def set_storage(self, storage: Any) -> None:
-        """Set the StorageManager used to record native plays for this instance."""
-        self._storage = storage
 
     def set_preview_mode(self, theme_index: int) -> None:
         """Enable preview mode with live theme cycling via blue button."""
@@ -206,94 +195,19 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
             return self._movies[idx]
         return None
 
-    def _build_info_listitem(self, details: Dict[str, Any],
-                             movie_id: int) -> xbmcgui.ListItem:
-        """Build a fully-populated ListItem for the native info pane.
+    def _show_info(self, movie: Dict[str, Any]) -> None:
+        """Open the addon-owned info dialog for the focused movie.
 
-        DialogVideoInfo renders only what the ListItem carries (it does not
-        re-query the library by dbid), so every field the pane shows must be
-        set here from the full-details query result.
-        """
-        li = xbmcgui.ListItem(details.get("title", ""))
-        # The pane's Play button plays this item's path; without it, Play fails
-        # with an empty OpenFile. Kodi applies path substitution at play time.
-        li.setPath(details.get("file", ""))
-        tag = li.getVideoInfoTag()
-        tag.setDbId(movie_id)
-        tag.setMediaType("movie")
-        tag.setTitle(details.get("title", ""))
-        tag.setOriginalTitle(details.get("originaltitle", ""))
-        tag.setGenres(details.get("genre", []))
-        tag.setYear(details.get("year", 0))
-        tag.setRating(details.get("rating", 0.0))
-        tag.setDuration(details.get("runtime", 0))
-        tag.setMpaa(details.get("mpaa", ""))
-        tag.setPlot(details.get("plot", ""))
-        tag.setPlotOutline(details.get("plotoutline", ""))
-        tag.setTagLine(details.get("tagline", ""))
-        tag.setDirectors(details.get("director", []))
-        tag.setWriters(details.get("writer", []))
-        tag.setStudios(details.get("studio", []))
-        tag.setCountries(details.get("country", []))
-        tag.setPremiered(details.get("premiered", ""))
-        actors = [
-            xbmc.Actor(c.get("name", ""), c.get("role", ""),
-                       c.get("order", 0), c.get("thumbnail", ""))
-            for c in details.get("cast", [])
-        ]
-        if actors:
-            tag.setCast(actors)
-        art = details.get("art", {})
-        if art:
-            li.setArt(dict(art))
-        return li
-
-    def _record_native_play_if_playing(self, movie_id: int, title: str) -> bool:
-        """Record a started play if the focused movie is now playing.
-
-        Called right after the native pane closes. If the user pressed Play in
-        the pane, the focused movie is now playing; record it as started for
-        this instance's storage so it can be offered for resume later. Returns
-        True if a play was recorded.
-        """
-        player = xbmc.Player()
-        for _ in range(NATIVE_PLAY_POLL_COUNT):
-            if player.isPlayingVideo():
-                break
-            xbmc.sleep(NATIVE_PLAY_POLL_MS)
-        if not player.isPlayingVideo():
-            return False
-        try:
-            playing_id = player.getVideoInfoTag().getDbId()
-        except RuntimeError:
-            return False
-        if playing_id != movie_id:
-            return False
-        if self._storage and movie_id:
-            self._storage.add_started(movie_id, title)
-            log.info("Recorded native play", event="ui.info.native_play",
-                     title=title, movieid=movie_id)
-        return True
-
-    def _show_native_info(self, movie: Dict[str, Any]) -> None:
-        """Open Kodi's native movie info pane for the focused movie.
-
-        Fetches full details for the movie's library DBID, builds a complete
-        ListItem, and opens it via Dialog().info(). If the user presses Play in
-        the pane, records the play for this instance and closes the browse
-        window so behavior matches a normal movie pick.
+        Fetches full details and shows the themed info dialog. If the user
+        presses Play, the browse window returns the movie so main.py plays it
+        through EasyMovie's normal (set-aware) flow, exactly as a direct pick.
         """
         movie_id = movie.get("movieid", 0)
-        title = movie.get("title", "")
-        log.info("Showing native movie info", event="ui.info",
-                 title=title, movieid=movie_id)
         details = json_query(
             get_movie_full_details_query(movie_id)
         ).get("moviedetails", {})
-        li = self._build_info_listitem(details, movie_id)
-        xbmcgui.Dialog().info(li)
-        if self._record_native_play_if_playing(movie_id, title):
-            self._result = RESULT_ALREADY_PLAYING
+        if show_info_dialog(movie, details, self._addon_id) == INFO_RESULT_PLAY:
+            self._result = movie
             self.close()
 
     def onAction(self, action):
@@ -330,14 +244,13 @@ class BrowseWindow(xbmcgui.WindowXMLDialog):
         elif action_id == ACTION_SHOW_INFO:
             movie = self._get_focused_movie()
             if movie:
-                self._show_native_info(movie)
+                self._show_info(movie)
 
 
 def show_browse_window(
     movies: List[Dict[str, Any]],
     view_style: int,
     addon_id: str = ADDON_ID,
-    storage: Optional[Any] = None,
 ) -> Optional[Any]:
     """Show the browse window with the specified view style.
 
@@ -345,12 +258,9 @@ def show_browse_window(
         movies: List of movie dicts (with art) to display.
         view_style: View style constant (VIEW_SHOWCASE, etc.)
         addon_id: Addon ID (for clone support).
-        storage: StorageManager for this instance, used to record a native
-            play launched from the info pane.
 
     Returns:
-        Selected movie dict, RESULT_REROLL, RESULT_SURPRISE,
-        RESULT_ALREADY_PLAYING, or None.
+        Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
     """
     xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_SHOWCASE])
     addon_path = xbmcaddon.Addon(addon_id).getAddonInfo('path')
@@ -358,7 +268,6 @@ def show_browse_window(
     window = BrowseWindow(xml_file, addon_path, 'Default', '1080i')
     window.set_movies(movies)
     window.set_addon_id(addon_id)
-    window.set_storage(storage)
     window.doModal()
 
     return window.result

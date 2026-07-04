@@ -49,7 +49,6 @@ from resources.lib.data.results import select_and_sort_results
 from resources.lib.data.smart_playlists import extract_movie_ids_from_playlist
 from resources.lib.data.storage import StorageManager
 from resources.lib.ui.browse_window import (
-    RESULT_ALREADY_PLAYING,
     RESULT_REROLL,
     RESULT_SURPRISE,
     show_browse_window,
@@ -914,18 +913,13 @@ def _run_browse_mode(
         log.debug("Presenting movies", event="browse.present",
                   count=len(results), pool=len(available), titles=titles)
         result = show_browse_window(
-            results, browse_settings.view_style, addon_id, storage=storage)
+            results, browse_settings.view_style, addon_id)
 
         if result == RESULT_REROLL:
             log.info("Re-rolling", event="ui.reroll")
             if playback_settings.show_processing_notifications:
                 notify(lang(32350))
             continue
-        elif result == RESULT_ALREADY_PLAYING:
-            # User pressed Play in the native info pane; movie is already
-            # playing and was recorded. Exit without starting playback again.
-            log.info("Native play from info pane", event="ui.info.native_play")
-            break
         elif result == RESULT_SURPRISE:
             if not results:
                 continue

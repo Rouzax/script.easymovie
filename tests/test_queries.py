@@ -54,7 +54,7 @@ def test_get_movie_details_with_art_query_movieid():
 
 
 def test_get_movie_full_details_query():
-    """Full-details query feeds the native info pane: needs cast and crew."""
+    """Full-details query feeds the info dialog: needs cast and crew."""
     query = get_movie_full_details_query(movie_id=7)
     assert query["method"] == "VideoLibrary.GetMovieDetails"
     assert query["params"]["movieid"] == 7
