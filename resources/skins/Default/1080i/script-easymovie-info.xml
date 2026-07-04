@@ -93,7 +93,7 @@
                 <!-- placeholder box (shows when a cast member has no thumbnail) -->
                 <control type="image">
                     <left>30</left><top>0</top><width>140</width><height>210</height>
-                    <texture border="8" colordiffuse="1fFFFFFF">common/white_rounded.png</texture>
+                    <texture colordiffuse="1fFFFFFF">common/white.png</texture>
                 </control>
                 <control type="image">
                     <left>30</left><top>0</top><width>140</width><height>210</height>
@@ -116,7 +116,7 @@
             <focusedlayout width="200" height="285">
                 <control type="image">
                     <left>27</left><top>-3</top><width>146</width><height>216</height>
-                    <texture border="10" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                    <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
                 </control>
                 <control type="image">
                     <left>30</left><top>0</top><width>140</width><height>210</height>
