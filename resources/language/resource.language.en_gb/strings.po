@@ -985,3 +985,7 @@ msgstr ""
 msgctxt "#32716"
 msgid "Continue"
 msgstr ""
+
+msgctxt "#32717"
+msgid "Rated"
+msgstr ""
