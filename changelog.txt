@@ -1,3 +1,15 @@
+v1.3.1 (2026-07-05)
+--------------------------
+Bug Fixes:
+  - Movie info screen: the highlighted cast member's accent frame had its top
+    3px clipped. The cast strip (control 100) is a list control, which clips
+    item content to its bounds, and the focused frame was drawn at top=-3 (above
+    the item's top edge). Moved the list origin up 3px, grew its height 3px to
+    hold the bottom, and inset every item-internal top by 3px (frame -3->0,
+    thumb 0->3, labels +3), so the full frame renders on all four sides with no
+    change to any visible position and no focus jitter (thumb top matches in
+    both layouts). script-easymovie-info.xml only.
+
 v1.3.0 (2026-07-05)
 --------------------------
 New Features:
