@@ -93,7 +93,12 @@ def build_include_table(xml_texts: Iterable[str]) -> Dict[str, "ET.Element"]:
     contents. Applies the same per-file guards as parse_fontset (size cap,
     DOCTYPE/ENTITY reject, parse-error skip). First definition of a name wins.
     Invocation elements (<include content=..> / <include>text</include>) are
-    not definitions and are ignored here."""
+    not definitions and are ignored here.
+
+    Note the size cap is also a functional ceiling: a skin that defines its font
+    include inside an oversized XML file is skipped here, so its fontset
+    <include> resolves to nothing and the skin degrades to identity (no
+    adaptation). That is a safe no-op, never a broken dialog."""
     table: Dict[str, "ET.Element"] = {}
     for text in xml_texts:
         if not text or len(text) > _MAX_FONT_XML_BYTES:

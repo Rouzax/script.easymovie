@@ -309,6 +309,20 @@ def test_expand_include_allowlists_resolved_names():
     assert sf._expand_include("A", tbl, {}, 0) == {"font13": 28}
 
 
+def test_expand_include_allowlists_param_assembled_name():
+    # The allowlist must apply to the RESOLVED name, AFTER $PARAM substitution:
+    # a param whose value decodes to an XML metacharacter, used as a font name,
+    # must be dropped so it can never reach the generated <font>NAME</font>.
+    xml = ("<includes><include name='A'>"
+           "<param name='evil'>x&lt;/font&gt;</param>"
+           "<definition>"
+           "<font><name>$PARAM[evil]</name><size>30</size></font>"
+           "<font><name>font13</name><size>28</size></font>"
+           "</definition></include></includes>")
+    tbl = sf.build_include_table([xml])
+    assert sf._expand_include("A", tbl, {}, 0) == {"font13": 28}
+
+
 def test_parse_fontset_inline_and_include_merge_inline_wins():
     xml = ("<fonts><fontset id='Default'>"
            "<font><name>font13</name><size>99</size></font>"
