@@ -263,6 +263,8 @@ def show_browse_window(
         Selected movie dict, RESULT_REROLL, RESULT_SURPRISE, or None.
     """
     xml_file = VIEW_XML_MAP.get(view_style, VIEW_XML_MAP[VIEW_SHOWCASE])
+    # KODI-FONT-WORKAROUND (kodi#28534): remove this indirection when Kodi lets
+    # addons register their own dialog fonts. See skin_fonts.py DELETION GUIDE.
     from resources.lib.ui.skin_fonts import ensure_generated
     addon_path = ensure_generated(addon_id)
 

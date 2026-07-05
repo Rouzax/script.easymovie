@@ -155,6 +155,8 @@ class MoviePlaybackMonitor(xbmc.Player):
             return
 
         # Build dialog
+        # KODI-FONT-WORKAROUND (kodi#28534): remove this indirection when Kodi
+        # lets addons register dialog fonts. See skin_fonts.py DELETION GUIDE.
         from resources.lib.ui.skin_fonts import ensure_generated
         addon_path = ensure_generated(ADDON_ID)
 

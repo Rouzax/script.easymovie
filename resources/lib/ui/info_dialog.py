@@ -20,6 +20,10 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import xbmcgui
 
 from resources.lib.constants import ACTION_NAV_BACK, ACTION_PREVIOUS_MENU, ADDON_ID
+
+# KODI-FONT-WORKAROUND (kodi#28534): ensure_generated adapts this dialog's fonts
+# to the active skin. Remove when Kodi lets addons register their own dialog
+# fonts, then load the dialog from the shipped path. See skin_fonts.py.
 from resources.lib.ui.skin_fonts import ensure_generated
 from resources.lib.utils import get_logger, lang
 

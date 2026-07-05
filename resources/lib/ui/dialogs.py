@@ -25,6 +25,9 @@ from resources.lib.constants import (
     ACTION_PREVIOUS_MENU,
     ADDON_ID,
 )
+
+# KODI-FONT-WORKAROUND (kodi#28534): remove when Kodi lets addons register their
+# own dialog fonts. See skin_fonts.py DELETION GUIDE and _get_addon_path below.
 from resources.lib.ui.skin_fonts import ensure_generated
 from resources.lib.utils import get_logger
 

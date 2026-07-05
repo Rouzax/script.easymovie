@@ -100,6 +100,8 @@ def show_context_menu(
     Returns:
         CONTEXT_PLAY, CONTEXT_PLAY_SET, or None.
     """
+    # KODI-FONT-WORKAROUND (kodi#28534): remove this indirection when Kodi lets
+    # addons register their own dialog fonts. See skin_fonts.py DELETION GUIDE.
     from resources.lib.ui.skin_fonts import ensure_generated
     addon_path = ensure_generated(addon_id or ADDON_ID)
 
