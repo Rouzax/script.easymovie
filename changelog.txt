@@ -1,3 +1,57 @@
+v1.3.0 (2026-07-05)
+--------------------------
+New Features:
+  - Movie info screen is now EasyMovie's own fullscreen dialog instead of
+    Kodi's native movie information window. The native window builds its
+    content from the active skin's media-window context and rendered blank on
+    Arctic-family skins (the original v1.2.0 Info-pane bug). The addon-owned
+    dialog renders from the movie's full details on every skin, in EasyMovie's
+    theme: poster, fanart, cast with photos, plot, and a metadata column (year,
+    rating with vote count, runtime, certification, genres), plus a Play button.
+    Play routes through the normal set-aware flow (INFO_RESULT_PLAY ->
+    main.py play_movie), so resume and in-progress tracking keep working,
+    exactly as a direct pick.
+  - Skin-adaptive fonts: EasyMovie's custom dialogs now adapt their fonts to the
+    active skin. Kodi resolves a dialog's <font> only against the active skin's
+    font set (addons cannot register their own fonts), so on non-Estuary skins
+    the Estuary-named anchors fell back to font13 and lost their size hierarchy.
+    The addon now reads the active skin's Font.xml at runtime, maps its anchor
+    fonts to the skin's nearest-size real text fonts, and loads font-substituted
+    dialog copies, restoring the hierarchy on any skin. Estuary is unchanged
+    (identity short-circuit, no generation). Works around Kodi issue #28534.
+
+Internal:
+  - Replaced the native DialogVideoInfo pane with resources/lib/ui/info_dialog.py
+    (InfoDialog, a WindowXMLDialog) and resources/skins/Default/1080i/
+    script-easymovie-info.xml. Added display formatters (format_runtime,
+    format_rating, format_genres, format_certification, build_metadata_rows,
+    build_cast_items). browse_window._show_info() fetches full details and opens
+    the dialog; a Play press returns INFO_RESULT_PLAY, consumed by main.py.
+  - Removed the native-pane mechanism and its tests: _build_info_listitem,
+    _show_native_info, _record_native_play_if_playing, set_storage,
+    RESULT_ALREADY_PLAYING, and the NATIVE_PLAY_POLL_* constants. The
+    movieinformation black backdrops in the five browse-view skins are removed
+    (they only masked the blank native pane).
+  - New resources/lib/ui/skin_fonts.py. parse_fontset() turns a skin fontset
+    into {name: size} with a DOCTYPE/ENTITY reject, a 512 KiB per-file cap, and
+    a font-name allowlist applied AFTER $PARAM resolution. build_include_table()
+    + _expand_include() + _resolve_params() resolve parameterized-include /
+    $PARAM fontsets (e.g. Arctic Fuse), bailing safely to identity on
+    $VAR/$INFO/skinvariables, missing params, conditional includes, or cycles.
+    build_font_map() picks the nearest-size real font, excluding
+    special-purpose (symbol/icon/glyph) faces by name. ensure_generated() writes
+    font-substituted dialog XML into addon_data via an atomic PID-unique temp +
+    O_EXCL lock + rename-swap, cache-keyed on skin id/version + fontset + addon
+    version + max mtime across the skin's XML files, with an identity
+    short-circuit for Estuary and a guaranteed fallback to the shipped path.
+    Routed through every dialog scriptPath (base- and clone-safe) and tagged
+    with KODI-FONT-WORKAROUND (kodi#28534) markers plus a module DELETION GUIDE
+    for clean removal if Kodi ships native addon-font support.
+  - Replaced the nonexistent font14_title (which silently fell back to font13)
+    with the real Estuary font36_title across all dialog XMLs.
+  - Test suite is now 206 tests (was 151): added tests/test_info_dialog.py and
+    tests/test_skin_fonts.py.
+
 v1.2.0 (2026-06-20)
 --------------------------
 New Features:
