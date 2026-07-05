@@ -9,6 +9,18 @@ actually defines, writes font-substituted copies of the dialog XML into
 addon_data, and returns a scriptPath the dialogs load from. Any failure falls
 back to the shipped addon path (dialogs then render as before).
 
+DELETION GUIDE (KODI-FONT-WORKAROUND, kodi#28534):
+    This entire module exists only to work around a Kodi limitation: addons
+    cannot register fonts for their WindowXML/WindowXMLDialog windows. It is
+    tracked upstream at https://github.com/xbmc/xbmc/issues/28534. When that
+    lands (an addon can ship/register its own fonts), delete all of this:
+      1. Delete this module (skin_fonts.py) and tests/test_skin_fonts.py.
+      2. At every call site, drop the ensure_generated(...) indirection and
+         pass the shipped addon path to the dialog scriptPath instead. Find
+         them all with:  grep -rn "KODI-FONT-WORKAROUND" resources/
+      3. The shipped dialog XML can then reference real registered fonts
+         directly, so the font-name anchors need no substitution.
+
 Logging:
     Logger: 'ui'
     Key events:
@@ -23,7 +35,7 @@ import re
 import shutil
 import time
 import xml.etree.ElementTree as ET
-from typing import Dict, Optional, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 
 import xbmc
 import xbmcaddon
@@ -44,6 +56,15 @@ _VALID_FONT_NAME = re.compile(r"^[A-Za-z0-9_.]{1,64}$")  # bounded length: a
 # Real skin fontsets are a few KB; cap input to avoid a flat-XML resource bomb.
 _MAX_FONT_XML_BYTES = 512 * 1024
 
+# Parameterized-include support (Fuse-style skins define fonts inside
+# <include name="..."><param name="size_main">28</param>... and reference
+# $PARAM[size_main] as a font size). Bounded by design: $VAR/$INFO/$EXP and
+# skinvariable tokens are dynamic (only resolvable at Kodi render time) and are
+# never evaluated here; a font using one is omitted rather than guessed.
+_PARAM_RE = re.compile(r"\$PARAM\[([A-Za-z0-9_]+)\]")
+_MAX_INCLUDE_DEPTH = 8
+_UNRESOLVED = "\x00"  # sentinel: a $PARAM key absent from scope
+
 # Anchor font names used in the dialog XML, keyed to their Estuary sizes (the
 # target sizes we designed against).
 ANCHOR_SIZES: Dict[str, int] = {
@@ -54,11 +75,119 @@ ANCHOR_SIZES: Dict[str, int] = {
 }
 
 
-def parse_fontset(font_xml_text: str, fontset_id: str = "Default") -> Dict[str, int]:
+def _resolve_params(text: Optional[str], scope: Dict[str, str]) -> Optional[str]:
+    """Substitute $PARAM[key] from `scope`. Return None (unresolvable) if any
+    key is absent, or if any '$' token survives substitution (a $VAR/$INFO/$EXP
+    or skinvariable we deliberately do not evaluate). Literal text passes
+    through unchanged."""
+    if text is None:
+        return None
+    out = _PARAM_RE.sub(lambda m: scope.get(m.group(1), _UNRESOLVED), text)
+    if _UNRESOLVED in out or "$" in out:
+        return None
+    return out
+
+
+def build_include_table(xml_texts: Iterable[str]) -> Dict[str, "ET.Element"]:
+    """Map every <include name="X"> element across the given skin XML file
+    contents. Applies the same per-file guards as parse_fontset (size cap,
+    DOCTYPE/ENTITY reject, parse-error skip). First definition of a name wins.
+    Invocation elements (<include content=..> / <include>text</include>) are
+    not definitions and are ignored here."""
+    table: Dict[str, "ET.Element"] = {}
+    for text in xml_texts:
+        if not text or len(text) > _MAX_FONT_XML_BYTES:
+            continue
+        low = text.lower()
+        if "<!doctype" in low or "<!entity" in low:
+            continue
+        try:
+            root = ET.fromstring(text)
+        except ET.ParseError:
+            continue
+        for inc in root.iter("include"):
+            name = inc.get("name")
+            if name and name not in table:
+                table[name] = inc
+    return table
+
+
+def _expand_include(name: str, includes: Dict[str, "ET.Element"],
+                    overrides: Dict[str, str], depth: int) -> Dict[str, int]:
+    """Expand include `name` into {font_name: size}, resolving $PARAM against the
+    param scope (the include's <param> defaults, overridden by `overrides`).
+    Bounded and bail-safe: an unknown name, depth past _MAX_INCLUDE_DEPTH, a
+    conditional include, or an unresolvable/non-integer size omits that font (or
+    branch) rather than raising or guessing."""
+    if depth > _MAX_INCLUDE_DEPTH:
+        return {}
+    defn = includes.get(name)
+    if defn is None:
+        return {}
+    scope: Dict[str, str] = {}
+    for p in defn.findall("param"):
+        pname = p.get("name")
+        if not pname:
+            continue
+        if pname in overrides:
+            scope[pname] = overrides[pname]
+        else:
+            resolved = _resolve_params(p.text or "", scope)
+            scope[pname] = resolved if resolved is not None else (p.text or "")
+    for k, v in overrides.items():
+        scope.setdefault(k, v)
+
+    definition = defn.find("definition")
+    body = definition if definition is not None else defn
+    result: Dict[str, int] = {}
+    for child in body:
+        if child.tag == "font":
+            name_el = child.find("name")
+            size_el = child.find("size")
+            if name_el is None or size_el is None:
+                continue
+            fname = _resolve_params((name_el.text or "").strip(), scope)
+            fsize = _resolve_params((size_el.text or "").strip(), scope)
+            if fname is None or fsize is None:
+                continue
+            try:
+                size = int(fsize)
+            except ValueError:
+                continue
+            if fname and size > 0 and _VALID_FONT_NAME.match(fname):
+                result[fname] = size
+        elif child.tag == "include":
+            if child.get("condition"):
+                continue
+            sub = child.get("content") or (child.text or "").strip()
+            if not sub:
+                continue
+            sub_over: Dict[str, str] = {}
+            for p in child.findall("param"):
+                pn = p.get("name")
+                if not pn:
+                    continue
+                rv = _resolve_params(p.text or "", scope)
+                sub_over[pn] = rv if rv is not None else (p.text or "")
+            for fn, sz in _expand_include(sub, includes, sub_over, depth + 1).items():
+                result.setdefault(fn, sz)
+    return result
+
+
+def parse_fontset(font_xml_text: str, fontset_id: str = "Default",
+                  includes: Optional[Dict[str, "ET.Element"]] = None) -> Dict[str, int]:
     """Parse a skin Font.xml into {font_name: size} for the given fontset.
 
     Falls back to the first fontset if `fontset_id` is absent. Fonts without a
     positive integer size are skipped. Returns {} on any parse error.
+
+    Some skins (e.g. Fuse-based ones) define a fontset as one or more
+    <include>NAME</include> references into a separate includes file, with the
+    actual <font> definitions and $PARAM[...] sizes living in that include.
+    Pass the table built by `build_include_table` as `includes` to resolve
+    those; the default (None or {}) keeps this to inline <font> parsing only,
+    matching the original behavior. Where a font name is defined both inline
+    and via an include, the inline definition wins.
 
     Security (input is a third-party skin's Font.xml):
     - Reject input over `_MAX_FONT_XML_BYTES` (flat-XML resource bomb).
@@ -100,6 +229,21 @@ def parse_fontset(font_xml_text: str, fontset_id: str = "Default") -> Dict[str, 
             continue
         if name and size > 0 and _VALID_FONT_NAME.match(name):
             result[name] = size
+    if includes:
+        for inc in chosen.findall("include"):
+            if inc.get("condition"):
+                continue
+            sub = inc.get("content") or (inc.text or "").strip()
+            if not sub:
+                continue
+            overrides: Dict[str, str] = {}
+            for p in inc.findall("param"):
+                pn = p.get("name")
+                if not pn:
+                    continue
+                overrides[pn] = p.text or ""
+            for fname, size in _expand_include(sub, includes, overrides, 0).items():
+                result.setdefault(fname, size)   # inline fonts take precedence
     return result
 
 

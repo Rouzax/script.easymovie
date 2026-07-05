@@ -184,6 +184,142 @@ def test_ensure_generated_rejects_bad_addon_id(monkeypatch):
     assert sf.ensure_generated("../evil") == "/ship"
 
 
+def test_resolve_params_literal_passthrough():
+    assert sf._resolve_params("28", {}) == "28"
+
+
+def test_resolve_params_substitutes_from_scope():
+    assert sf._resolve_params("$PARAM[size_main]", {"size_main": "28"}) == "28"
+
+
+def test_resolve_params_missing_key_is_none():
+    assert sf._resolve_params("$PARAM[nope]", {"size_main": "28"}) is None
+
+
+def test_resolve_params_dynamic_token_is_none():
+    # $VAR/$INFO/skinvariable etc. cannot be resolved -> None (font gets skipped)
+    assert sf._resolve_params("$VAR[FontSize]", {}) is None
+    assert sf._resolve_params("$INFO[Skin.String(x)]", {}) is None
+
+
+def test_resolve_params_none_input_is_none():
+    assert sf._resolve_params(None, {}) is None
+
+
+def test_build_include_table_collects_named_includes():
+    a = "<includes><include name='Foo'><font><name>x</name><size>10</size></font></include></includes>"
+    b = "<includes><include name='Bar'/></includes>"
+    tbl = sf.build_include_table([a, b])
+    assert set(tbl) == {"Foo", "Bar"}
+
+
+def test_build_include_table_ignores_invocations_and_guards():
+    # <include content=..> and bare <include>text</include> are invocations, not defs
+    inv = "<includes><include content='Foo'/><include>Bar</include></includes>"
+    assert sf.build_include_table([inv]) == {}
+    # per-file guards: DOCTYPE and oversize files are skipped, not fatal
+    hostile = "<!DOCTYPE x [<!ENTITY e 'y'>]><includes><include name='Z'/></includes>"
+    big = "<includes>" + "<include name='Q'/>" * 100000 + "</includes>"
+    assert "Z" not in sf.build_include_table([hostile])
+    assert len(big) > 512 * 1024 and "Q" not in sf.build_include_table([big])
+
+
+def test_build_include_table_first_definition_wins():
+    a = "<includes><include name='Foo'><font><name>a</name><size>1</size></font></include></includes>"
+    b = "<includes><include name='Foo'><font><name>b</name><size>2</size></font></include></includes>"
+    tbl = sf.build_include_table([a, b])
+    assert tbl["Foo"].find("font/name").text == "a"
+
+
+# A Fuse-shaped skin: fontset references Font_Default via <include>; the real
+# fonts live in a sibling include file with $PARAM sizes + a nested include.
+_FUSE_FONTSET = "<fonts><fontset id='Default'><include>Font_Default</include></fontset></fonts>"
+_FUSE_INCLUDES = """<includes>
+  <include name="Font_Static">
+    <definition>
+      <font><name>font_main_iconic</name><filename>fa.ttf</filename><size>30</size></font>
+    </definition>
+  </include>
+  <include name="Font_Default">
+    <param name="size_tiny">21</param>
+    <param name="size_main">28</param>
+    <param name="size_head">38</param>
+    <definition>
+      <include content="Font_Static"/>
+      <font><name>font10</name><size>$PARAM[size_tiny]</size></font>
+      <font><name>font13</name><size>$PARAM[size_main]</size></font>
+      <font><name>font_head</name><size>$PARAM[size_head]</size></font>
+      <font><name>font_bad</name><size>$VAR[Dynamic]</size></font>
+    </definition>
+  </include>
+</includes>"""
+
+
+def test_parse_fontset_resolves_parameterized_include():
+    tbl = sf.build_include_table([_FUSE_INCLUDES])
+    fonts = sf.parse_fontset(_FUSE_FONTSET, "Default", tbl)
+    assert fonts["font10"] == 21
+    assert fonts["font13"] == 28
+    assert fonts["font_head"] == 38
+    # nested include resolves its own literal-size font
+    assert fonts["font_main_iconic"] == 30
+
+
+def test_parse_fontset_skips_unresolvable_font_but_keeps_rest():
+    tbl = sf.build_include_table([_FUSE_INCLUDES])
+    fonts = sf.parse_fontset(_FUSE_FONTSET, "Default", tbl)
+    assert "font_bad" not in fonts          # $VAR -> omitted, not fatal
+    assert fonts                            # the resolvable fonts still came through
+
+
+def test_parse_fontset_without_includes_is_inline_only():
+    # Existing behavior: no include table -> fontset <include> yields nothing extra
+    assert sf.parse_fontset(_FUSE_FONTSET, "Default") == {}
+    assert sf.parse_fontset(_FUSE_FONTSET, "Default", {}) == {}
+
+
+def test_parse_fontset_unknown_include_name_is_empty():
+    assert sf.parse_fontset(_FUSE_FONTSET, "Default", {}) == {}
+
+
+def test_expand_include_depth_guard_stops_cycle():
+    cyc = "<includes><include name='A'><definition><include content='A'/></definition></include></includes>"
+    tbl = sf.build_include_table([cyc])
+    assert sf._expand_include("A", tbl, {}, 0) == {}   # no infinite recursion
+
+
+def test_expand_include_ignores_conditional_includes():
+    xml = ("<includes><include name='A'><definition>"
+           "<include content='B' condition='Skin.HasSetting(x)'/>"
+           "<font><name>font13</name><size>28</size></font>"
+           "</definition></include>"
+           "<include name='B'><definition>"
+           "<font><name>font10</name><size>21</size></font></definition></include></includes>")
+    tbl = sf.build_include_table([xml])
+    out = sf._expand_include("A", tbl, {}, 0)
+    assert out == {"font13": 28}            # conditional branch skipped
+
+
+def test_expand_include_allowlists_resolved_names():
+    xml = ("<includes><include name='A'><definition>"
+           "<font><name>bad&lt;name</name><size>20</size></font>"
+           "<font><name>font13</name><size>28</size></font>"
+           "</definition></include></includes>")
+    tbl = sf.build_include_table([xml])
+    assert sf._expand_include("A", tbl, {}, 0) == {"font13": 28}
+
+
+def test_parse_fontset_inline_and_include_merge_inline_wins():
+    xml = ("<fonts><fontset id='Default'>"
+           "<font><name>font13</name><size>99</size></font>"
+           "<include>Foo</include></fontset></fonts>")
+    inc = "<includes><include name='Foo'><definition><font><name>font13</name><size>28</size></font><font><name>font10</name><size>21</size></font></definition></include></includes>"
+    tbl = sf.build_include_table([inc])
+    fonts = sf.parse_fontset(xml, "Default", tbl)
+    assert fonts["font13"] == 99            # inline definition wins
+    assert fonts["font10"] == 21
+
+
 def test_show_info_dialog_uses_generated_scriptpath(monkeypatch):
     captured = {}
 
