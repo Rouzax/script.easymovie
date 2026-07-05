@@ -84,53 +84,55 @@
 
         <!-- Cast strip: wider portrait tiles, scrollable (Up from Play focuses it) -->
         <control type="list" id="100">
-            <left>560</left><top>165</top><width>1280</width><height>285</height>
+            <left>560</left><top>162</top><width>1280</width><height>288</height>
             <orientation>horizontal</orientation>
             <itemgap>16</itemgap>
             <onup>10</onup>
             <ondown>10</ondown>
-            <itemlayout width="200" height="285">
-                <!-- placeholder box (shows when a cast member has no thumbnail) -->
+            <itemlayout width="200" height="288">
+                <!-- placeholder box (shows when a cast member has no thumbnail);
+                     thumb inset 3px from the item top so the focused accent frame
+                     (top 0) has headroom and its top edge is not clipped by the list -->
                 <control type="image">
-                    <left>30</left><top>0</top><width>140</width><height>210</height>
+                    <left>30</left><top>3</top><width>140</width><height>210</height>
                     <texture colordiffuse="1fFFFFFF">common/white.png</texture>
                 </control>
                 <control type="image">
-                    <left>30</left><top>0</top><width>140</width><height>210</height>
+                    <left>30</left><top>3</top><width>140</width><height>210</height>
                     <aspectratio>keep</aspectratio>
                     <texture background="true">$INFO[ListItem.Art(thumb)]</texture>
                 </control>
                 <control type="label">
-                    <left>0</left><top>214</top><width>200</width><height>36</height>
+                    <left>0</left><top>217</top><width>200</width><height>36</height>
                     <font>font10</font><align>center</align>
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[ListItem.Label]</label>
                 </control>
                 <control type="label">
-                    <left>0</left><top>250</top><width>200</width><height>32</height>
+                    <left>0</left><top>253</top><width>200</width><height>32</height>
                     <font>font10</font><align>center</align>
                     <textcolor>FF888888</textcolor>
                     <label>$INFO[ListItem.Label2]</label>
                 </control>
             </itemlayout>
-            <focusedlayout width="200" height="285">
+            <focusedlayout width="200" height="288">
                 <control type="image">
-                    <left>27</left><top>-3</top><width>146</width><height>216</height>
+                    <left>27</left><top>0</top><width>146</width><height>216</height>
                     <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white.png</texture>
                 </control>
                 <control type="image">
-                    <left>30</left><top>0</top><width>140</width><height>210</height>
+                    <left>30</left><top>3</top><width>140</width><height>210</height>
                     <aspectratio>keep</aspectratio>
                     <texture background="true">$INFO[ListItem.Art(thumb)]</texture>
                 </control>
                 <control type="label">
-                    <left>0</left><top>214</top><width>200</width><height>36</height>
+                    <left>0</left><top>217</top><width>200</width><height>36</height>
                     <font>font10</font><align>center</align>
                     <textcolor>$INFO[Window.Property(EasyMovie.Accent)]</textcolor>
                     <label>$INFO[ListItem.Label]</label>
                 </control>
                 <control type="label">
-                    <left>0</left><top>250</top><width>200</width><height>32</height>
+                    <left>0</left><top>253</top><width>200</width><height>32</height>
                     <font>font10</font><align>center</align>
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[ListItem.Label2]</label>
