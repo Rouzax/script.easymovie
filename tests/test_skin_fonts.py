@@ -332,6 +332,28 @@ def test_load_skin_includes_reads_sibling_xml(tmp_path):
     assert "Font_Default" in tbl
 
 
+def test_load_skin_includes_dir_unreadable_returns_empty(monkeypatch):
+    # If the skin resolution dir itself cannot be listed (permissions, removed
+    # mid-scan, etc.), the loader must degrade to {} rather than raise.
+    monkeypatch.setattr(sf.os, "listdir",
+                        lambda path: (_ for _ in ()).throw(OSError("no access")))
+    assert sf._load_skin_includes("/whatever") == {}
+
+
+def test_load_skin_includes_skips_unreadable_file(tmp_path):
+    # One sibling file that cannot be opened must not block the rest: a
+    # directory named "bad.xml" makes open() raise IsADirectoryError (an
+    # OSError subclass), while "good.xml" still resolves normally.
+    d = tmp_path / "1080i"
+    d.mkdir()
+    (d / "bad.xml").mkdir()
+    (d / "good.xml").write_text(
+        "<includes><include name='Font_Default'><definition>"
+        "<font><name>font13</name><size>28</size></font></definition></include></includes>")
+    tbl = sf._load_skin_includes(str(d))
+    assert "Font_Default" in tbl
+
+
 def test_ensure_generated_adapts_parameterized_skin(tmp_path, monkeypatch):
     # Fake skin dir: Font.xml (include-based) + sibling include file with $PARAM.
     skin = tmp_path / "skin" / "1080i"
@@ -371,6 +393,47 @@ def test_ensure_generated_adapts_parameterized_skin(tmp_path, monkeypatch):
     # font36_title(36) -> nearest resolved text font is font_head(38), not the shipped anchor
     assert "<font>font_head</font>" in gen.read_text()
     assert path == str(out / "skingen")
+
+
+def test_ensure_generated_survives_listdir_error(tmp_path, monkeypatch):
+    # If os.listdir on the skin's Font.xml directory raises (removed mid-scan,
+    # permissions, network share hiccup), the multi-file mtime scan must
+    # degrade to Font.xml's own mtime and the caller must still get a valid
+    # scriptPath back, never an exception.
+    skin = tmp_path / "skin" / "1080i"
+    skin.mkdir(parents=True)
+    (skin / "Font.xml").write_text(
+        "<fonts><fontset id='Default'><include>Font_Default</include></fontset></fonts>")
+
+    ship = tmp_path / "addon"
+    res = ship / "resources" / "skins" / "Default" / "1080i"
+    res.mkdir(parents=True)
+    (res / "script-easymovie-info.xml").write_text(
+        "<window><control><font>font36_title</font></control></window>")
+    (ship / "resources" / "skins" / "Default" / "media").mkdir(parents=True)
+
+    out = tmp_path / "data"
+
+    class _A:
+        def getAddonInfo(self, k):
+            return {"path": str(ship), "version": "1.0.0"}[k]
+    monkeypatch.setattr(sf.xbmcaddon, "Addon", lambda addon_id: _A())
+    monkeypatch.setattr(sf, "_active_skin", lambda: ("skin.fuse", "3.0"))
+    monkeypatch.setattr(sf, "_active_fontset", lambda: "Default")
+    monkeypatch.setattr(sf, "_find_skin_font_xml", lambda: str(skin / "Font.xml"))
+    monkeypatch.setattr(sf.xbmcvfs, "translatePath",
+                        lambda p: str(out / "skingen") if "skingen" in p else str(out))
+
+    real_listdir = sf.os.listdir
+
+    def fake_listdir(path):
+        if path == str(skin):
+            raise OSError("directory vanished")
+        return real_listdir(path)
+    monkeypatch.setattr(sf.os, "listdir", fake_listdir)
+
+    path = sf.ensure_generated("script.easymovie")
+    assert isinstance(path, str) and path
 
 
 def test_show_info_dialog_uses_generated_scriptpath(monkeypatch):
