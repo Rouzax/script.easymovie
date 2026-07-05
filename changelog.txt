@@ -52,6 +52,17 @@ Internal:
   - Test suite is now 206 tests (was 151): added tests/test_info_dialog.py and
     tests/test_skin_fonts.py.
 
+Development (dev/CI only, not shipped in the addon):
+  - Established a pinned dev toolchain and matching CI gate: ruff, pyflakes,
+    pyright, vulture, and pytest+coverage run via pre-commit (commit and
+    pre-push) and mirrored in CI. Added a Dependabot config (with a cooldown)
+    and pinned GitHub Actions to commit SHAs.
+  - Dependabot updates since v1.2.0: ruff 0.15.5 -> 0.15.18, pytest 9.0.2 ->
+    9.1.1, pyright 1.1.408 -> 1.1.410, coverage 7.13.4 -> 7.14.1;
+    actions/checkout 4.3.1 -> 7.0.0, actions/configure-pages 5.0.0 -> 6.0.0,
+    actions/upload-pages-artifact 3.0.1 -> 5.0.0, actions/deploy-pages 4.0.5 ->
+    5.0.0, actions/setup-python 5.6.0 -> 6.2.0.
+
 v1.2.0 (2026-06-20)
 --------------------------
 New Features:
