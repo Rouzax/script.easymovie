@@ -35,7 +35,7 @@ import re
 import shutil
 import time
 import xml.etree.ElementTree as ET
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import xbmc
 import xbmcaddon
@@ -368,6 +368,26 @@ def _find_skin_font_xml() -> Optional[str]:
     return None
 
 
+def _load_skin_includes(skin_xml_dir: str) -> Dict[str, "ET.Element"]:
+    """Build the include table from every *.xml in the skin's resolution dir
+    (where Arctic-family skins keep Includes_Font.xml). Best-effort: unreadable
+    files are skipped. Returns {} if the directory cannot be listed."""
+    texts: List[str] = []
+    try:
+        names = sorted(os.listdir(skin_xml_dir))
+    except OSError:
+        return {}
+    for entry in names:
+        if not entry.lower().endswith(".xml"):
+            continue
+        try:
+            with open(os.path.join(skin_xml_dir, entry), "r", encoding="utf-8") as fh:
+                texts.append(fh.read())
+        except OSError:
+            continue
+    return build_include_table(texts)
+
+
 def _try_lock(lock_path: str) -> Optional[int]:
     """Acquire an exclusive lockfile fd, or None if another process holds it.
 
@@ -452,7 +472,15 @@ def ensure_generated(addon_id: str) -> str:
         font_xml_path = _find_skin_font_xml()
         if not font_xml_path:
             return shipped                          # cannot adapt; shipped is valid
-        font_mtime = int(os.path.getmtime(font_xml_path))
+        skin_xml_dir = os.path.dirname(font_xml_path)
+        mtimes = [os.path.getmtime(font_xml_path)]
+        try:
+            for entry in os.listdir(skin_xml_dir):
+                if entry.lower().endswith(".xml"):
+                    mtimes.append(os.path.getmtime(os.path.join(skin_xml_dir, entry)))
+        except OSError:
+            pass
+        font_mtime = int(max(mtimes))
         key = cache_key(skin_id, skin_version, fontset,
                         addon.getAddonInfo('version'), font_mtime)
 
@@ -471,8 +499,9 @@ def ensure_generated(addon_id: str) -> str:
         if _fresh():
             return out_base
 
+        includes = _load_skin_includes(skin_xml_dir)
         with open(font_xml_path, "r", encoding="utf-8") as fh:
-            font_map = build_font_map(parse_fontset(fh.read(), fontset))
+            font_map = build_font_map(parse_fontset(fh.read(), fontset, includes))
         if all(anchor == mapped for anchor, mapped in font_map.items()):
             return shipped                          # identity skin: no rewrite needed
 

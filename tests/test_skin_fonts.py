@@ -320,6 +320,59 @@ def test_parse_fontset_inline_and_include_merge_inline_wins():
     assert fonts["font10"] == 21
 
 
+def test_load_skin_includes_reads_sibling_xml(tmp_path):
+    d = tmp_path / "1080i"
+    d.mkdir()
+    (d / "Font.xml").write_text("<fonts><fontset id='Default'><include>Font_Default</include></fontset></fonts>")
+    (d / "Includes_Font.xml").write_text(
+        "<includes><include name='Font_Default'><definition>"
+        "<font><name>font13</name><size>28</size></font></definition></include></includes>")
+    (d / "notxml.txt").write_text("ignore me")
+    tbl = sf._load_skin_includes(str(d))
+    assert "Font_Default" in tbl
+
+
+def test_ensure_generated_adapts_parameterized_skin(tmp_path, monkeypatch):
+    # Fake skin dir: Font.xml (include-based) + sibling include file with $PARAM.
+    skin = tmp_path / "skin" / "1080i"
+    skin.mkdir(parents=True)
+    (skin / "Font.xml").write_text(
+        "<fonts><fontset id='Default'><include>Font_Default</include></fontset></fonts>")
+    (skin / "Includes_Font.xml").write_text(
+        "<includes><include name='Font_Default'>"
+        "<param name='size_main'>28</param><param name='size_head'>38</param>"
+        "<definition>"
+        "<font><name>font13</name><size>$PARAM[size_main]</size></font>"
+        "<font><name>font_head</name><size>$PARAM[size_head]</size></font>"
+        "</definition></include></includes>")
+
+    # Fake shipped addon tree with one dialog that uses the title anchor.
+    ship = tmp_path / "addon"
+    res = ship / "resources" / "skins" / "Default" / "1080i"
+    res.mkdir(parents=True)
+    (res / "script-easymovie-info.xml").write_text(
+        "<window><control><font>font36_title</font></control></window>")
+    (ship / "resources" / "skins" / "Default" / "media").mkdir(parents=True)
+
+    out = tmp_path / "data"
+
+    class _A:
+        def getAddonInfo(self, k):
+            return {"path": str(ship), "version": "1.0.0"}[k]
+    monkeypatch.setattr(sf.xbmcaddon, "Addon", lambda addon_id: _A())
+    monkeypatch.setattr(sf, "_active_skin", lambda: ("skin.fuse", "3.0"))
+    monkeypatch.setattr(sf, "_active_fontset", lambda: "Default")
+    monkeypatch.setattr(sf, "_find_skin_font_xml", lambda: str(skin / "Font.xml"))
+    monkeypatch.setattr(sf.xbmcvfs, "translatePath",
+                        lambda p: str(out / "skingen") if "skingen" in p else str(out))
+
+    path = sf.ensure_generated("script.easymovie")
+    gen = out / "skingen" / "resources" / "skins" / "Default" / "1080i" / "script-easymovie-info.xml"
+    # font36_title(36) -> nearest resolved text font is font_head(38), not the shipped anchor
+    assert "<font>font_head</font>" in gen.read_text()
+    assert path == str(out / "skingen")
+
+
 def test_show_info_dialog_uses_generated_scriptpath(monkeypatch):
     captured = {}
 
