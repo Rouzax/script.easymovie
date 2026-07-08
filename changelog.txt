@@ -1,3 +1,21 @@
+v1.3.2 (2026-07-08)
+--------------------------
+Internal:
+  - Hardened the skin-adaptive font generator (kodi#28534 workaround) with
+    concurrency and durability fixes backported from the sibling EasyTV addon.
+    A short-lived in-process memo short-circuits the per-open freshness probe
+    (getSkinDir only), so a dialog reopened moments later skips the JSON-RPC
+    fontset lookup and skin-directory mtime scan. Stale build-lock reclaim is
+    now atomic (rename-then-open, so racing builders cannot both proceed);
+    generated XML and its cache marker are fsync'd before the atomic swap; and
+    orphaned build directories from crashed writers are garbage-collected
+    behind an age gate. The font-XML byte cap now measures UTF-8 bytes rather
+    than codepoints and gates on file size before reading, and the font-name
+    allowlist anchors with \Z so a trailing newline can no longer slip a name
+    through. addon ids "." and ".." are now rejected. Adds skinfont.skip
+    diagnostic logging and matching hardening tests. No user-visible behavior
+    change.
+
 v1.3.1 (2026-07-05)
 --------------------------
 Bug Fixes:
