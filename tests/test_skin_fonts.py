@@ -1,4 +1,9 @@
 """Tests for skin-adaptive font mapping."""
+import os
+import time
+
+import pytest
+
 import resources.lib.ui.info_dialog as idlg
 import resources.lib.ui.skin_fonts as sf
 from resources.lib.ui.skin_fonts import (
@@ -8,6 +13,14 @@ from resources.lib.ui.skin_fonts import (
     parse_fontset,
     substitute_fonts,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_skin_fonts_memo():
+    """ensure_generated memoizes per addon_id; clear it so one test's cached
+    path can never leak into the next test's assertions."""
+    sf.reset_memo()
+    yield
 
 _SAMPLE = """<?xml version="1.0"?>
 <fonts>
@@ -89,6 +102,33 @@ def test_shipped_templates_only_use_anchor_fonts():
             used |= set(_re.findall(r"<font>([^<]+)</font>", fh.read()))
     assert used <= set(ANCHOR_SIZES), (
         "templates use non-anchor fonts: %s" % (used - set(ANCHOR_SIZES)))
+
+
+def test_every_font_tag_uses_bare_form():
+    # substitute_fonts only rewrites the exact <font>NAME</font> byte form (no
+    # attributes, no surrounding whitespace/newline). A shipped dialog XML that
+    # drifts from that bare form would silently never get font-adapted.
+    import glob
+    import re as _re
+    files = glob.glob("resources/skins/Default/1080i/*.xml")
+    assert files, "no shipped dialog XML found"
+    for path in files:
+        with open(path, "r", encoding="utf-8") as fh:
+            text = fh.read()
+        assert _re.search(r"<font\s", text) is None, "%s has attributed <font>" % path
+        assert _re.search(r"<font>\s|\s</font>", text) is None, "%s has padded <font>" % path
+
+
+def test_generate_into_copies_all_shipped_subdirs():
+    # _generate_into only copies the 1080i XML dir and the media dir (see
+    # skin_fonts._XML_DIR / _MEDIA_DIR). If Default/ ever ships a third subdir,
+    # _generate_into would silently drop it from the adapted tree.
+    skin_dir = os.path.join("resources", "skins", "Default")
+    subdirs = {d for d in os.listdir(skin_dir)
+               if os.path.isdir(os.path.join(skin_dir, d))}
+    assert subdirs == {"1080i", "media"}, (
+        "Default/ ships %s; _generate_into only copies {1080i, media}. Add the "
+        "new subdir to _generate_into or this feature silently drops it." % subdirs)
 
 
 def test_build_font_map_identity_when_anchor_present():
@@ -182,6 +222,41 @@ def test_ensure_generated_fallback_never_raises(monkeypatch):
 def test_ensure_generated_rejects_bad_addon_id(monkeypatch):
     monkeypatch.setattr(sf, "_safe_shipped", lambda a: "/ship")
     assert sf.ensure_generated("../evil") == "/ship"
+
+
+def test_memo_skips_probe_within_ttl(monkeypatch):
+    sf.reset_memo()
+    calls = {"fontset": 0}
+    monkeypatch.setattr(sf.xbmc, "getSkinDir", lambda: "skin.estuary")
+    monkeypatch.setattr(sf, "_active_fontset", lambda: (calls.__setitem__("fontset", calls["fontset"] + 1) or "Default"))
+    # Make the full path return a known value the first time. It stands in for
+    # the real _compute_generated_path, which is what actually calls
+    # _active_fontset (the RPC probe) on a genuine cache miss.
+    monkeypatch.setattr(sf, "_compute_generated_path",
+                        lambda addon_id, skin_id: sf._active_fontset() and "/gen")
+    t = {"v": 1000.0}
+    monkeypatch.setattr(sf.time, "monotonic", lambda: t["v"])
+    assert sf.ensure_generated("script.easymovie") == "/gen"
+    assert sf.ensure_generated("script.easymovie") == "/gen"   # within TTL
+    assert calls["fontset"] == 1                            # probe ran once
+    t["v"] += sf._MEMO_TTL + 1                              # expire
+    assert sf.ensure_generated("script.easymovie") == "/gen"
+    assert calls["fontset"] == 2                            # re-probed after TTL
+
+
+def test_memo_invalidates_on_skin_change(monkeypatch):
+    sf.reset_memo()
+    skin = {"v": "skin.estuary"}
+    monkeypatch.setattr(sf.xbmc, "getSkinDir", lambda: skin["v"])
+    monkeypatch.setattr(sf, "_active_fontset", lambda: "Default")
+    seen = []
+    monkeypatch.setattr(sf, "_compute_generated_path",
+                        lambda addon_id, skin_id: seen.append(skin_id) or ("/gen/" + skin_id))
+    monkeypatch.setattr(sf.time, "monotonic", lambda: 1000.0)
+    assert sf.ensure_generated("script.easymovie") == "/gen/skin.estuary"
+    skin["v"] = "skin.arctic"
+    assert sf.ensure_generated("script.easymovie") == "/gen/skin.arctic"
+    assert seen == ["skin.estuary", "skin.arctic"]
 
 
 def test_resolve_params_literal_passthrough():
@@ -334,6 +409,18 @@ def test_parse_fontset_inline_and_include_merge_inline_wins():
     assert fonts["font10"] == 21
 
 
+def test_font_relevant_xml_filters():
+    names = ["Font.xml", "Includes_Font.xml", "Includes.xml", "Home.xml",
+             "DialogSelect.xml", "font_extra.xml", "notxml.txt"]
+    got = set(sf._font_relevant_xml(names))
+    assert "Font.xml" in got
+    assert "Includes_Font.xml" in got
+    assert "Includes.xml" in got            # starts with "includes"
+    assert "font_extra.xml" in got
+    assert "Home.xml" not in got            # unrelated dialog XML excluded
+    assert "notxml.txt" not in got
+
+
 def test_load_skin_includes_reads_sibling_xml(tmp_path):
     d = tmp_path / "1080i"
     d.mkdir()
@@ -342,29 +429,32 @@ def test_load_skin_includes_reads_sibling_xml(tmp_path):
         "<includes><include name='Font_Default'><definition>"
         "<font><name>font13</name><size>28</size></font></definition></include></includes>")
     (d / "notxml.txt").write_text("ignore me")
-    tbl = sf._load_skin_includes(str(d))
+    names = os.listdir(str(d))
+    tbl = sf._load_skin_includes(str(d), names)
     assert "Font_Default" in tbl
 
 
-def test_load_skin_includes_dir_unreadable_returns_empty(monkeypatch):
-    # If the skin resolution dir itself cannot be listed (permissions, removed
-    # mid-scan, etc.), the loader must degrade to {} rather than raise.
-    monkeypatch.setattr(sf.os, "listdir",
-                        lambda path: (_ for _ in ()).throw(OSError("no access")))
-    assert sf._load_skin_includes("/whatever") == {}
+def test_load_skin_includes_empty_names_returns_empty():
+    # Caller passes [] when the directory listing itself failed (see the
+    # os.listdir try/except in _compute_generated_path); the loader must
+    # degrade to {} rather than raise.
+    assert sf._load_skin_includes("/whatever", []) == {}
 
 
 def test_load_skin_includes_skips_unreadable_file(tmp_path):
     # One sibling file that cannot be opened must not block the rest: a
-    # directory named "bad.xml" makes open() raise IsADirectoryError (an
-    # OSError subclass), while "good.xml" still resolves normally.
+    # directory named "BadFont.xml" makes open() raise IsADirectoryError (an
+    # OSError subclass), while "GoodFont.xml" still resolves normally. Both
+    # names must be font-relevant (contain "font") or _font_relevant_xml
+    # would exclude them before either is ever opened.
     d = tmp_path / "1080i"
     d.mkdir()
-    (d / "bad.xml").mkdir()
-    (d / "good.xml").write_text(
+    (d / "BadFont.xml").mkdir()
+    (d / "GoodFont.xml").write_text(
         "<includes><include name='Font_Default'><definition>"
         "<font><name>font13</name><size>28</size></font></definition></include></includes>")
-    tbl = sf._load_skin_includes(str(d))
+    names = os.listdir(str(d))
+    tbl = sf._load_skin_includes(str(d), names)
     assert "Font_Default" in tbl
 
 
@@ -450,16 +540,136 @@ def test_ensure_generated_survives_listdir_error(tmp_path, monkeypatch):
     assert isinstance(path, str) and path
 
 
+def test_parse_fontset_rejects_multibyte_over_byte_cap():
+    # len(str) under cap, UTF-8 bytes over cap -> rejected. The ballast lives in
+    # <filename> (unread by parse_fontset) so the extracted font name stays
+    # short and valid; only the byte-length cap check can make this {}. "é" is
+    # 1 codepoint but 2 UTF-8 bytes, so a large-enough repeat count crosses the
+    # byte cap while the codepoint count stays under it.
+    font = ("<font><name>font10</name><filename>" + ("é" * 280000)
+           + "</filename><size>23</size></font>")
+    payload = "<fonts><fontset id='Default'>%s</fontset></fonts>" % font
+    assert len(payload) < sf._MAX_FONT_XML_BYTES
+    assert len(payload.encode("utf-8")) > sf._MAX_FONT_XML_BYTES
+    assert sf.parse_fontset(payload, "Default") == {}
+
+
+def test_read_font_xml_skips_oversized(tmp_path):
+    big = tmp_path / "Font.xml"
+    big.write_bytes(b"x" * (sf._MAX_FONT_XML_BYTES + 1))
+    assert sf._read_font_xml(str(big)) is None
+
+
+def test_read_font_xml_reads_small(tmp_path):
+    small = tmp_path / "Font.xml"
+    small.write_text("<fonts/>", encoding="utf-8")
+    assert sf._read_font_xml(str(small)) == "<fonts/>"
+
+
+def test_valid_font_name_rejects_trailing_newline():
+    assert sf._VALID_FONT_NAME.match("font10") is not None
+    assert sf._VALID_FONT_NAME.match("font10\n") is None
+
+
+def test_ensure_generated_rejects_dotdot_addon_id(monkeypatch):
+    called = {}
+    def mock_safe_shipped(aid):
+        called["id"] = aid
+        return "/shipped"
+    monkeypatch.setattr(sf, "_safe_shipped", mock_safe_shipped)
+    assert sf.ensure_generated("..") == "/shipped"
+    assert sf.ensure_generated(".") == "/shipped"
+    assert called["id"] in (".", "..")
+
+
+def test_cleanup_orphans_removes_stale_new_and_old(tmp_path):
+    import os
+    import time
+
+    import resources.lib.ui.skin_fonts as sf
+    out_base = str(tmp_path / "skingen")
+    os.makedirs(out_base + ".new.99999")   # orphan from a dead pid
+    old = time.time() - (sf._LOCK_STALE_SECS + 5)
+    os.utime(out_base + ".new.99999", (old, old))  # age it past the stale threshold
+    os.makedirs(out_base + ".old")
+    keep = out_base + ".new." + str(os.getpid())
+    os.makedirs(keep)
+    sf._cleanup_orphans(out_base, keep)
+    assert not os.path.isdir(out_base + ".new.99999")
+    assert not os.path.isdir(out_base + ".old")
+    assert os.path.isdir(keep)             # our own tmp is preserved
+
+
+def test_cleanup_orphans_preserves_fresh_foreign_new(tmp_path):
+    """A fresh .new.<otherpid> may belong to a live concurrent builder; only a
+    stale one (older than _LOCK_STALE_SECS) is safe to sweep."""
+    import os
+
+    import resources.lib.ui.skin_fonts as sf
+    out_base = str(tmp_path / "skingen")
+    fresh_foreign = out_base + ".new.12345"
+    os.makedirs(fresh_foreign)             # freshly created: mtime is "now"
+    stale_foreign = out_base + ".new.99999"
+    os.makedirs(stale_foreign)
+    old = time.time() - (sf._LOCK_STALE_SECS + 5)
+    os.utime(stale_foreign, (old, old))
+    os.makedirs(out_base + ".old")
+    keep = out_base + ".new." + str(os.getpid())
+    os.makedirs(keep)
+    sf._cleanup_orphans(out_base, keep)
+    assert os.path.isdir(fresh_foreign)    # live concurrent builder: preserved
+    assert not os.path.isdir(stale_foreign)  # crashed builder: removed
+    assert not os.path.isdir(out_base + ".old")
+    assert os.path.isdir(keep)             # our own tmp is preserved
+
+
+def test_fsync_path_best_effort_never_raises(tmp_path):
+    # _fsync_path must swallow errors on a path that cannot be fsynced.
+    sf._fsync_path(str(tmp_path / "does-not-exist"))   # must not raise
+
+
+def test_try_lock_atomic_reclaim(tmp_path):
+    lock = str(tmp_path / "x.lock")
+    open(lock, "w").close()
+    old = time.time() - (sf._LOCK_STALE_SECS + 5)
+    os.utime(lock, (old, old))              # make it stale
+    fd = sf._try_lock(lock)
+    assert fd is not None                    # stale lock reclaimed
+    sf._release_lock(fd, lock)
+
+
+def test_try_lock_non_stale_not_reclaimed(tmp_path):
+    lock = str(tmp_path / "x.lock")
+    open(lock, "w").close()                 # fresh mtime: not stale
+    assert sf._try_lock(lock) is None
+
+
+def test_try_lock_failed_rename_backs_off(tmp_path, monkeypatch):
+    lock = str(tmp_path / "x.lock")
+    open(lock, "w").close()
+    old = time.time() - (sf._LOCK_STALE_SECS + 5)
+    os.utime(lock, (old, old))              # make it stale
+
+    def _boom(_src, _dst):
+        raise OSError("simulated: another racer already reclaimed it")
+
+    monkeypatch.setattr(sf.os, "rename", _boom)
+    assert sf._try_lock(lock) is None       # loses the race: does not steal
+
+
 def test_show_info_dialog_uses_generated_scriptpath(monkeypatch):
     captured = {}
 
     class _FakeDialog:
         def __init__(self, xml, path, skin, res):
             captured["path"] = path
+
         def __setattr__(self, k, v):
             object.__setattr__(self, k, v)
+
         def doModal(self):
             pass
+
         result = None
 
     monkeypatch.setattr(idlg, "InfoDialog", _FakeDialog)

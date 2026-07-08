@@ -142,6 +142,7 @@ Events follow the pattern: `domain.action`
 | `ui`           | User interface        | `ui.open`, `ui.select`, `ui.browse`, `ui.surprise`, `ui.pool_reset` |
 | `clone`        | Clone operations      | `clone.create`, `clone.fail`                           |
 | `selector`     | Genre/rating picker   | `selector.open`, `selector.save`                       |
+| `skinfont`     | Skin-adaptive fonts (kodi#28534) | `skinfont.generate` (INFO), `skinfont.fallback` (WARNING), `skinfont.error` (ERROR), `skinfont.bad_id` (WARNING), `skinfont.skip` (DEBUG) |
 
 ### Timing Operations
 
