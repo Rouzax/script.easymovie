@@ -325,7 +325,14 @@ _RES_REL = os.path.join("resources", "skins", "Default")
 _XML_DIR = os.path.join(_RES_REL, "1080i")
 _MEDIA_DIR = os.path.join(_RES_REL, "media")
 _MARKER = ".built-for"
-_VALID_ID = re.compile(r"^[A-Za-z0-9_.]+$")
+# Addon ids reach the addon_data path join, so they are allowlisted. The set
+# mirrors what clone.py's _sanitize_filename can emit for a clone suffix
+# (letters, digits, and "_ . - ( )"); clone ids look like
+# "script.easymovie.easymovie_-_in_progress". The sanitizer strips path
+# separators, and clone.py falls back to "clone" for all-special names, so no
+# traversal sequence can be built from this set. "." and ".." are still
+# rejected explicitly below as defense in depth.
+_VALID_ID = re.compile(r"^[A-Za-z0-9_.()-]+\Z")
 _LOCK_STALE_SECS = 30
 
 
