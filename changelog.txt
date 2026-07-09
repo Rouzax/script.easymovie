@@ -1,3 +1,20 @@
+v1.3.3 (2026-07-09)
+--------------------------
+Bug Fixes:
+  - Fixed: EasyMovie clones never received the skin-adaptive dialog fonts
+    (kodi#28534 workaround) and silently fell back to the shipped dialog XML.
+    Clone ids are "script.easymovie.<sanitized_name>", and clone.py's
+    _sanitize_filename emits letters, digits and "_ . - ( )", but skin_fonts'
+    _VALID_ID allowlist only permitted letters, digits, "_" and ".". Ids such
+    as script.easymovie.easymovie_-_in_progress were rejected by
+    ensure_generated (logged skinfont.bad_id), so those clones rendered with
+    the skin's default font sizes instead of the generated mapping. Widened
+    the allowlist to the sanitizer's character set and anchored it with \Z.
+    Traversal guards are unchanged: the sanitizer strips path separators,
+    clone.py falls back to "clone" for all-special names, the id is always
+    prefixed with "script.easymovie.", and "." / ".." remain explicitly
+    rejected. Adds regression tests for hyphenated and parenthesized ids.
+
 v1.3.2 (2026-07-08)
 --------------------------
 Internal:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.easymovie" name="EasyMovie" version="1.3.2" provider-name="Rouzax">
+<addon id="script.easymovie" name="EasyMovie" version="1.3.3" provider-name="Rouzax">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
@@ -19,6 +19,11 @@
     <source>https://github.com/Rouzax/script.easymovie</source>
     <platform>all</platform>
     <news>
+v1.3.3 (2026-07-09)
+- Copies of EasyMovie made with the clone feature now match your skin's text style, the same way the main addon does
+- Titles and headings in a clone's windows no longer fall back to the wrong sizes on some skins
+- Nothing changes for the main EasyMovie addon
+
 v1.3.2 (2026-07-08)
 - Improved reliability of the skin-adaptive dialog fonts behind the scenes
 - Faster reopening of dialogs when the skin has not changed
