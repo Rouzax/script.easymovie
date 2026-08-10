@@ -25,7 +25,7 @@
             <top>0</top>
             <width>1920</width>
             <height>1080</height>
-            <texture colordiffuse="BB000000">common/white.png</texture>
+            <texture colordiffuse="BB000000">easymovie/white.png</texture>
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" />
             </animation>
@@ -55,7 +55,7 @@
                 <top>-2</top>
                 <width>804</width>
                 <height>484</height>
-                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">easymovie/white_rounded.png</texture>
             </control>
 
             <!-- Rounded dark panel background -->
@@ -64,7 +64,7 @@
                 <top>0</top>
                 <width>800</width>
                 <height>480</height>
-                <texture border="12">common/menu.png</texture>
+                <texture border="12">easymovie/menu.png</texture>
                 <colordiffuse>ffffffff</colordiffuse>
             </control>
 
@@ -86,7 +86,7 @@
                 <top>66</top>
                 <width>740</width>
                 <height>2</height>
-                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">easymovie/line_fade.png</texture>
             </control>
 
             <!-- Movie Poster (ID 20) -->
@@ -145,8 +145,8 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
-                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">easymovie/white_rounded.png</texturefocus>
+                    <texturenofocus border="12" colordiffuse="1fFFFFFF">easymovie/white_rounded.png</texturenofocus>
                 </control>
 
                 <!-- No/secondary Button (ID 11) -->
@@ -159,8 +159,8 @@
                     <textoffsetx>10</textoffsetx>
                     <textcolor>FFFFFFFF</textcolor>
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
-                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
-                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">easymovie/white_rounded.png</texturefocus>
+                    <texturenofocus border="12" colordiffuse="1fFFFFFF">easymovie/white_rounded.png</texturenofocus>
                 </control>
             </control>
         </control>

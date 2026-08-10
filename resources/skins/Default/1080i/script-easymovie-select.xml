@@ -30,7 +30,7 @@
             <top>0</top>
             <width>1920</width>
             <height>1080</height>
-            <texture colordiffuse="BB000000">common/white.png</texture>
+            <texture colordiffuse="BB000000">easymovie/white.png</texture>
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="300" />
             </animation>
@@ -60,7 +60,7 @@
                 <top>-2</top>
                 <width>604</width>
                 <height>584</height>
-                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">common/white_rounded.png</texture>
+                <texture border="12" colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">easymovie/white_rounded.png</texture>
             </control>
 
             <!-- Rounded dark panel background -->
@@ -69,7 +69,7 @@
                 <top>0</top>
                 <width>600</width>
                 <height>580</height>
-                <texture border="12">common/menu.png</texture>
+                <texture border="12">easymovie/menu.png</texture>
                 <colordiffuse>ffffffff</colordiffuse>
             </control>
 
@@ -91,7 +91,7 @@
                 <top>66</top>
                 <width>540</width>
                 <height>2</height>
-                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">common/line_fade.png</texture>
+                <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentGlow)]">easymovie/line_fade.png</texture>
             </control>
 
             <!-- Scrollable list (ID 100) -->
@@ -130,7 +130,7 @@
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
-                        <texture colordiffuse="44FFFFFF">check_off.png</texture>
+                        <texture colordiffuse="44FFFFFF">easymovie/check_off.png</texture>
                         <visible>[!String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true) + !String.IsEqual(ListItem.Property(is_header),true)</visible>
                     </control>
                     <!-- Checkbox: checked (multi-select only) -->
@@ -139,7 +139,7 @@
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">check_on.png</texture>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">easymovie/check_on.png</texture>
                         <visible>[String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true) + !String.IsEqual(ListItem.Property(is_header),true)</visible>
                     </control>
 
@@ -177,7 +177,7 @@
                         <top>0</top>
                         <width>540</width>
                         <height>50</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">common/white.png</texture>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.AccentBG)]">easymovie/white.png</texture>
                         <visible>!String.IsEqual(ListItem.Property(is_header),true)</visible>
                     </control>
 
@@ -202,7 +202,7 @@
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
-                        <texture colordiffuse="66FFFFFF">check_off.png</texture>
+                        <texture colordiffuse="66FFFFFF">easymovie/check_off.png</texture>
                         <visible>[!String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true) + !String.IsEqual(ListItem.Property(is_header),true)</visible>
                     </control>
                     <!-- Checkbox: checked (multi-select only) -->
@@ -211,7 +211,7 @@
                         <top>13</top>
                         <width>24</width>
                         <height>24</height>
-                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">check_on.png</texture>
+                        <texture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]">easymovie/check_on.png</texture>
                         <visible>[String.IsEqual(ListItem.Property(checked),true)] + !String.IsEqual(Window.Property(EasyMovie.SingleSelect),true) + !String.IsEqual(ListItem.Property(is_header),true)</visible>
                     </control>
 
@@ -265,8 +265,8 @@
                     <focusedcolor>$INFO[Window.Property(EasyMovie.ButtonTextFocused)]</focusedcolor>
                     <onup>100</onup>
                     <label>$ADDON[script.easymovie 32302]</label>
-                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
-                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">easymovie/white_rounded.png</texturefocus>
+                    <texturenofocus border="12" colordiffuse="1fFFFFFF">easymovie/white_rounded.png</texturenofocus>
                 </control>
 
                 <!-- OK Button (ID 10) — hidden in single-select -->
@@ -282,8 +282,8 @@
                     <onup>100</onup>
                     <visible>!String.IsEqual(Window.Property(EasyMovie.SingleSelect),true)</visible>
                     <label>$ADDON[script.easymovie 32300]</label>
-                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">common/white_rounded.png</texturefocus>
-                    <texturenofocus border="12" colordiffuse="1fFFFFFF">common/white_rounded.png</texturenofocus>
+                    <texturefocus border="12" colordiffuse="$INFO[Window.Property(EasyMovie.ButtonFocus)]">easymovie/white_rounded.png</texturefocus>
+                    <texturenofocus border="12" colordiffuse="1fFFFFFF">easymovie/white_rounded.png</texturenofocus>
                 </control>
             </control>
         </control>

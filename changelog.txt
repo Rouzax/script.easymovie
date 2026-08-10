@@ -1,3 +1,19 @@
+Unreleased
+--------------------------
+Bug Fixes:
+  - Fixed: EasyMovie dialogs rendered as a white box with near-invisible text
+    and invisible buttons under some skins (reported on Arctic Fuse 3). Kodi
+    resolves an addon dialog's textures against the active skin before the
+    addon's own media folder, so any skin shipping a texture with the same
+    relative name replaces ours. Arctic Fuse 3 ships media/common/menu.png as
+    an opaque white image, which took the place of EasyMovie's near-black
+    dialog panel; the light text and subtle unfocused buttons drawn on top
+    then became unreadable. EasyMovie's textures now live in their own
+    media/easymovie/ folder so no skin can shadow them. Not specific to
+    Kodi 22: the same lookup order applies on Kodi 21, and the trigger is the
+    skin, not the Kodi version. Also removed three unused image assets
+    (gradient_bottom.png, scrim_topleft.png, scrim_topright.png).
+
 v1.3.3 (2026-07-09)
 --------------------------
 Bug Fixes:

@@ -46,9 +46,9 @@
     </default>
 
     <default type="progress">
-        <texturebg colordiffuse="1fFFFFFF" border="12,0,12,0">common/white.png</texturebg>
+        <texturebg colordiffuse="1fFFFFFF" border="12,0,12,0">easymovie/white.png</texturebg>
         <lefttexture />
-        <midtexture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]" border="12,0,12,0">common/white.png</midtexture>
+        <midtexture colordiffuse="$INFO[Window.Property(EasyMovie.Accent)]" border="12,0,12,0">easymovie/white.png</midtexture>
         <righttexture />
         <overlaytexture />
     </default>
