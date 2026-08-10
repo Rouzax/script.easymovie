@@ -38,11 +38,6 @@ v1.3.2 (2026-07-08)
 v1.3.1 (2026-07-05)
 - Fixed the top edge of the highlighted cast member's frame being cut off in the movie info screen
 
-v1.3.0 (2026-07-05)
-- The movie info screen (opened from Browse Mode) is now built right into EasyMovie, with a large poster, cast photos, plot, and details like year, rating, runtime, certification, and genres
-- This fixes a problem where the info screen could appear blank on some Kodi skins; it now displays correctly on every skin
-- Playing a movie from the info screen still remembers it for resume and in-progress tracking, just like before
-- Text in EasyMovie's windows now better matches your skin's style, so titles and headings stay clearly bigger than the regular text instead of shrinking down on some skins
     </news>
   </extension>
 </addon>
