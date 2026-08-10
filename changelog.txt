@@ -1,4 +1,4 @@
-Unreleased
+v1.3.4 (2026-08-10)
 --------------------------
 Bug Fixes:
   - Fixed: EasyMovie dialogs rendered as a white box with near-invisible text
@@ -11,8 +11,11 @@ Bug Fixes:
     then became unreadable. EasyMovie's textures now live in their own
     media/easymovie/ folder so no skin can shadow them. Not specific to
     Kodi 22: the same lookup order applies on Kodi 21, and the trigger is the
-    skin, not the Kodi version. Also removed three unused image assets
-    (gradient_bottom.png, scrim_topleft.png, scrim_topright.png).
+    skin, not the Kodi version.
+
+Internal:
+  - Removed three image assets with no references anywhere in the repo:
+    gradient_bottom.png, scrim_topleft.png and scrim_topright.png.
 
 v1.3.3 (2026-07-09)
 --------------------------
