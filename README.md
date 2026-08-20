@@ -86,6 +86,14 @@ See the [Installation page in the docs](https://rouzax.github.io/script.easymovi
 
 ---
 
+## Support
+
+Building tools that solve my own problems and sharing them in the hope they solve yours too. If EasyMovie has spared you the twenty minutes of scrolling that used to end with picking nothing, a coffee is always welcome.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O0W221GBUG)
+
+---
+
 ## Credits & License
 
 ### Author
