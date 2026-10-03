@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.easymovie" name="EasyMovie" version="1.3.4" provider-name="Rouzax">
+<addon id="script.easymovie" name="EasyMovie" version="1.3.5" provider-name="Rouzax">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
@@ -19,6 +19,10 @@
     <source>https://github.com/Rouzax/script.easymovie</source>
     <platform>all</platform>
     <news>
+v1.3.5 (2026-10-03)
+- Fixed Kodi crashing when EasyMovie showed a movie whose title, plot or file path in your library contains an unusual character
+- Such characters now show as a placeholder symbol instead
+
 v1.3.4 (2026-08-10)
 - Fixed EasyMovie's dialogs appearing as a white box with unreadable text and invisible buttons on some skins, including Arctic Fuse 3
 - EasyMovie's own images are now kept separate from the skin's, so a skin can no longer replace them by accident

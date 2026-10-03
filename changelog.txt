@@ -1,3 +1,27 @@
+v1.3.5 (2026-10-03)
+--------------------------
+Bug Fixes:
+  - Fixed: Kodi crashed outright when EasyMovie handled a movie whose
+    title, plot, set name or file path in the video library is not valid
+    UTF-8 (for example a Latin-1 title): opening the browse view, building
+    a playlist, or the set check when such a movie was played.
+    executeJSONRPC decodes its result with surrogateescape, so the bad
+    byte reached Python as a lone surrogate; handing it back to Kodi
+    (ListItem, dialog text, xbmc.log) segfaults Kodi because
+    PyXBMCGetUnicodeString does not check PyUnicode_AsUTF8 for NULL.
+    json_query now restores the raw bytes and decodes them with
+    replacement, so invalid bytes become U+FFFD before any caller sees
+    them (Rouzax/script.easytv#64).
+  - Fixed: the same crash was reachable through logging and the custom
+    icon picker. StructuredLogger._format_message now replaces surrogates
+    before the Kodi log and easymovie.log, and the icon picker refuses a
+    browsed file name that is not valid UTF-8 instead of passing it to
+    xbmcvfs.copy.
+
+Internal:
+  - ui/main.py: moved function-scope re-imports (xbmcvfs, os, get_addon,
+    CUSTOM_ICON_BACKUP) to module level.
+
 v1.3.4 (2026-08-10)
 --------------------------
 Bug Fixes:
