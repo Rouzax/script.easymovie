@@ -61,6 +61,48 @@ class TestStructuredLogger:
         result = logger._format_message("test")
         assert "[EasyMovie.wizard]" in result
 
+    def test_format_message_replaces_lone_surrogates(self, mock_kodi_modules):
+        from resources.lib.utils import StructuredLogger
+        logger = StructuredLogger("test")
+        bad = b"Pok\xe9mon".decode("utf-8", "surrogateescape")
+        result = logger._format_message(bad, path=bad)
+        result.encode("utf-8")  # raises if a surrogate survived
+        assert "Pok?mon" in result
+
+    def test_format_message_keeps_valid_non_ascii(self, mock_kodi_modules):
+        from resources.lib.utils import StructuredLogger
+        logger = StructuredLogger("test")
+        result = logger._format_message("Pokémon ☃", title="Amélie")
+        assert result == "[EasyMovie.test] Pokémon ☃ | title=Amélie"
+
+    def test_info_hands_xbmc_log_utf8_encodable_text(self, mock_kodi_modules):
+        from resources.lib.utils import StructuredLogger
+        logger = StructuredLogger("test")
+        bad = b"Pok\xe9mon".decode("utf-8", "surrogateescape")
+        logger.info("Movie", event="test.event", title=bad)
+        logged = mock_kodi_modules['xbmc'].log.call_args[0][0]
+        logged.encode("utf-8")
+        assert "title=Pok?mon" in logged
+
+
+class TestJsonQuery:
+    def test_invalid_utf8_becomes_replacement_character(self, mock_kodi_modules):
+        from resources.lib.utils import json_query
+        raw = b'{"result": {"title": "Pok\xe9mon"}}'
+        # Kodi decodes executeJSONRPC output with surrogateescape
+        mock_kodi_modules['xbmc'].executeJSONRPC.return_value = raw.decode(
+            "utf-8", "surrogateescape")
+        result = json_query({"method": "VideoLibrary.GetMovies"})
+        assert result == {"title": "Pok�mon"}
+
+    def test_valid_non_ascii_passes_unchanged(self, mock_kodi_modules):
+        from resources.lib.utils import json_query
+        raw = '{"result": {"title": "Pokémon ☃"}}'.encode("utf-8")
+        mock_kodi_modules['xbmc'].executeJSONRPC.return_value = raw.decode(
+            "utf-8", "surrogateescape")
+        result = json_query({"method": "VideoLibrary.GetMovies"})
+        assert result == {"title": "Pokémon ☃"}
+
 
 class TestSettingHelpers:
     def test_get_bool_setting_true(self, mock_kodi_modules):

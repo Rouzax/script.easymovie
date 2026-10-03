@@ -31,6 +31,7 @@ import xbmcvfs
 
 from resources.lib.constants import (
     ADDON_ID,
+    CUSTOM_ICON_BACKUP,
     MODE_ASK,
     MODE_BROWSE,
     MODE_PLAYLIST,
@@ -61,6 +62,7 @@ from resources.lib.ui.dialogs import (
 from resources.lib.ui.settings import load_settings
 from resources.lib.ui.wizard import WizardFlow
 from resources.lib.utils import (
+    get_addon,
     get_logger,
     invalidate_icon_cache,
     json_query,
@@ -807,7 +809,6 @@ def _get_storage(addon_id: str) -> StorageManager:
     storage_dir = xbmcvfs.translatePath(
         f"special://profile/addon_data/{addon_id}/"
     )
-    import os
     os.makedirs(storage_dir, exist_ok=True)
     return StorageManager(os.path.join(storage_dir, "easymovie_data.json"))
 
@@ -1029,6 +1030,14 @@ def _reopen_settings(addon_id: str) -> None:
     )
 
 
+def _is_valid_utf8(text: str) -> bool:
+    try:
+        text.encode('utf-8')
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
 def _handle_entry_args(addon_id: str) -> bool:
     """Handle command-line arguments for special entry points.
 
@@ -1055,9 +1064,7 @@ def _handle_entry_args(addon_id: str) -> bool:
         return True
     elif action == 'set_icon':
         import xbmcgui
-        import xbmcvfs as _xbmcvfs
 
-        from resources.lib.utils import get_addon
         log = get_logger('default')
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
@@ -1067,8 +1074,7 @@ def _handle_entry_args(addon_id: str) -> bool:
             "icon-golden-hour.png", "icon-ultraviolet.png",
             "icon-ember.png", "icon-nightfall.png",
         ]
-        from resources.lib.constants import CUSTOM_ICON_BACKUP
-        addon_data = _xbmcvfs.translatePath(
+        addon_data = xbmcvfs.translatePath(
             f'special://profile/addon_data/{addon_id}/'
         )
         backup_path = os.path.join(addon_data, CUSTOM_ICON_BACKUP)
@@ -1083,45 +1089,47 @@ def _handle_entry_args(addon_id: str) -> bool:
             dst = os.path.join(addon_path, 'icon.png')
             if idx < len(icon_files):
                 src = os.path.join(icons_dir, icon_files[idx])
-                ok = _xbmcvfs.copy(src, dst)
+                ok = xbmcvfs.copy(src, dst)
                 if ok:
                     addon.setSetting('icon_choice',
                                      f'built-in:{icon_files[idx]}')
-                    _xbmcvfs.copy(src, backup_path)
+                    xbmcvfs.copy(src, backup_path)
                 log.info("Icon set" if ok else "Icon set failed",
                          event="icon.set", source=src, target=dst, success=ok)
             else:
                 dialog = xbmcgui.Dialog()
                 image = dialog.browse(2, "Select Icon", 'files', '.png|.jpg|.jpeg')
-                if image:
-                    ok = _xbmcvfs.copy(cast(str, image), dst)
+                image = cast(str, image)
+                if image and not _is_valid_utf8(image):
+                    # A file name that is not valid UTF-8 comes back holding
+                    # lone surrogates, and xbmcvfs.copy segfaults Kodi on it.
+                    log.warning("Icon path is not valid UTF-8",
+                                event="icon.path_invalid", path=image)
+                elif image:
+                    ok = xbmcvfs.copy(image, dst)
                     if ok:
                         addon.setSetting('icon_choice', 'custom')
-                        _xbmcvfs.copy(cast(str, image), backup_path)
+                        xbmcvfs.copy(image, backup_path)
                     log.info("Custom icon set" if ok else "Custom icon set failed",
-                             event="icon.set", source=cast(str, image),
+                             event="icon.set", source=image,
                              target=dst, success=ok)
         invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True
     elif action == 'reset_icon':
-        import xbmcvfs as _xbmcvfs
-
-        from resources.lib.constants import CUSTOM_ICON_BACKUP
-        from resources.lib.utils import get_addon
         addon = get_addon(addon_id)
         addon_path = addon.getAddonInfo('path')
         default_icon = os.path.join(addon_path, 'icon_default.png')
         icon_path = os.path.join(addon_path, 'icon.png')
-        if _xbmcvfs.exists(default_icon):
-            _xbmcvfs.copy(default_icon, icon_path)
+        if xbmcvfs.exists(default_icon):
+            xbmcvfs.copy(default_icon, icon_path)
         addon.setSetting('icon_choice', '')
-        addon_data = _xbmcvfs.translatePath(
+        addon_data = xbmcvfs.translatePath(
             f'special://profile/addon_data/{addon_id}/'
         )
         backup_path = os.path.join(addon_data, CUSTOM_ICON_BACKUP)
-        if _xbmcvfs.exists(backup_path):
-            _xbmcvfs.delete(backup_path)
+        if xbmcvfs.exists(backup_path):
+            xbmcvfs.delete(backup_path)
         invalidate_icon_cache(addon_id)
         _reopen_settings(addon_id)
         return True

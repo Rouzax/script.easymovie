@@ -214,7 +214,7 @@ class StructuredLogger:
 
     def _format_message(self, message: str, **kwargs: Any) -> str:
         """Format log message with optional key=value pairs."""
-        base = f"[EasyMovie.{self.module}] {message}"
+        formatted = f"[EasyMovie.{self.module}] {message}"
         if kwargs:
             pairs = []
             for k, v in kwargs.items():
@@ -222,8 +222,11 @@ class StructuredLogger:
                 if k != 'trace' and len(str_v) > LOG_MAX_VALUE_LENGTH:
                     str_v = str_v[:LOG_MAX_VALUE_LENGTH] + "..."
                 pairs.append(f"{k}={str_v}")
-            return f"{base} | {', '.join(pairs)}"
-        return base
+            formatted = f"{formatted} | {', '.join(pairs)}"
+        # Strings Kodi hands to Python (paths, info labels) can carry lone
+        # surrogates for non-UTF-8 bytes. xbmc.log segfaults Kodi on those and
+        # the UTF-8 log file rejects them, so replace them before either sink.
+        return formatted.encode('utf-8', 'replace').decode('utf-8')
 
     def _format_file_line(self, level: str, formatted_message: str) -> str:
         """Format a log line for file output with timestamp."""
@@ -411,6 +414,12 @@ def json_query(query: Union[Dict[str, Any], List[Dict[str, Any]]], return_result
     try:
         request = json.dumps(query)
         response = xbmc.executeJSONRPC(request)
+        # Kodi decodes the response with surrogateescape, so a non-UTF-8 byte
+        # in the library (a Latin-1 title, path or plot) arrives as a lone
+        # surrogate. Passing such a string back into the Kodi API segfaults
+        # Kodi (it does not check PyUnicode_AsUTF8 for NULL), so restore the
+        # raw bytes and replace the invalid ones with U+FFFD.
+        response = response.encode('utf-8', 'surrogateescape').decode('utf-8', 'replace')
         data = json.loads(response)
 
         if return_result:
