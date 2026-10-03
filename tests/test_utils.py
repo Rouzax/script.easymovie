@@ -95,6 +95,56 @@ class TestJsonQuery:
         result = json_query({"method": "VideoLibrary.GetMovies"})
         assert result == {"title": "Pok�mon"}
 
+    @pytest.fixture
+    def debug_lines(self, mock_kodi_modules, monkeypatch):
+        """Enable debug logging and collect the lines written to the log file."""
+        from resources.lib.utils import StructuredLogger
+        lines = []
+        monkeypatch.setattr(StructuredLogger, "_initialized", True)
+        monkeypatch.setattr(StructuredLogger, "_debug_enabled", True)
+        monkeypatch.setattr(StructuredLogger, "_write_to_file",
+                            lambda self, level, msg: lines.append((level, msg)))
+        return lines
+
+    @staticmethod
+    def _respond(mock_kodi_modules, raw):
+        mock_kodi_modules['xbmc'].executeJSONRPC.return_value = raw.decode(
+            "utf-8", "surrogateescape")
+
+    def test_replacement_is_logged_with_owning_item(self, mock_kodi_modules,
+                                                     debug_lines):
+        from resources.lib.utils import json_query
+        self._respond(mock_kodi_modules,
+                      b'{"result": {"movies": [{"movieid": 7, "title": "Up"},'
+                      b' {"movieid": 812, "title": "Am\xe9lie", "plot": "ok"}]}}')
+        json_query({"method": "VideoLibrary.GetMovies"})
+        assert len(debug_lines) == 1
+        level, msg = debug_lines[0]
+        assert level == "DEBUG"
+        assert "event=jsonrpc.invalid_utf8" in msg
+        assert "method=VideoLibrary.GetMovies" in msg
+        assert "field=result.movies[1].title" in msg
+        assert "movieid=812" in msg
+
+    def test_replacement_in_list_names_the_enclosing_item(self, mock_kodi_modules,
+                                                           debug_lines):
+        from resources.lib.utils import json_query
+        self._respond(mock_kodi_modules,
+                      b'{"result": {"movies": [{"movieid": 3, "title": "Heat",'
+                      b' "genre": ["Crime", "Dr\xe9ma"]}]}}')
+        json_query({"method": "VideoLibrary.GetMovies"})
+        _level, msg = debug_lines[0]
+        assert "field=result.movies[0].genre[1]" in msg
+        assert "movieid=3" in msg
+        assert "item=Heat" in msg
+
+    def test_clean_response_logs_nothing(self, mock_kodi_modules, debug_lines):
+        from resources.lib.utils import json_query
+        self._respond(mock_kodi_modules,
+                      '{"result": {"movies": [{"title": "Pokémon �"}]}}'.encode())
+        json_query({"method": "VideoLibrary.GetMovies"})
+        assert debug_lines == []
+
     def test_valid_non_ascii_passes_unchanged(self, mock_kodi_modules):
         from resources.lib.utils import json_query
         raw = '{"result": {"title": "Pokémon ☃"}}'.encode("utf-8")

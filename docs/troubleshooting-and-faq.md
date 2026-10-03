@@ -107,6 +107,31 @@ Movies you watch through EasyMovie don't update their status.
 
 ---
 
+### A Title Shows a � Symbol
+
+A movie title, plot, or other text in EasyMovie shows the replacement character `�`.
+
+**Why it happens:** that text is stored in the Kodi video library with a character that is not valid UTF-8, typically an accented letter (such as é) saved in an older encoding, often from an NFO file or an old scrape. EasyMovie deliberately shows `�` in its place, because handing that text back to Kodi unchanged would crash Kodi. This is protection, not a bug, and playback of the movie is unaffected.
+
+**Find the affected movie:**
+1. Enable debug logging: **Settings > Advanced > Debugging > Enable debug logging**
+2. Open EasyMovie so it loads your library
+3. Search easymovie.log for `jsonrpc.invalid_utf8` (locations are in [Log File Locations](#log-file-locations))
+
+Each line names the field (`field=`), the movie's id (`movieid=`) and its title (`item=`):
+
+```
+2026-10-03 10:15:02.481 [DEBUG] [EasyMovie.data] Invalid UTF-8 replaced in library text | event=jsonrpc.invalid_utf8, method=VideoLibrary.GetMovies, field=result.movies[3].plot, movieid=812, item=Amélie
+```
+
+**Fix it:**
+1. Correct the text in Kodi (edit the movie's information) or in the NFO file it was scraped from
+2. Refresh or rescan that movie
+
+After that the `�` disappears.
+
+---
+
 ## Debug Logging
 
 For diagnosing complex issues, enable detailed logging.
