@@ -1,3 +1,28 @@
+v1.4.0 (2026-11-07)
+--------------------------
+New Features:
+  - Shipped 25 white 128x128 home-menu icons in resources/icons/menu/
+    for skins that let the user pick a menu icon (Skin Shortcuts thumb):
+    a film-strip family with one badge per clone purpose, sparkle and
+    wordmark variants for EasyMovie itself, and plain die and tree
+    glyphs. They follow the skin extras/icons format, so colordiffuse
+    tinting and sizing line up. Built from Tabler Icons (MIT); the
+    licence ships as resources/icons/menu/LICENSE-tabler-icons.txt.
+    Documented on the new Menu Icons docs page.
+  - With debug logging on, each library string that json_query had to
+    repair (invalid UTF-8 replaced with U+FFFD) is logged as
+    jsonrpc.invalid_utf8 with its field path and the enclosing item's
+    ids and title, so the affected movie can be found and fixed. The
+    walk only runs when a replacement happened and debug logging is
+    enabled. The troubleshooting page gained a matching symptom entry.
+
+Internal:
+  - tests/test_menu_icons.py pins the icon format (size, white-only,
+    glyph inside 32..95).
+  - Codified issue labels in .github/sync-labels.sh and the Next/Later
+    milestones; the issue template config links the FAQ, docs and
+    forum thread, and CONTRIBUTING.md documents both.
+
 v1.3.5 (2026-10-03)
 --------------------------
 Bug Fixes:
