@@ -48,6 +48,8 @@ Each clone can have its own custom icon:
 
 This makes it easy to identify different clones at a glance.
 
+This sets the add-on's own icon, shown in the add-on browser. For the icon next to the clone in your skin's home menu, see [Menu Icons](menu-icons.md).
+
 ## Updating Clones
 
 When you update EasyMovie (install a new version), clones need to be updated too:

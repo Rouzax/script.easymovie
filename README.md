@@ -73,6 +73,7 @@ See the [Installation page in the docs](https://rouzax.github.io/script.easymovi
 | [Movie Sets](https://rouzax.github.io/script.easymovie/docs/movie-sets/) | Collection awareness and continuation |
 | [Settings Reference](https://rouzax.github.io/script.easymovie/docs/settings-reference/) | All settings explained |
 | [Clones](https://rouzax.github.io/script.easymovie/docs/clones/) | Multiple EasyMovie instances |
+| [Menu Icons](https://rouzax.github.io/script.easymovie/docs/menu-icons/) | Icons for EasyMovie and its clones in your home menu |
 | [Advanced Features](https://rouzax.github.io/script.easymovie/docs/advanced-features/) | Movie pool, re-suggestion, debugging |
 | [Troubleshooting & FAQ](https://rouzax.github.io/script.easymovie/docs/troubleshooting-and-faq/) | Common issues |
 
@@ -104,6 +105,8 @@ Building tools that solve my own problems and sharing them in the hope they solv
 This project is licensed under the **GNU General Public License v3.0** (GPL-3.0-only).
 
 See [LICENSE.txt](LICENSE.txt) for the full license text.
+
+The [menu icons](https://rouzax.github.io/script.easymovie/docs/menu-icons/) are built from [Tabler Icons](https://tabler.io/icons) (MIT). Their license ships with them in `resources/icons/menu/LICENSE-tabler-icons.txt`.
 
 ---
 
